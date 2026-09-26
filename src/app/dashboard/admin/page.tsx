@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { AdminView } from "@/components/views/AdminView";
+import { AdminOverviewView } from "@/components/views/AdminOverviewView";
 
 export const metadata: Metadata = {
-  title: "LifeDispatch | Admin Overview",
+  title: "Operations Control Desk | LifeDispatch Admin",
   description:
-    "Platform management, fleet oversight, and hospital coordination.",
+    "Monitor regional emergency dispatching, telemetry sensor feeds, active ambulance units, and hospital intake.",
 };
 
 export default function AdminPage() {
-  return <AdminView />;
+  return <AdminOverviewView />;
 }

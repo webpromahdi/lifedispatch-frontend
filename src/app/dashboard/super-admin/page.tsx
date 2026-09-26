@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { SuperAdminView } from "@/components/views/SuperAdminView";
+import { SuperAdminOverviewView } from "@/components/views/SuperAdminOverviewView";
 
 export const metadata: Metadata = {
-  title: "LifeDispatch | Super Admin Governance",
+  title: "Platform Command & Security | LifeDispatch Super Admin",
   description:
     "Platform security oversight, immutable audit logging, and authorization governance.",
 };
 
 export default function SuperAdminPage() {
-  return <SuperAdminView />;
+  return <SuperAdminOverviewView />;
 }

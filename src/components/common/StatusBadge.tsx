@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface StatusBadgeProps {
@@ -59,7 +62,9 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   }
 
   return (
-    <span
+    <motion.span
+      layout
+      transition={{ duration: 0.2 }}
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border border-border bg-surface shadow-xs transition-colors",
         colorClasses,
@@ -73,6 +78,6 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
         />
       )}
       <span>{formattedLabel}</span>
-    </span>
+    </motion.span>
   );
 }

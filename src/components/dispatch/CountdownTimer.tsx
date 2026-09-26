@@ -49,7 +49,8 @@ export function CountdownTimer({
   const seconds = remainingSeconds % 60;
   const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
-  const isLow = remainingSeconds <= 30 && remainingSeconds > 0;
+  const isAmber = remainingSeconds <= 60 && remainingSeconds > 20;
+  const isRedPulse = remainingSeconds <= 20 && remainingSeconds > 0;
   const isExpired = remainingSeconds === 0;
 
   return (
@@ -57,17 +58,20 @@ export function CountdownTimer({
       className={cn(
         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium border transition-colors",
         isExpired
-          ? "bg-destructive-bg text-destructive border-destructive/30"
-          : isLow
-            ? "bg-warning-bg text-warning-foreground border-warning/40 animate-pulse"
-            : "bg-primary-light text-primary border-primary/20",
+          ? "bg-destructive-bg text-destructive border-destructive/30 font-semibold"
+          : isRedPulse
+            ? "bg-destructive-bg text-destructive border-destructive/40 animate-pulse font-semibold"
+            : isAmber
+              ? "bg-warning-bg text-warning-foreground border-warning/40 transition-colors"
+              : "bg-primary-light text-primary border-primary/20",
         className,
       )}
       role="timer"
-      aria-label={`Time remaining: ${formattedTime}`}
+      aria-live="polite"
+      aria-label={`Time remaining: ${isExpired ? "Expired" : formattedTime}`}
     >
       <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-      <span>{isExpired ? "TIMED OUT" : formattedTime}</span>
+      <span>{isExpired ? "EXPIRED" : formattedTime}</span>
     </div>
   );
 }

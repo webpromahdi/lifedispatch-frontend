@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import type { EmergencyPriority } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +41,10 @@ export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
   }
 
   return (
-    <span
+    <motion.span
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className={cn(
         "inline-flex items-center text-xs tracking-tight",
         textColor,
@@ -46,6 +52,6 @@ export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
       )}
     >
       {label}
-    </span>
+    </motion.span>
   );
 }

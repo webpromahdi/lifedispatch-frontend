@@ -16,6 +16,7 @@ export interface StatCardProps {
   };
   subtitle?: string;
   className?: string;
+  delay?: number;
 }
 
 export function StatCard({
@@ -25,12 +26,13 @@ export function StatCard({
   trend,
   subtitle,
   className,
+  delay = 0,
 }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+      transition={{ duration: 0.35, ease: "easeOut", delay }}
       className={cn(
         "bg-surface border border-border rounded-xl p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[120px]",
         className,
