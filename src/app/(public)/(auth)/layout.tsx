@@ -57,13 +57,6 @@ export default function AuthLayout({
             />
             256-bit TLS Encrypted
           </span>
-          <span>•</span>
-          <Link
-            href="/dev/components"
-            className="hover:text-primary transition-colors"
-          >
-            Dev Gallery
-          </Link>
         </div>
       </footer>
     </div>

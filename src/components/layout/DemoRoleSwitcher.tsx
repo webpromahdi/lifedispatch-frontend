@@ -94,7 +94,7 @@ export function DemoRoleSwitcher({
     );
   }
 
-  // Inline mode (used in Topbar or Dev Gallery)
+  // Inline mode (used in Topbar)
   return (
     <nav
       aria-label="Demo role selector"

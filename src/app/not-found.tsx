@@ -22,14 +22,6 @@ export default function NotFound() {
             Return Home
           </Button>
         </Link>
-        <Link href="/dev/components">
-          <Button
-            variant="outline"
-            className="min-h-[44px] border-border cursor-pointer"
-          >
-            Dev Components
-          </Button>
-        </Link>
       </div>
     </div>
   );

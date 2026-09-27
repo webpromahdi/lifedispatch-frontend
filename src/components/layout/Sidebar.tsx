@@ -7,7 +7,6 @@ import {
   Building2,
   Clock,
   FileText,
-  Layers,
   LayoutDashboard,
   LogOut,
   Radio,
@@ -318,24 +317,8 @@ export function Sidebar({
         </nav>
       </div>
 
-      {/* Bottom section with Dev Gallery & Logout */}
+      {/* Bottom section with Logout */}
       <div className="p-3 border-t border-border space-y-1 bg-surface shrink-0">
-        <Link
-          href="/dev/components"
-          onClick={onNavClick}
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors min-h-[44px]",
-            pathname === "/dev/components"
-              ? "bg-[#F0FDFA] text-[#14B8A6] font-semibold border-l-4 border-[#14B8A6]"
-              : "text-text-secondary hover:text-text-primary hover:bg-sidebar-hover",
-          )}
-        >
-          <Layers
-            className="h-4 w-4 text-secondary shrink-0"
-            aria-hidden="true"
-          />
-          <span>Dev Component Gallery</span>
-        </Link>
 
         <Link
           href="/login"

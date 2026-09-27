@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Clock,
   CreditCard,
-  Layers,
   Menu,
   PhoneCall,
   Radio,
@@ -75,13 +74,6 @@ export function LandingPageView() {
             >
               Hospital Network
             </a>
-            <Link
-              href="/dev/components"
-              className="hover:text-primary transition-colors py-2 flex items-center gap-1.5 text-xs text-secondary font-semibold"
-            >
-              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-              Dev Gallery
-            </Link>
           </nav>
 
           {/* Desktop Auth CTAs */}
@@ -148,14 +140,6 @@ export function LandingPageView() {
               >
                 Hospital Network
               </button>
-              <Link
-                href="/dev/components"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-secondary-light/40 transition-colors min-h-[44px] flex items-center gap-2"
-              >
-                <Layers className="h-4 w-4" aria-hidden="true" />
-                Dev Component Gallery
-              </Link>
             </nav>
 
             <div className="pt-3 border-t border-border flex flex-col gap-2.5">
@@ -559,8 +543,8 @@ export function LandingPageView() {
           </h2>
 
           <p className="text-sm sm:text-base text-text-secondary max-w-xl mx-auto leading-relaxed">
-            Access patient services, review fleet operational telemetry, or
-            explore our interactive shared design components.
+            Access patient services, review fleet operational telemetry, and
+            coordinate rapid emergency response across metropolitan grids.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -570,20 +554,6 @@ export function LandingPageView() {
                 className="min-h-[44px] bg-primary hover:bg-primary-dark text-primary-foreground font-semibold px-8 shadow-xs cursor-pointer"
               >
                 Create Free Account
-              </Button>
-            </Link>
-
-            <Link href="/dev/components">
-              <Button
-                size="lg"
-                variant="outline"
-                className="min-h-[44px] border-border hover:border-primary text-text-primary font-semibold px-6 cursor-pointer"
-              >
-                <Layers
-                  className="h-4 w-4 mr-2 text-secondary"
-                  aria-hidden="true"
-                />
-                Dev Component Gallery
               </Button>
             </Link>
           </div>
@@ -632,12 +602,6 @@ export function LandingPageView() {
               className="hover:text-primary transition-colors"
             >
               Receipt Preview
-            </Link>
-            <Link
-              href="/dev/components"
-              className="hover:text-primary text-secondary font-medium transition-colors"
-            >
-              Dev Gallery
             </Link>
           </div>
         </div>
