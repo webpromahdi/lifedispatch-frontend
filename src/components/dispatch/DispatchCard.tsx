@@ -65,9 +65,8 @@ export function DispatchCard({
   );
   const [isDismissed, setIsDismissed] = useState<boolean>(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState<boolean>(false);
-  const [rejectionReason, setRejectionReason] = useState<string>(
-    "MECHANICAL_ISSUE",
-  );
+  const [rejectionReason, setRejectionReason] =
+    useState<string>("MECHANICAL_ISSUE");
 
   const handleExpire = () => {
     setIsExpired(true);
@@ -161,9 +160,7 @@ export function DispatchCard({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <StatusBadge
-                    status={isExpired ? "TIMED_OUT" : localStatus}
-                  />
+                  <StatusBadge status={isExpired ? "TIMED_OUT" : localStatus} />
                   {localStatus === "PENDING_ACCEPTANCE" && !isExpired && (
                     <CountdownTimer
                       timeoutAt={dispatch.timeoutAt}
@@ -182,9 +179,13 @@ export function DispatchCard({
               {/* Expired alert banner if expired */}
               {isExpired && (
                 <div className="mt-3 p-2.5 rounded-lg bg-destructive-bg/60 border border-destructive/20 flex items-center gap-2 text-xs text-destructive">
-                  <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <AlertTriangle
+                    className="h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  />
                   <span>
-                    This dispatch alert has timed out and can no longer be accepted.
+                    This dispatch alert has timed out and can no longer be
+                    accepted.
                   </span>
                 </div>
               )}
@@ -282,7 +283,9 @@ export function DispatchCard({
             ) : (
               <div className="mt-4 pt-2 border-t border-border text-center text-xs text-text-muted">
                 Assignment status:{" "}
-                <span className="font-medium text-text-primary">{localStatus}</span>
+                <span className="font-medium text-text-primary">
+                  {localStatus}
+                </span>
               </div>
             )}
           </motion.div>

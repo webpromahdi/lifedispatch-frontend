@@ -37,7 +37,6 @@ export function Navbar() {
       ].join(" ")}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 sm:h-[70px] grid grid-cols-[auto_1fr_auto] items-center gap-6">
-
         {/* ── Logo (left zone) ── */}
         <Link
           href="/"
@@ -93,13 +92,23 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-menu"
-            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             className="md:hidden min-h-[44px] min-w-[44px] p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
           >
             {mobileMenuOpen ? (
-              <X className="h-5 w-5 text-primary" strokeWidth={2.5} aria-hidden="true" />
+              <X
+                className="h-5 w-5 text-primary"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
             ) : (
-              <Menu className="h-5 w-5 text-slate-900" strokeWidth={2.5} aria-hidden="true" />
+              <Menu
+                className="h-5 w-5 text-slate-900"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
             )}
           </button>
         </div>
@@ -113,7 +122,10 @@ export function Navbar() {
           aria-label="Mobile navigation"
           className="md:hidden border-t-2 border-slate-200 bg-white/98 backdrop-blur-md px-6 pt-4 pb-6 space-y-2 shadow-lg animate-in slide-in-from-top-1 duration-150"
         >
-          <nav className="flex flex-col space-y-1" aria-label="Mobile Navigation">
+          <nav
+            className="flex flex-col space-y-1"
+            aria-label="Mobile Navigation"
+          >
             {[
               { label: "Features", id: "features" },
               { label: "How It Works", id: "how-it-works" },

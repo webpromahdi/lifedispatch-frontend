@@ -7,8 +7,6 @@ import {
   CheckCircle2,
   Clock,
   Filter,
-  MapPin,
-  Navigation,
   Route,
   Search,
   Truck,
@@ -18,7 +16,6 @@ import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -231,7 +228,10 @@ export function DriverTripsView() {
                     </TableCell>
                     <TableCell className="text-xs text-text-secondary">
                       <div className="flex items-center gap-1.5 font-mono">
-                        <Calendar className="h-3.5 w-3.5 text-text-muted" aria-hidden="true" />
+                        <Calendar
+                          className="h-3.5 w-3.5 text-text-muted"
+                          aria-hidden="true"
+                        />
                         <span>
                           {formatDate(trip.departedAt, "MMM dd, yyyy hh:mm a")}
                         </span>
@@ -239,14 +239,24 @@ export function DriverTripsView() {
                     </TableCell>
                     <TableCell className="text-xs text-text-secondary">
                       <div className="flex items-center gap-1.5 font-mono">
-                        <Truck className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                        <span>{amb ? amb.registrationNumber : trip.ambulanceId}</span>
+                        <Truck
+                          className="h-3.5 w-3.5 text-primary"
+                          aria-hidden="true"
+                        />
+                        <span>
+                          {amb ? amb.registrationNumber : trip.ambulanceId}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-xs text-text-secondary">
                       <div className="flex items-center gap-1.5">
-                        <Building2 className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
-                        <span>{hosp ? hosp.name : "Local Emergency Center"}</span>
+                        <Building2
+                          className="h-3.5 w-3.5 text-secondary"
+                          aria-hidden="true"
+                        />
+                        <span>
+                          {hosp ? hosp.name : "Local Emergency Center"}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-xs font-mono font-medium text-text-primary">

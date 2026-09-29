@@ -141,7 +141,8 @@ export function RecommendationList({
                       <>
                         <span>•</span>
                         <span>
-                          Driver: {cand.driver.certificationLevel.replace(/_/g, " ")}
+                          Driver:{" "}
+                          {cand.driver.certificationLevel.replace(/_/g, " ")}
                         </span>
                       </>
                     )}
@@ -247,7 +248,10 @@ export function RecommendationList({
               </div>
 
               <div className="flex items-center gap-2 text-text-secondary text-[11px]">
-                <ShieldCheck className="h-4 w-4 text-status shrink-0" aria-hidden="true" />
+                <ShieldCheck
+                  className="h-4 w-4 text-status shrink-0"
+                  aria-hidden="true"
+                />
                 <span>
                   Telemetry will transmit coordinates to the driver console with
                   a 2-minute response timer.

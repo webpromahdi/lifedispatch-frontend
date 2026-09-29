@@ -1,14 +1,24 @@
-export function TechnicalDivider({ variant = "notch-down" }: { variant?: "notch-down" | "notch-up" | "straight" }) {
+export function TechnicalDivider({
+  variant = "notch-down",
+}: {
+  variant?: "notch-down" | "notch-up" | "straight";
+}) {
   if (variant === "straight") {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-none select-none" aria-hidden="true">
+      <div
+        className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-none select-none"
+        aria-hidden="true"
+      >
         <div className="w-full h-px bg-slate-200" />
       </div>
     );
   }
 
   return (
-    <div className="w-full overflow-hidden pointer-events-none select-none py-1 sm:py-2" aria-hidden="true">
+    <div
+      className="w-full overflow-hidden pointer-events-none select-none py-1 sm:py-2"
+      aria-hidden="true"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <svg
           className="w-full h-5 sm:h-6 text-slate-200"

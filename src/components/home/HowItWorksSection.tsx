@@ -1,4 +1,10 @@
-import { Ambulance, Building2, FileText, Headset, Settings } from "lucide-react";
+import {
+  Ambulance,
+  Building2,
+  FileText,
+  Headset,
+  Settings,
+} from "lucide-react";
 
 const steps = [
   {
@@ -45,7 +51,11 @@ export function HowItWorksSection() {
           <div className="max-w-xl">
             {/* Eyebrow Pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-primary rounded-md shadow-xs mb-3.5">
-              <Settings className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} aria-hidden="true" />
+              <Settings
+                className="h-3.5 w-3.5 text-primary"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
               <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-800">
                 How It Works
               </span>
@@ -182,7 +192,10 @@ export function HowItWorksSection() {
             const Icon = step.icon;
             const isLast = index === steps.length - 1;
             return (
-              <div key={step.number} className="relative flex items-start gap-4">
+              <div
+                key={step.number}
+                className="relative flex items-start gap-4"
+              >
                 {/* Left: 3D Octagonal Marker + Vertical Connector Line */}
                 <div className="flex flex-col items-center shrink-0">
                   <div className="relative z-10 select-none">
@@ -229,7 +242,11 @@ export function HowItWorksSection() {
                 {/* Right: Details */}
                 <div className="pt-0.5 pb-2">
                   <div className="flex items-center gap-2 mb-1">
-                    <Icon className="h-5 w-5 text-primary shrink-0" strokeWidth={2.2} aria-hidden="true" />
+                    <Icon
+                      className="h-5 w-5 text-primary shrink-0"
+                      strokeWidth={2.2}
+                      aria-hidden="true"
+                    />
                     <h3 className="font-bold text-slate-900 text-base">
                       {step.title}
                     </h3>
@@ -246,4 +263,3 @@ export function HowItWorksSection() {
     </section>
   );
 }
-

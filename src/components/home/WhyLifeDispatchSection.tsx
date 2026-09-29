@@ -1,6 +1,9 @@
 import { ChartNoAxesCombined, ShieldCheck, Zap } from "lucide-react";
 
-function ClearerOperationsIcon({ className, ...props }: React.SVGProps<SVGSVGElement>) {
+function ClearerOperationsIcon({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -61,7 +64,11 @@ export function WhyLifeDispatchSection() {
             <div className="py-2">
               {/* Eyebrow Pill */}
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-primary rounded-md mb-4 sm:mb-5 w-fit shadow-xs">
-                <ChartNoAxesCombined className="h-4 w-4 text-primary" strokeWidth={2.2} aria-hidden="true" />
+                <ChartNoAxesCombined
+                  className="h-4 w-4 text-primary"
+                  strokeWidth={2.2}
+                  aria-hidden="true"
+                />
                 <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-800">
                   Why LifeDispatch
                 </span>
@@ -79,7 +86,8 @@ export function WhyLifeDispatchSection() {
 
               {/* Description */}
               <p className="mt-4 sm:mt-5 text-sm sm:text-[14.5px] text-slate-500 font-normal leading-relaxed max-w-[265px]">
-                LifeDispatch helps organizations respond faster, operate more clearly, and maintain accountability across every emergency.
+                LifeDispatch helps organizations respond faster, operate more
+                clearly, and maintain accountability across every emergency.
               </p>
             </div>
           </div>
@@ -99,7 +107,11 @@ export function WhyLifeDispatchSection() {
                       {item.number}
                     </div>
                     <div className="shrink-0 text-primary">
-                      <Icon className="h-6 w-6" strokeWidth={2.2} aria-hidden="true" />
+                      <Icon
+                        className="h-6 w-6"
+                        strokeWidth={2.2}
+                        aria-hidden="true"
+                      />
                     </div>
                     <h3 className="font-bold text-slate-900 text-base sm:text-[17px] tracking-tight whitespace-nowrap">
                       {item.title}
@@ -127,4 +139,3 @@ export function WhyLifeDispatchSection() {
     </section>
   );
 }
-

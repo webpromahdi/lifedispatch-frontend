@@ -40,7 +40,7 @@ export function ResetPasswordForm() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs"
+      className="w-full max-w-md mx-auto bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs"
     >
       <div className="text-center mb-6">
         <div className="h-12 w-12 rounded-2xl bg-primary-light text-primary flex items-center justify-center mx-auto mb-3 shadow-2xs">

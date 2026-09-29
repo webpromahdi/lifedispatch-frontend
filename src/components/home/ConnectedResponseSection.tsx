@@ -36,7 +36,8 @@ const participants = [
     statusText: "En Route",
     statusDot: "bg-blue-500",
     statusBadge: "bg-blue-50 text-blue-700 border border-blue-100",
-    description: "Driver receives the assignment and updates trip status in real time.",
+    description:
+      "Driver receives the assignment and updates trip status in real time.",
   },
   {
     role: "Hospital",
@@ -63,7 +64,11 @@ export function ConnectedResponseSection() {
           <div className="lg:col-span-5 flex flex-col justify-center">
             {/* Eyebrow Pill: 24–28px margin to heading */}
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-primary rounded-md shadow-xs mb-6 sm:mb-7 w-fit">
-              <Users className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} aria-hidden="true" />
+              <Users
+                className="h-3.5 w-3.5 text-primary"
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
               <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-800">
                 One Connected Response
               </span>
@@ -79,14 +84,14 @@ export function ConnectedResponseSection() {
               <span className="block text-primary mt-2.5 sm:mt-3">
                 Everyone Knows
               </span>
-              <span className="block text-primary">
-                What Happens Next.
-              </span>
+              <span className="block text-primary">What Happens Next.</span>
             </h2>
 
             {/* Description: 28–32px margin from heading with comfortable line-height */}
             <p className="mt-7 sm:mt-8 text-base text-slate-500 font-normal leading-relaxed max-w-md">
-              LifeDispatch connects patients, dispatchers, ambulance crews, and hospitals around the same response, so critical information doesn’t have to move through disconnected systems.
+              LifeDispatch connects patients, dispatchers, ambulance crews, and
+              hospitals around the same response, so critical information
+              doesn’t have to move through disconnected systems.
             </p>
           </div>
 
@@ -104,7 +109,11 @@ export function ConnectedResponseSection() {
                 {/* Alert Icon & Incident Title */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-md bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <AlertTriangle className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
+                    <AlertTriangle
+                      className="h-5 w-5"
+                      strokeWidth={2.4}
+                      aria-hidden="true"
+                    />
                   </div>
                   <div>
                     <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">
@@ -130,7 +139,10 @@ export function ConnectedResponseSection() {
             </div>
 
             {/* Desktop Visual Circuit Wiring (Hidden on Mobile/Tablet) */}
-            <div className="hidden lg:block w-full h-11 relative z-0 pointer-events-none" aria-hidden="true">
+            <div
+              className="hidden lg:block w-full h-11 relative z-0 pointer-events-none"
+              aria-hidden="true"
+            >
               <svg
                 className="w-full h-full text-primary"
                 viewBox="0 0 800 44"
@@ -139,24 +151,79 @@ export function ConnectedResponseSection() {
               >
                 <title>Circuit connection lines to network participants</title>
                 {/* Drop from central card */}
-                <path d="M400 0 L400 20" stroke="currentColor" strokeWidth="1.5" />
+                <path
+                  d="M400 0 L400 20"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
                 {/* Horizontal distribution trace */}
-                <path d="M100 20 L700 20" stroke="currentColor" strokeWidth="1.5" />
+                <path
+                  d="M100 20 L700 20"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
                 {/* 4 Drops down to the participant cards */}
-                <path d="M100 20 L100 36" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M300 20 L300 36" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M500 20 L500 36" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M700 20 L700 36" stroke="currentColor" strokeWidth="1.5" />
+                <path
+                  d="M100 20 L100 36"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M300 20 L300 36"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M500 20 L500 36"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M700 20 L700 36"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
                 {/* Terminal circular connection pins */}
-                <circle cx="100" cy="36" r="3.5" fill="#FFFFFF" stroke="currentColor" strokeWidth="1.5" />
-                <circle cx="300" cy="36" r="3.5" fill="#FFFFFF" stroke="currentColor" strokeWidth="1.5" />
-                <circle cx="500" cy="36" r="3.5" fill="#FFFFFF" stroke="currentColor" strokeWidth="1.5" />
-                <circle cx="700" cy="36" r="3.5" fill="#FFFFFF" stroke="currentColor" strokeWidth="1.5" />
+                <circle
+                  cx="100"
+                  cy="36"
+                  r="3.5"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <circle
+                  cx="300"
+                  cy="36"
+                  r="3.5"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <circle
+                  cx="500"
+                  cy="36"
+                  r="3.5"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <circle
+                  cx="700"
+                  cy="36"
+                  r="3.5"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
               </svg>
             </div>
 
             {/* Mobile/Tablet Connector Line */}
-            <div className="lg:hidden w-[1.5px] h-6 bg-primary my-1" aria-hidden="true" />
+            <div
+              className="lg:hidden w-[1.5px] h-6 bg-primary my-1"
+              aria-hidden="true"
+            />
 
             {/* Participant Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 w-full">
@@ -171,7 +238,11 @@ export function ConnectedResponseSection() {
                     <div
                       className={`w-9 h-9 rounded-lg ${p.iconBg} ${p.iconColor} flex items-center justify-center shrink-0 mb-2.5`}
                     >
-                      <Icon className="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
+                      <Icon
+                        className="h-5 w-5"
+                        strokeWidth={2.2}
+                        aria-hidden="true"
+                      />
                     </div>
 
                     {/* Role Name */}
@@ -184,7 +255,9 @@ export function ConnectedResponseSection() {
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${p.statusBadge}`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${p.statusDot}`} />
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${p.statusDot}`}
+                        />
                         {p.statusText}
                       </span>
                     </div>

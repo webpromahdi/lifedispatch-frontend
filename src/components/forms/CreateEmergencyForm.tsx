@@ -87,7 +87,10 @@ export function CreateEmergencyForm({
             value={emergencyType}
             onValueChange={(val) => val && setEmergencyType(val)}
           >
-            <SelectTrigger id="emergency-type" className="text-base md:text-xs h-10 md:h-9">
+            <SelectTrigger
+              id="emergency-type"
+              className="text-base md:text-xs h-10 md:h-9"
+            >
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent>
@@ -106,9 +109,7 @@ export function CreateEmergencyForm({
               <SelectItem value="OBSTETRIC">
                 Obstetric / Labor Complication
               </SelectItem>
-              <SelectItem value="PEDIATRIC">
-                Pediatric Emergency
-              </SelectItem>
+              <SelectItem value="PEDIATRIC">Pediatric Emergency</SelectItem>
               <SelectItem value="OTHER">Other Clinical Emergency</SelectItem>
             </SelectContent>
           </Select>
@@ -123,7 +124,10 @@ export function CreateEmergencyForm({
             value={capability}
             onValueChange={(val) => val && setCapability(val)}
           >
-            <SelectTrigger id="required-capability" className="text-base md:text-xs h-10 md:h-9">
+            <SelectTrigger
+              id="required-capability"
+              className="text-base md:text-xs h-10 md:h-9"
+            >
               <SelectValue placeholder="Select capability" />
             </SelectTrigger>
             <SelectContent>

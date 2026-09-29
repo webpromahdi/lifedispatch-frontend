@@ -2,7 +2,6 @@
 
 import {
   Award,
-  Calendar,
   CheckCircle2,
   FileCheck,
   HeartPulse,
@@ -51,7 +50,10 @@ export function DriverProfileView() {
                   variant="outline"
                   className="bg-status-bg text-status-text border-status/40 text-xs font-semibold"
                 >
-                  <CheckCircle2 className="h-3 w-3 mr-1 text-status" aria-hidden="true" />
+                  <CheckCircle2
+                    className="h-3 w-3 mr-1 text-status"
+                    aria-hidden="true"
+                  />
                   {driver.isOnShift ? "Active Duty" : "Off Duty"}
                 </Badge>
               </div>
@@ -60,7 +62,10 @@ export function DriverProfileView() {
               </p>
               <div className="flex items-center gap-2 mt-1.5 text-xs text-text-muted">
                 <span className="flex items-center text-amber-500">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400 mr-1" aria-hidden="true" />
+                  <Star
+                    className="h-3.5 w-3.5 fill-amber-400 text-amber-400 mr-1"
+                    aria-hidden="true"
+                  />
                   <strong className="text-text-primary">4.95</strong> / 5.0
                 </span>
                 <span>•</span>
@@ -122,7 +127,11 @@ export function DriverProfileView() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-text-muted flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-status" aria-hidden="true" /> Emergency Contact:
+                  <ShieldCheck
+                    className="h-3.5 w-3.5 text-status"
+                    aria-hidden="true"
+                  />{" "}
+                  Emergency Contact:
                 </span>
                 <span className="text-text-primary font-medium">
                   +880 1819-998877 (Spouse)
@@ -152,7 +161,8 @@ export function DriverProfileView() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-text-muted flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" /> Base Station:
+                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" /> Base
+                  Station:
                 </span>
                 <span className="font-medium text-text-primary">
                   Banani Dispatch Hub (Zone 4)
@@ -164,7 +174,10 @@ export function DriverProfileView() {
           {/* Card 3: Clinical & EVOC Certifications */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-              <FileCheck className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <FileCheck
+                className="h-3.5 w-3.5 text-primary"
+                aria-hidden="true"
+              />
               Clinical Credentials
             </h3>
             <div className="p-3.5 rounded-lg bg-background border border-border space-y-2 text-xs">
@@ -180,13 +193,15 @@ export function DriverProfileView() {
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">ACLS / BLS Certified:</span>
                 <span className="text-status font-medium flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Valid through 2028
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                  Valid through 2028
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">EVOC Emergency Driving:</span>
                 <span className="text-status font-medium flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Class 1 Certified
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                  Class 1 Certified
                 </span>
               </div>
             </div>
@@ -205,8 +220,8 @@ export function DriverProfileView() {
               Advanced Cardiac Life Support
             </h4>
             <p className="text-[11px] text-text-secondary mt-0.5">
-              Authorized for defibrillator deployment, cardiac telemetry, and
-              IV drug administration.
+              Authorized for defibrillator deployment, cardiac telemetry, and IV
+              drug administration.
             </p>
           </div>
         </div>

@@ -1,18 +1,12 @@
 "use client";
 
 import {
-  AlertCircle,
-  Building2,
   Calendar,
-  CheckCircle2,
   Clock,
-  HeartPulse,
   Hospital,
   Power,
-  ShieldCheck,
   Stethoscope,
   UserCheck,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -261,7 +255,9 @@ export function HospitalStaffShiftView() {
               </div>
 
               <div className="flex items-center justify-between sm:justify-end gap-3 text-xs">
-                <span className="font-mono text-text-primary">{item.shift}</span>
+                <span className="font-mono text-text-primary">
+                  {item.shift}
+                </span>
                 <Badge
                   variant="outline"
                   className={cn(

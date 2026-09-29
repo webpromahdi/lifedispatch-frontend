@@ -319,7 +319,6 @@ export function Sidebar({
 
       {/* Bottom section with Logout */}
       <div className="p-3 border-t border-border space-y-1 bg-surface shrink-0">
-
         <Link
           href="/login"
           onClick={onNavClick}

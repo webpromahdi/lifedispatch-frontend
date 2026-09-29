@@ -1,9 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
-  AlertTriangle,
   Ambulance,
   ChevronDown,
   ChevronUp,
@@ -13,7 +12,6 @@ import {
   MapPin,
   PhoneCall,
   Search,
-  Send,
   ShieldAlert,
   Sparkles,
   User,
@@ -82,8 +80,8 @@ function formatTimeAgo(isoString: string): string {
 export function DispatcherView() {
   const [emergencies, setEmergencies] = useState<EmergencyRequest[]>(() => {
     return [...seedEmergencies].sort((a, b) => {
-      const wA = a.priority ? priorityWeight[a.priority] ?? 99 : 99;
-      const wB = b.priority ? priorityWeight[b.priority] ?? 99 : 99;
+      const wA = a.priority ? (priorityWeight[a.priority] ?? 99) : 99;
+      const wB = b.priority ? (priorityWeight[b.priority] ?? 99) : 99;
       return wA - wB;
     });
   });
@@ -215,7 +213,7 @@ export function DispatcherView() {
       .sort((a, b) => b.score - a.score);
   }, [activeRecommendationEmergency]);
 
-  const handleDispatchSuccess = (candidate: ScoredAmbulanceCandidate) => {
+  const handleDispatchSuccess = (_candidate: ScoredAmbulanceCandidate) => {
     if (!activeRecommendationEmergency) return;
 
     setEmergencies((prev) =>
@@ -370,9 +368,15 @@ export function DispatcherView() {
                       >
                         <TableCell className="py-3 px-2 text-center text-text-muted">
                           {isExpanded ? (
-                            <ChevronUp className="h-4 w-4 inline" aria-hidden="true" />
+                            <ChevronUp
+                              className="h-4 w-4 inline"
+                              aria-hidden="true"
+                            />
                           ) : (
-                            <ChevronDown className="h-4 w-4 inline" aria-hidden="true" />
+                            <ChevronDown
+                              className="h-4 w-4 inline"
+                              aria-hidden="true"
+                            />
                           )}
                         </TableCell>
                         <TableCell className="font-mono text-xs font-semibold text-text-primary">
@@ -409,7 +413,10 @@ export function DispatcherView() {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                                 <div className="space-y-2 p-3 bg-surface rounded-lg border border-border">
                                   <div className="flex items-center gap-2 text-text-primary font-semibold">
-                                    <ShieldAlert className="h-4 w-4 text-primary" aria-hidden="true" />
+                                    <ShieldAlert
+                                      className="h-4 w-4 text-primary"
+                                      aria-hidden="true"
+                                    />
                                     <span>Incident Overview</span>
                                   </div>
                                   <p className="text-text-secondary leading-relaxed">
@@ -445,7 +452,10 @@ export function DispatcherView() {
 
                                 <div className="space-y-2 p-3 bg-surface rounded-lg border border-border">
                                   <div className="flex items-center gap-2 text-text-primary font-semibold">
-                                    <MapPin className="h-4 w-4 text-primary" aria-hidden="true" />
+                                    <MapPin
+                                      className="h-4 w-4 text-primary"
+                                      aria-hidden="true"
+                                    />
                                     <span>Scene Location & Contact</span>
                                   </div>
                                   <p className="text-text-secondary">
@@ -453,13 +463,19 @@ export function DispatcherView() {
                                   </p>
                                   <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-text-muted">
                                     <span className="flex items-center gap-1 font-mono">
-                                      <Compass className="h-3.5 w-3.5" aria-hidden="true" />
+                                      <Compass
+                                        className="h-3.5 w-3.5"
+                                        aria-hidden="true"
+                                      />
                                       {em.locationLat.toFixed(4)},{" "}
                                       {em.locationLng.toFixed(4)}
                                     </span>
                                     <span>•</span>
                                     <span className="flex items-center gap-1">
-                                      <User className="h-3.5 w-3.5" aria-hidden="true" />
+                                      <User
+                                        className="h-3.5 w-3.5"
+                                        aria-hidden="true"
+                                      />
                                       {em.callerName} ({em.callerPhone})
                                     </span>
                                   </div>
@@ -494,7 +510,10 @@ export function DispatcherView() {
                                     }
                                     className="min-h-[38px] bg-primary hover:bg-primary-dark text-white text-xs font-medium cursor-pointer"
                                   >
-                                    <Sparkles className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                                    <Sparkles
+                                      className="h-3.5 w-3.5 mr-1.5"
+                                      aria-hidden="true"
+                                    />
                                     Run Recommendation
                                   </Button>
                                 </div>
@@ -535,7 +554,8 @@ export function DispatcherView() {
                   <strong className="text-text-primary capitalize">
                     {activeRecommendationEmergency.emergencyType.toLowerCase()}
                   </strong>{" "}
-                  at {activeRecommendationEmergency.locationAddress.split(",")[0]}.
+                  at{" "}
+                  {activeRecommendationEmergency.locationAddress.split(",")[0]}.
                 </p>
 
                 <RecommendationList

@@ -52,7 +52,11 @@ export function DemoRoleSwitcher({
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-text-muted hover:text-text-primary rounded-lg transition-colors cursor-pointer shrink-0"
-            aria-label={isCollapsed ? "Expand demo role switcher" : "Collapse demo role switcher"}
+            aria-label={
+              isCollapsed
+                ? "Expand demo role switcher"
+                : "Collapse demo role switcher"
+            }
             title="Toggle role switcher"
           >
             <Layers className="h-3.5 w-3.5 text-primary" aria-hidden="true" />

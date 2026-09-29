@@ -7,23 +7,17 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
-  Clock,
   Compass,
   MapPin,
-  Navigation,
-  PhoneCall,
   Power,
   Radio,
-  Shield,
   Truck,
-  User,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatCard } from "@/components/common/StatCard";
-import { StatusBadge } from "@/components/common/StatusBadge";
 import { DispatchCard } from "@/components/dispatch/DispatchCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +27,7 @@ import { seedDrivers } from "@/lib/dummy/drivers";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { seedHospitals } from "@/lib/dummy/hospitals";
 import { seedTrips } from "@/lib/dummy/trips";
-import { cn, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface MilestoneStep {
   id: string;
@@ -109,11 +103,13 @@ export function DriverView() {
 
     if (nextState) {
       toast.success("Shift Started — ON DUTY", {
-        description: "You are now active and receiving emergency dispatch alerts.",
+        description:
+          "You are now active and receiving emergency dispatch alerts.",
       });
     } else {
       toast.info("Shift Ended — OFF DUTY", {
-        description: "You have logged off duty. Fleet telematics set to standby.",
+        description:
+          "You have logged off duty. Fleet telematics set to standby.",
       });
     }
   };
@@ -221,7 +217,10 @@ export function DriverView() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Radio className="h-4 w-4 text-primary animate-pulse" aria-hidden="true" />
+              <Radio
+                className="h-4 w-4 text-primary animate-pulse"
+                aria-hidden="true"
+              />
               <h2 className="text-sm font-bold text-text-primary">
                 Incoming Dispatch Alerts
               </h2>
@@ -233,7 +232,10 @@ export function DriverView() {
 
           {pendingDispatches.length === 0 ? (
             <div className="p-8 text-center text-xs text-text-muted bg-surface border border-dashed border-border rounded-xl">
-              <CheckCircle2 className="h-8 w-8 text-status mx-auto mb-2" aria-hidden="true" />
+              <CheckCircle2
+                className="h-8 w-8 text-status mx-auto mb-2"
+                aria-hidden="true"
+              />
               <p className="font-medium text-text-primary">
                 No Pending Dispatch Alerts
               </p>
@@ -311,7 +313,10 @@ export function DriverView() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-lg bg-background border border-border text-xs">
                   <div className="space-y-1">
                     <span className="text-text-muted flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                      <MapPin
+                        className="h-3.5 w-3.5 text-primary"
+                        aria-hidden="true"
+                      />
                       Pickup Scene:
                     </span>
                     <span className="font-medium text-text-primary block truncate">
@@ -321,7 +326,10 @@ export function DriverView() {
 
                   <div className="space-y-1">
                     <span className="text-text-muted flex items-center gap-1">
-                      <Building2 className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
+                      <Building2
+                        className="h-3.5 w-3.5 text-secondary"
+                        aria-hidden="true"
+                      />
                       Destination Hospital:
                     </span>
                     <span className="font-medium text-text-primary block truncate">
@@ -336,7 +344,7 @@ export function DriverView() {
                     Mission Milestones Progress
                   </span>
 
-                  <ol role="list" className="space-y-2.5">
+                  <ol className="space-y-2.5">
                     {MILESTONES.map((milestone, idx) => {
                       const isCompleted = idx <= currentStepIndex;
                       const isCurrent = idx === currentStepIndex;
@@ -344,7 +352,6 @@ export function DriverView() {
                       return (
                         <li
                           key={milestone.id}
-                          role="listitem"
                           className={cn(
                             "flex items-start gap-3 p-2.5 rounded-lg border transition-colors",
                             isCurrent
@@ -363,7 +370,10 @@ export function DriverView() {
                             )}
                           >
                             {isCompleted ? (
-                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                              <Check
+                                className="h-3.5 w-3.5"
+                                aria-hidden="true"
+                              />
                             ) : (
                               <span>{idx + 1}</span>
                             )}
@@ -419,7 +429,10 @@ export function DriverView() {
                   >
                     {currentStepIndex === MILESTONES.length - 1 ? (
                       <>
-                        <CheckCircle2 className="h-4 w-4 mr-1" aria-hidden="true" />
+                        <CheckCircle2
+                          className="h-4 w-4 mr-1"
+                          aria-hidden="true"
+                        />
                         Complete Trip
                       </>
                     ) : (
@@ -428,7 +441,10 @@ export function DriverView() {
                         <strong>
                           {MILESTONES[currentStepIndex + 1]?.label}
                         </strong>
-                        <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                        <ChevronRight
+                          className="h-4 w-4 ml-1"
+                          aria-hidden="true"
+                        />
                       </>
                     )}
                   </Button>
@@ -448,8 +464,9 @@ export function DriverView() {
                   Trip Completed & Patient Handed Over
                 </h3>
                 <p className="text-xs text-text-secondary max-w-sm mx-auto">
-                  Trip {sampleTrip.id} has successfully concluded. Clinical handover
-                  telematics have been saved to United Hospital and central operations.
+                  Trip {sampleTrip.id} has successfully concluded. Clinical
+                  handover telematics have been saved to United Hospital and
+                  central operations.
                 </p>
                 <Button
                   size="sm"

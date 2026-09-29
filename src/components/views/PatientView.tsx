@@ -9,17 +9,12 @@ import {
   Ban,
   Building2,
   Check,
-  CheckCircle2,
   Clock,
   HeartHandshake,
-  MapPin,
   PhoneCall,
   Plus,
-  Radio,
   Receipt,
-  Shield,
   ShieldAlert,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -30,7 +25,6 @@ import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { CreateEmergencyForm } from "@/components/forms/CreateEmergencyForm";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -137,7 +131,9 @@ export function PatientView() {
           value={hasActiveEmergency ? activeIncidentNumber : "None Active"}
           icon={AlertCircle}
           subtitle={
-            hasActiveEmergency ? "Unit En Route (ETA: ~4 min)" : "Ready on standby"
+            hasActiveEmergency
+              ? "Unit En Route (ETA: ~4 min)"
+              : "Ready on standby"
           }
           trend={
             hasActiveEmergency
@@ -211,7 +207,6 @@ export function PatientView() {
               </span>
 
               <ol
-                role="list"
                 aria-label="Emergency response progress"
                 className="grid grid-cols-1 sm:grid-cols-5 gap-3"
               >
@@ -222,7 +217,6 @@ export function PatientView() {
                   return (
                     <li
                       key={stage.key}
-                      role="listitem"
                       aria-current={isCurrent ? "step" : undefined}
                       className={cn(
                         "p-3 rounded-xl border flex flex-col justify-between transition-all duration-200 relative",
@@ -258,7 +252,10 @@ export function PatientView() {
                             )}
                           >
                             {isPast ? (
-                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                              <Check
+                                className="h-3.5 w-3.5"
+                                aria-hidden="true"
+                              />
                             ) : (
                               <span>{idx + 1}</span>
                             )}

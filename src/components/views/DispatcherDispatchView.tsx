@@ -1,21 +1,11 @@
 "use client";
 
-import {
-  AlertTriangle,
-  Ban,
-  Clock,
-  Filter,
-  Radio,
-  Search,
-  Truck,
-  User,
-} from "lucide-react";
+import { AlertTriangle, Ban, Filter, Search, Truck, User } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -76,7 +66,8 @@ export function DispatcherDispatchView() {
           ...d,
           status: DispatchStatus.CANCELLED,
           cancelledAt: new Date().toISOString(),
-          cancellationReason: "Cancelled manually by dispatcher console operator.",
+          cancellationReason:
+            "Cancelled manually by dispatcher console operator.",
         };
       }),
     );
@@ -170,7 +161,9 @@ export function DispatcherDispatchView() {
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Statuses ({dispatches.length})</SelectItem>
+              <SelectItem value="ALL">
+                All Statuses ({dispatches.length})
+              </SelectItem>
               <SelectItem value="ACCEPTED">ACCEPTED</SelectItem>
               <SelectItem value="PENDING_ACCEPTANCE">
                 PENDING ACCEPTANCE
@@ -264,13 +257,21 @@ export function DispatcherDispatchView() {
                     </TableCell>
                     <TableCell className="text-xs text-text-secondary">
                       <div className="flex items-center gap-1.5 font-mono">
-                        <Truck className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />
-                        <span>{amb ? amb.registrationNumber : disp.ambulanceId}</span>
+                        <Truck
+                          className="h-3.5 w-3.5 text-primary shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>
+                          {amb ? amb.registrationNumber : disp.ambulanceId}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-xs text-text-secondary">
                       <div className="flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5 text-text-muted shrink-0" aria-hidden="true" />
+                        <User
+                          className="h-3.5 w-3.5 text-text-muted shrink-0"
+                          aria-hidden="true"
+                        />
                         <span>{drv ? drv.licenseNumber : disp.driverId}</span>
                       </div>
                     </TableCell>

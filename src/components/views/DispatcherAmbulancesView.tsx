@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Activity,
-  AlertCircle,
-  Ambulance,
-  CheckCircle2,
-  Compass,
-  MapPin,
-  Search,
-  Shield,
-  Truck,
-  Wrench,
-} from "lucide-react";
+import { Ambulance, MapPin, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -21,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import type { Ambulance as AmbulanceModel } from "@/lib/types/ambulance.types";
 import type { AmbulanceStatus } from "@/lib/types/enums";
-import { cn } from "@/lib/utils";
 
 export function DispatcherAmbulancesView() {
   const [ambulances, setAmbulances] =
@@ -227,7 +215,10 @@ function AmbulanceStatusCard({
     <div className="p-4 rounded-xl bg-surface border border-border hover:border-border-strong transition-all shadow-xs space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Ambulance className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+          <Ambulance
+            className="h-4 w-4 text-primary shrink-0"
+            aria-hidden="true"
+          />
           <span className="font-mono font-semibold text-xs text-text-primary">
             {ambulance.registrationNumber}
           </span>

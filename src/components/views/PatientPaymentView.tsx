@@ -1,24 +1,19 @@
 "use client";
 
 import {
-  AlertCircle,
   ArrowLeft,
   CheckCircle2,
   CreditCard,
   Download,
-  FileCheck,
   Lock,
   Receipt,
-  Shield,
   Smartphone,
-  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { seedPayments } from "@/lib/dummy/payments";
 import { PaymentStatus } from "@/lib/types/enums";
@@ -28,9 +23,13 @@ export interface PatientPaymentViewProps {
   paymentId?: string;
 }
 
-export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentViewProps) {
+export function PatientPaymentView({
+  paymentId = "pay_001",
+}: PatientPaymentViewProps) {
   const initialPayment =
-    seedPayments.find((p) => p.id === paymentId) || seedPayments[1] || seedPayments[0];
+    seedPayments.find((p) => p.id === paymentId) ||
+    seedPayments[1] ||
+    seedPayments[0];
 
   const [payment, setPayment] = useState(initialPayment);
   const [selectedMethod, setSelectedMethod] = useState<string>("BKASH");
@@ -76,7 +75,11 @@ export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentView
         ]}
         action={
           <Link href="/dashboard/patient">
-            <Button variant="outline" size="sm" className="text-xs min-h-[38px] cursor-pointer">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs min-h-[38px] cursor-pointer"
+            >
               <ArrowLeft className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
               Return to Portal
             </Button>
@@ -120,28 +123,36 @@ export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentView
         {/* Invoice Meta Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-background border border-border text-xs">
           <div>
-            <span className="text-text-muted block text-[11px]">Invoice Date</span>
+            <span className="text-text-muted block text-[11px]">
+              Invoice Date
+            </span>
             <span className="font-medium text-text-primary">
               {formatDate(payment.createdAt, "dd MMM yyyy")}
             </span>
           </div>
 
           <div>
-            <span className="text-text-muted block text-[11px]">Trip Reference</span>
+            <span className="text-text-muted block text-[11px]">
+              Trip Reference
+            </span>
             <span className="font-mono font-medium text-text-primary">
               {payment.tripId}
             </span>
           </div>
 
           <div>
-            <span className="text-text-muted block text-[11px]">Payment Method</span>
+            <span className="text-text-muted block text-[11px]">
+              Payment Method
+            </span>
             <span className="font-medium text-text-primary">
               {payment.paymentMethod || selectedMethod}
             </span>
           </div>
 
           <div>
-            <span className="text-text-muted block text-[11px]">Transaction ID</span>
+            <span className="text-text-muted block text-[11px]">
+              Transaction ID
+            </span>
             <span className="font-mono text-text-primary truncate block">
               {payment.transactionId || "Pending Gateway"}
             </span>
@@ -272,7 +283,10 @@ export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentView
                       : "border-border hover:border-border-strong bg-background"
                   }`}
                 >
-                  <method.icon className="h-4 w-4 text-primary mb-2" aria-hidden="true" />
+                  <method.icon
+                    className="h-4 w-4 text-primary mb-2"
+                    aria-hidden="true"
+                  />
                   <span className="font-semibold text-xs text-text-primary">
                     {method.name}
                   </span>
@@ -286,7 +300,10 @@ export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentView
             {/* Security Guarantee & Pay Button */}
             <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-xs text-text-muted">
-                <Lock className="h-4 w-4 text-status shrink-0" aria-hidden="true" />
+                <Lock
+                  className="h-4 w-4 text-status shrink-0"
+                  aria-hidden="true"
+                />
                 <span>
                   256-bit SSL encrypted PCI-DSS certified payment gateway.
                 </span>
@@ -298,16 +315,22 @@ export function PatientPaymentView({ paymentId = "pay_001" }: PatientPaymentView
                 aria-label={`Pay now ${payment.totalAmount} Bangladeshi Taka via ${selectedMethod}`}
                 className="w-full sm:w-auto min-h-[44px] px-8 bg-primary hover:bg-primary-dark text-white font-semibold text-xs cursor-pointer shadow-xs"
               >
-                {isProcessing ? "Connecting to Gateway..." : `Pay Now ${formatBDT(payment.totalAmount)}`}
+                {isProcessing
+                  ? "Connecting to Gateway..."
+                  : `Pay Now ${formatBDT(payment.totalAmount)}`}
               </Button>
             </div>
           </div>
         ) : (
           <div className="p-4 rounded-xl bg-status-bg border border-status/30 flex items-center justify-between text-xs text-status-text">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-status shrink-0" aria-hidden="true" />
+              <CheckCircle2
+                className="h-5 w-5 text-status shrink-0"
+                aria-hidden="true"
+              />
               <span>
-                <strong>Paid in Full</strong> • Confirmation recorded in hospital billing ledger.
+                <strong>Paid in Full</strong> • Confirmation recorded in
+                hospital billing ledger.
               </span>
             </div>
             <span className="font-mono text-[11px] text-text-muted">

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { ConnectedResponseSection } from "@/components/home/ConnectedResponseSection";
+import { CtaSection } from "@/components/home/CtaSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
-import { ConnectedResponseSection } from "@/components/home/ConnectedResponseSection";
-import { WhyLifeDispatchSection } from "@/components/home/WhyLifeDispatchSection";
-import { CtaSection } from "@/components/home/CtaSection";
 import { TechnicalDivider } from "@/components/home/TechnicalDivider";
+import { WhyLifeDispatchSection } from "@/components/home/WhyLifeDispatchSection";
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
   title:

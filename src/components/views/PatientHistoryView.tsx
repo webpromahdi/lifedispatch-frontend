@@ -1,26 +1,12 @@
 "use client";
 
-import {
-  Calendar,
-  Clock,
-  Compass,
-  FileText,
-  Filter,
-  HeartPulse,
-  MapPin,
-  Receipt,
-  Search,
-  Shield,
-  Truck,
-  User,
-} from "lucide-react";
+import { Filter, MapPin, Receipt, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -49,7 +35,8 @@ export function PatientHistoryView() {
         .toLowerCase();
 
       const matchesSearch = searchTerms.includes(search.toLowerCase());
-      const matchesType = typeFilter === "ALL" || em.emergencyType === typeFilter;
+      const matchesType =
+        typeFilter === "ALL" || em.emergencyType === typeFilter;
 
       return matchesSearch && matchesType;
     });
@@ -107,7 +94,7 @@ export function PatientHistoryView() {
 
       {/* Timeline List of Emergencies */}
       <div className="space-y-4">
-        {filteredEmergencies.map((em, idx) => (
+        {filteredEmergencies.map((em, _idx) => (
           <div
             key={em.id}
             className="p-5 rounded-xl bg-surface border border-border hover:border-border-strong transition-all shadow-xs space-y-4"
@@ -143,7 +130,10 @@ export function PatientHistoryView() {
                 </p>
 
                 <div className="flex items-center gap-2 text-text-muted text-[11px] pt-1">
-                  <MapPin className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />
+                  <MapPin
+                    className="h-3.5 w-3.5 text-primary shrink-0"
+                    aria-hidden="true"
+                  />
                   <span className="text-text-secondary truncate">
                     {em.locationAddress}
                   </span>

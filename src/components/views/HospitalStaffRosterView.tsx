@@ -1,24 +1,12 @@
 "use client";
 
-import {
-  Building2,
-  Mail,
-  Phone,
-  Plus,
-  Search,
-  Shield,
-  Stethoscope,
-  Trash2,
-  UserCheck,
-  Users,
-} from "lucide-react";
+import { Plus, Search, Stethoscope, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,8 +33,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedUsers } from "@/lib/dummy/users";
-import { UserRole } from "@/lib/types/enums";
 
 interface HospitalStaffMember {
   id: string;
@@ -289,7 +275,10 @@ export function HospitalStaffRosterView() {
 
                   <TableCell className="text-xs text-text-secondary">
                     <div className="flex items-center gap-1.5">
-                      <Stethoscope className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />
+                      <Stethoscope
+                        className="h-3.5 w-3.5 text-primary shrink-0"
+                        aria-hidden="true"
+                      />
                       <span>{staff.department}</span>
                     </div>
                   </TableCell>
@@ -336,13 +325,17 @@ export function HospitalStaffRosterView() {
               <div>
                 <DialogTitle>Provision Hospital Staff</DialogTitle>
                 <DialogDescription>
-                  Assign a clinician or nurse to the Emergency Department roster.
+                  Assign a clinician or nurse to the Emergency Department
+                  roster.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleAddStaffSubmit} className="space-y-3.5 py-2 text-xs">
+          <form
+            onSubmit={handleAddStaffSubmit}
+            className="space-y-3.5 py-2 text-xs"
+          >
             <div className="space-y-1">
               <Label htmlFor="staff-name" className="text-xs font-medium">
                 Clinician Full Name *

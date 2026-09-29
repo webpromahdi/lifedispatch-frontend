@@ -2,16 +2,11 @@
 
 import {
   Activity,
-  AlertOctagon,
   AlertTriangle,
   Bed,
   Building2,
-  CheckCircle2,
-  Clock,
   HeartPulse,
   Hospital,
-  ShieldCheck,
-  Stethoscope,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -251,7 +246,10 @@ export function HospitalStaffView() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <HeartPulse className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+                    <HeartPulse
+                      className="h-4 w-4 text-primary shrink-0"
+                      aria-hidden="true"
+                    />
                     <span className="font-semibold text-xs text-text-primary">
                       {unit.name}
                     </span>
@@ -302,7 +300,8 @@ export function HospitalStaffView() {
                   Update Diversion Telemetry
                 </DialogTitle>
                 <DialogDescription>
-                  Broadcast new emergency intake availability to all central dispatchers.
+                  Broadcast new emergency intake availability to all central
+                  dispatchers.
                 </DialogDescription>
               </div>
             </div>
@@ -335,14 +334,16 @@ export function HospitalStaffView() {
                   title: "DIVERTING (Congested)",
                   description:
                     "ER capacity saturated. Ambulances will be re-routed to adjacent regional facilities.",
-                  color: "border-warning/40 bg-warning-bg/30 text-warning-foreground",
+                  color:
+                    "border-warning/40 bg-warning-bg/30 text-warning-foreground",
                 },
                 {
                   value: HospitalDiversionStatus.CLOSED,
                   title: "CLOSED (Emergency Closure)",
                   description:
                     "Department closed to all new incoming ambulance arrivals due to facility decontamination or crisis.",
-                  color: "border-destructive/40 bg-destructive-bg/30 text-destructive",
+                  color:
+                    "border-destructive/40 bg-destructive-bg/30 text-destructive",
                 },
               ].map((option) => (
                 <div

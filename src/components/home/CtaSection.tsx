@@ -13,7 +13,10 @@ export function CtaSection() {
         {/* Technical Circuit Frame Wrapper */}
         <div className="relative p-2 sm:p-3">
           {/* Outer Circuit Perimeter Traces & Geometric Nodes */}
-          <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+          <div
+            className="absolute inset-0 pointer-events-none select-none"
+            aria-hidden="true"
+          >
             {/* SVG Circuit Border with Chamfered Corners */}
             <svg
               className="w-full h-full text-primary/40"
@@ -49,7 +52,11 @@ export function CtaSection() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-5 sm:gap-6 text-center sm:text-left">
               {/* Ambulance Icon Container */}
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary-light border-2 border-primary/40 text-primary flex items-center justify-center shrink-0 shadow-xs">
-                <Ambulance className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={2} aria-hidden="true" />
+                <Ambulance
+                  className="h-8 w-8 sm:h-10 sm:w-10"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
               </div>
 
               {/* Text Block */}
@@ -62,7 +69,8 @@ export function CtaSection() {
                   <span className="block sm:inline"> Emergency Response?</span>
                 </h2>
                 <p className="mt-2 text-base text-slate-500 font-normal leading-relaxed max-w-xl">
-                  Bring patients, ambulances, dispatchers, and hospitals into one connected emergency response platform.
+                  Bring patients, ambulances, dispatchers, and hospitals into
+                  one connected emergency response platform.
                 </p>
               </div>
             </div>
@@ -70,11 +78,13 @@ export function CtaSection() {
             {/* Right Buttons: Stacked on desktop matching the reference image */}
             <div className="flex flex-col gap-3 w-full sm:w-auto shrink-0">
               <Link href="/register" className="w-full sm:w-auto">
-                <Button
-                  className="w-full sm:w-[220px] min-h-[48px] px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
+                <Button className="w-full sm:w-[220px] min-h-[48px] px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2">
                   <span>Get Started</span>
-                  <ArrowRight className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight
+                    className="h-4 w-4"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  />
                 </Button>
               </Link>
               <Link href="#how-it-works" className="w-full sm:w-auto">
@@ -83,7 +93,11 @@ export function CtaSection() {
                   className="w-full sm:w-[220px] min-h-[48px] px-6 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Explore the Platform</span>
-                  <ArrowRight className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+                  <ArrowRight
+                    className="h-4 w-4"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  />
                 </Button>
               </Link>
             </div>
