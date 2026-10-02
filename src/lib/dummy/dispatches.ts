@@ -22,10 +22,10 @@ export const seedDispatches: Dispatch[] = [
     id: "disp_002",
     emergencyId: "em_002",
     ambulanceId: "amb_002",
-    driverId: "drv_002",
+    driverId: "drv_001",
     status: DispatchStatus.PENDING_ACCEPTANCE,
     dispatchScore: 0.912,
-    timeoutAt: new Date(Date.now() + 95 * 1000).toISOString(), // ~1m 35s remaining for live preview
+    timeoutAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ahead for reliable testing
     acceptedAt: null,
     rejectedAt: null,
     rejectionReason: null,

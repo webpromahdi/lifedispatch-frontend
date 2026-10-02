@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 export interface StatusBadgeProps {
   status: string;
   className?: string;
+  variant?: "default" | "square";
 }
 
 // Positive statuses that display a single green dot (#22C55E) per PRD §3.3 & color-design.md
@@ -18,7 +19,11 @@ const POSITIVE_STATUSES = new Set([
   "ACCEPTED",
 ]);
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
+export function StatusBadge({
+  status,
+  className,
+  variant = "default",
+}: StatusBadgeProps) {
   const normalized = status?.toUpperCase() || "";
   const isPositive = POSITIVE_STATUSES.has(normalized);
 
@@ -27,6 +32,60 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     .split("_")
     .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
     .join(" ");
+
+  if (variant === "square") {
+    let squareClasses = "bg-slate-100 border border-slate-200 text-slate-600";
+    if (normalized === "PENDING" || normalized === "PENDING_ACCEPTANCE") {
+      squareClasses = "bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]";
+    } else if (normalized === "PRIORITIZED") {
+      squareClasses = "bg-[#F1F5F9] border border-[#CBD5E1] text-[#1E2D3D]";
+    } else if (normalized === "DISPATCHING") {
+      squareClasses = "bg-[#CCFBF1] border border-[#99F6E4] text-[#0D9488]";
+    } else if (
+      normalized === "ACTIVE_TRIP" ||
+      normalized === "ACTIVE" ||
+      normalized === "ACCEPTING" ||
+      normalized === "ON_SHIFT" ||
+      normalized === "ON SHIFT"
+    ) {
+      squareClasses = "bg-[#DCFCE7] border border-[#BBF7D0] text-[#16A34A]";
+    } else if (normalized === "COMPLETED") {
+      squareClasses = "bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D]";
+    } else if (
+      normalized === "DIVERTING" ||
+      normalized === "SUSPENDED" ||
+      normalized === "OVERDUE" ||
+      normalized === "SERVICE_OVERDUE" ||
+      normalized === "SERVICE OVERDUE"
+    ) {
+      squareClasses = "bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]";
+    } else if (
+      normalized === "CLOSED" ||
+      normalized === "DELETED"
+    ) {
+      squareClasses = "bg-red-50 border border-red-200 text-red-600";
+    } else if (
+      normalized === "CANCELLED" ||
+      normalized === "REJECTED" ||
+      normalized === "FAILED" ||
+      normalized === "OFF_SHIFT" ||
+      normalized === "OFF SHIFT"
+    ) {
+      squareClasses = "bg-slate-100 border border-slate-200 text-slate-500";
+    }
+
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-bold rounded-none select-none tracking-tight",
+          squareClasses,
+          className,
+        )}
+      >
+        {formattedLabel}
+      </span>
+    );
+  }
 
   // Text color logic per design specifications
   let colorClasses = "text-text-secondary";

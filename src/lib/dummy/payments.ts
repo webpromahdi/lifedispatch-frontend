@@ -29,17 +29,17 @@ export const seedPayments: Payment[] = [
   },
   {
     id: "pay_002",
-    tripId: "trip_004",
-    patientId: "usr_patient_03",
+    tripId: "trip_001",
+    patientId: "usr_patient_01",
     invoiceNumber: "INV-2026-000102",
     status: PaymentStatus.PENDING,
     currency: "BDT",
     baseFare: 500,
-    distanceCharge: 532, // 15.2 km * 35 BDT/km
+    distanceCharge: 140, // 4 km * 35 BDT/km
     waitingCharge: 0,
     additionalCharges: 0,
     discount: 0,
-    totalAmount: 1032,
+    totalAmount: 640,
     transactionId: null,
     paymentMethod: null,
     paymentInitiatedAt: null,

@@ -4,7 +4,7 @@ import { AmbulanceStatus, AmbulanceType } from "@/lib/types/enums";
 export const seedAmbulances: Ambulance[] = [
   {
     id: "amb_001",
-    registrationNumber: "DHAKA-METRO-CHA-71-4091",
+    registrationNumber: "DHK-AMB-204",
     type: AmbulanceType.ADVANCED_LIFE_SUPPORT,
     status: AmbulanceStatus.BUSY,
     version: 3,

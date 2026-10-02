@@ -7,10 +7,28 @@ import { cn } from "@/lib/utils";
 export interface PriorityBadgeProps {
   priority: EmergencyPriority | string | null | undefined;
   className?: string;
+  variant?: "default" | "square" | "compact";
 }
 
-export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
+export function PriorityBadge({
+  priority,
+  className,
+  variant = "default",
+}: PriorityBadgeProps) {
   if (!priority) {
+    if (variant === "square") {
+      return (
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B]",
+            className,
+          )}
+        >
+          <span className="w-2 h-2 bg-[#94A3B8] shrink-0" />
+          <span>Unset</span>
+        </span>
+      );
+    }
     return (
       <span className={cn("text-xs text-text-muted", className)}>
         Unassigned
@@ -19,6 +37,47 @@ export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
   }
 
   const p = priority.toUpperCase();
+
+  if (variant === "square") {
+    if (p.includes("P1") || p === "P1_CRITICAL") {
+      return (
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 text-xs font-bold text-[#DC2626]",
+            className,
+          )}
+        >
+          <span className="w-2 h-2 bg-[#DC2626] shrink-0" />
+          <span>P1</span>
+        </span>
+      );
+    }
+    if (p.includes("P2") || p === "P2_EMERGENCY") {
+      return (
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706]",
+            className,
+          )}
+        >
+          <span className="w-2 h-2 bg-[#D97706] shrink-0" />
+          <span>P2</span>
+        </span>
+      );
+    }
+    const label = p.includes("P3") ? "P3" : p.includes("P4") ? "P4" : "P5";
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B]",
+          className,
+        )}
+      >
+        <span className="w-2 h-2 bg-[#94A3B8] shrink-0" />
+        <span>{label}</span>
+      </span>
+    );
+  }
 
   let textColor = "text-text-muted";
   let label = priority;

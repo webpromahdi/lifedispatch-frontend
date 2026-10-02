@@ -20,7 +20,7 @@ export const seedHospitals: Hospital[] = [
   },
   {
     id: "hosp_002",
-    name: "Evercare Hospital Dhaka",
+    name: "Central City Hospital",
     address: "Plot 81, Block E, Bashundhara R/A, Dhaka-1229",
     locationLat: 23.8103,
     locationLng: 90.4312,
