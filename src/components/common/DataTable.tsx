@@ -17,7 +17,7 @@ export function DataTable({
   return (
     <div
       className={cn(
-        "w-full bg-surface border border-border rounded-xl shadow-xs overflow-hidden flex flex-col",
+        "w-full bg-surface border border-border rounded-none shadow-xs overflow-hidden flex flex-col",
         className,
       )}
     >

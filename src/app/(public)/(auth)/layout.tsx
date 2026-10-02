@@ -39,14 +39,14 @@ export default function AuthLayout({
             alt="LifeDispatch"
             width={240}
             height={80}
-            className="h-10 sm:h-12 md:h-[50px] w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            className="h-10 sm:h-12 md:h-12.5 w-auto object-contain transition-transform group-hover:scale-[1.02]"
             priority
           />
         </Link>
 
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-slate-700 hover:text-primary transition-colors min-h-[44px] px-3 py-2 focus:outline-hidden"
+          className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold text-slate-700 hover:text-primary transition-colors min-h-11 px-3 py-2 focus:outline-hidden"
         >
           <ChevronLeft className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
           <span>Back to Home</span>

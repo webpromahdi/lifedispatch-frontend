@@ -154,7 +154,7 @@ export function LoginForm() {
         >
           {/* Left trace */}
           <svg
-            className="absolute top-[86px] left-0 w-[calc(50%-240px)] h-6 text-primary/40"
+            className="absolute top-21.5 left-0 w-[calc(50%-240px)] h-6 text-primary/40"
             preserveAspectRatio="none"
             viewBox="0 0 400 24"
             fill="none"
@@ -168,7 +168,7 @@ export function LoginForm() {
           </svg>
           {/* Right trace */}
           <svg
-            className="absolute top-[86px] right-0 w-[calc(50%-240px)] h-6 text-primary/40"
+            className="absolute top-21.5 right-0 w-[calc(50%-240px)] h-6 text-primary/40"
             preserveAspectRatio="none"
             viewBox="0 0 400 24"
             fill="none"
@@ -187,11 +187,11 @@ export function LoginForm() {
           <motion.div
             initial={false}
             animate={{ opacity: 1, y: 0 }}
-            className="relative w-full max-w-[460px] filter drop-shadow-[0_8px_24px_rgba(20,184,166,0.12)]"
+            className="relative w-full max-w-115 filter drop-shadow-[0_8px_24px_rgba(20,184,166,0.12)]"
           >
             {/* Outer teal 2px framed border with chamfered corners */}
             <div
-              className="w-full bg-primary p-[2px]"
+              className="w-full bg-primary p-0.5"
               style={{
                 clipPath:
                   "polygon(16px 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 24px 100%, 0 calc(100% - 24px), 0 16px)",
@@ -260,7 +260,7 @@ export function LoginForm() {
                       </div>
                       {/* Teal corner notch */}
                       <svg
-                        className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                         viewBox="0 0 14 14"
                         fill="none"
                         aria-hidden="true"
@@ -312,7 +312,7 @@ export function LoginForm() {
                           aria-label={
                             showPassword ? "Hide password" : "Show password"
                           }
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-11 min-w-11 flex items-center justify-center cursor-pointer transition-colors"
                         >
                           {showPassword ? (
                             <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -323,7 +323,7 @@ export function LoginForm() {
                       </div>
                       {/* Teal corner notch */}
                       <svg
-                        className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                         viewBox="0 0 14 14"
                         fill="none"
                         aria-hidden="true"
@@ -345,7 +345,7 @@ export function LoginForm() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full h-12 min-h-[48px] bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-md flex items-center justify-between px-5 transition-all shadow-[0_3px_0_0_#0f766e] active:translate-y-[2px] active:shadow-none cursor-pointer disabled:opacity-60"
+                      className="w-full h-12 min-h-12 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-md flex items-center justify-between px-5 transition-all shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-60"
                       style={{
                         clipPath:
                           "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
@@ -378,7 +378,7 @@ export function LoginForm() {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="relative w-full h-12 min-h-[48px] group flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
+                  className="relative w-full h-12 min-h-12 group flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
                 >
                   {/* Outer border container */}
                   <div
@@ -389,7 +389,7 @@ export function LoginForm() {
                     }}
                   >
                     <div
-                      className="absolute inset-[2px] bg-white group-hover:bg-slate-50 transition-colors"
+                      className="absolute inset-0.5 bg-white group-hover:bg-slate-50 transition-colors"
                       style={{
                         clipPath:
                           "polygon(6px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px)",
@@ -399,7 +399,7 @@ export function LoginForm() {
 
                   {/* Top-right corner black notch */}
                   <div
-                    className="absolute top-0 right-0 w-[14px] h-[14px] bg-slate-900 pointer-events-none"
+                    className="absolute top-0 right-0 w-3.5 h-3.5 bg-slate-900 pointer-events-none"
                     style={{
                       clipPath: "polygon(0 0, 100% 0, 100% 100%)",
                     }}
@@ -455,11 +455,11 @@ export function LoginForm() {
       <div className="w-full pt-6 sm:pt-8">
         <section
           aria-label="Quick Access Role Selection"
-          className="relative w-full max-w-[840px] mx-auto"
+          className="relative w-full max-w-210 mx-auto"
         >
           {/* Outer teal framed box — 8-point chamfered corners */}
           <div
-            className="w-full bg-primary p-[2px] relative"
+            className="w-full bg-primary p-0.5 relative"
             style={{
               clipPath:
                 "polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px)",
@@ -487,9 +487,9 @@ export function LoginForm() {
                 className="w-full flex items-center justify-between mb-6 pointer-events-none"
                 aria-hidden="true"
               >
-                <div className="h-[1.5px] flex-1 max-w-[140px] sm:max-w-[200px] bg-primary/35" />
+                <div className="h-[1.5px] flex-1 max-w-35 sm:max-w-50 bg-primary/35" />
                 <div className="flex-1" />
-                <div className="h-[1.5px] flex-1 max-w-[140px] sm:max-w-[200px] bg-primary/35" />
+                <div className="h-[1.5px] flex-1 max-w-35 sm:max-w-50 bg-primary/35" />
               </div>
 
               {/* 3×2 grid — 1 col mobile, 2 col tablet, 3 col desktop */}
@@ -513,7 +513,7 @@ export function LoginForm() {
                       <button
                         type="button"
                         onClick={() => handleQuickLogin(role)}
-                        className="mt-2.5 relative w-full h-10 min-h-[42px] group/btn flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
+                        className="mt-2.5 relative w-full h-10 min-h-10.5 group/btn flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
                       >
                         {/* Outer continuous dark border with 4-corner chamfer */}
                         <div

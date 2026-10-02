@@ -86,7 +86,7 @@ export function ForgotPasswordForm() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors mt-2"
+              className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors mt-2"
             >
               {loading ? (
                 <span>Generating OTP...</span>
@@ -102,7 +102,7 @@ export function ForgotPasswordForm() {
           <div className="mt-6 pt-5 border-t border-border text-center text-xs text-text-secondary">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary-dark hover:underline transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary-dark hover:underline transition-colors min-h-11"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               <span>Back to Sign In</span>
@@ -138,7 +138,7 @@ export function ForgotPasswordForm() {
                   `/reset-password?email=${encodeURIComponent(email)}`,
                 )
               }
-              className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors"
+              className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors"
             >
               <span>Proceed to Enter OTP</span>
               <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
@@ -147,7 +147,7 @@ export function ForgotPasswordForm() {
             <Button
               variant="outline"
               onClick={() => setSubmitted(false)}
-              className="w-full min-h-[44px] border-border text-text-secondary hover:text-text-primary cursor-pointer"
+              className="w-full min-h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
             >
               Didn&apos;t receive it? Try again
             </Button>

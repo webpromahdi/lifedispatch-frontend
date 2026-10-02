@@ -99,7 +99,7 @@ export function HospitalStaffShiftView() {
           { label: "Shift Schedule" },
         ]}
         action={
-          <div className="flex items-center gap-3 bg-surface p-1.5 px-3 rounded-xl border border-border shadow-2xs">
+          <div className="flex items-center gap-3 bg-surface p-1.5 px-3 rounded-none border border-border shadow-2xs">
             <div className="text-right">
               <div className="text-xs font-semibold text-text-primary">
                 ER Duty Status
@@ -114,7 +114,7 @@ export function HospitalStaffShiftView() {
               onClick={handleToggleShift}
               aria-label={`Toggle ER clinical shift duty. Currently ${isOnShift ? "On Duty" : "Off Duty"}`}
               className={cn(
-                "min-h-[38px] font-semibold text-xs gap-1.5 cursor-pointer transition-colors",
+                "min-h-9.5 font-semibold text-xs gap-1.5 cursor-pointer transition-colors",
                 isOnShift
                   ? "bg-status hover:bg-status/90 text-white"
                   : "bg-muted text-text-secondary hover:bg-muted/80 border border-border",
@@ -159,7 +159,7 @@ export function HospitalStaffShiftView() {
       {/* Duty Status Highlight Banner */}
       <div
         className={cn(
-          "p-5 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4",
+          "p-5 rounded-none border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4",
           isOnShift
             ? "bg-status-bg border-status/30"
             : "bg-muted/40 border-border",
@@ -168,7 +168,7 @@ export function HospitalStaffShiftView() {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center shrink-0",
+              "h-10 w-10 rounded-none flex items-center justify-center shrink-0",
               isOnShift
                 ? "bg-status text-white shadow-xs"
                 : "bg-muted text-text-muted",
@@ -195,14 +195,14 @@ export function HospitalStaffShiftView() {
           onClick={handleToggleShift}
           variant="outline"
           aria-label={isOnShift ? "End current shift" : "Start current shift"}
-          className="min-h-[40px] text-xs font-semibold bg-surface border-border hover:bg-background cursor-pointer"
+          className="min-h-10 text-xs font-semibold bg-surface border-border hover:bg-background cursor-pointer"
         >
           {isOnShift ? "Clock Out of Shift" : "Clock In to Shift"}
         </Button>
       </div>
 
       {/* Weekly Schedule Overview */}
-      <div className="bg-surface border border-border rounded-xl p-6 shadow-xs space-y-4">
+      <div className="bg-surface border border-border rounded-none p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-border">
           <div>
             <h3 className="font-bold text-base text-text-primary">
@@ -223,14 +223,14 @@ export function HospitalStaffShiftView() {
             <div
               key={item.day}
               className={cn(
-                "p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-all",
+                "p-3.5 rounded-none border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs",
                 item.status === "CURRENT"
                   ? "bg-primary-light/40 border-primary shadow-xs ring-1 ring-primary/20"
                   : "bg-background border-border",
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center font-bold text-xs text-text-primary shrink-0">
+                <div className="h-8 w-8 rounded-none bg-surface border border-border flex items-center justify-center font-bold text-xs text-text-primary shrink-0">
                   {item.day.slice(0, 3)}
                 </div>
 

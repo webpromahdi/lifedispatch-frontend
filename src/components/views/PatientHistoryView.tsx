@@ -54,7 +54,7 @@ export function PatientHistoryView() {
       />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -97,7 +97,7 @@ export function PatientHistoryView() {
         {filteredEmergencies.map((em, _idx) => (
           <div
             key={em.id}
-            className="p-5 rounded-xl bg-surface border border-border hover:border-border-strong transition-all shadow-xs space-y-4"
+            className="p-5 rounded-none bg-surface border border-border shadow-xs space-y-4"
           >
             {/* Top row: Incident #, Type, Priority, Status */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
@@ -140,7 +140,7 @@ export function PatientHistoryView() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-background border border-border space-y-2">
+              <div className="p-3 rounded-none bg-background border border-border space-y-2">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-text-muted">Capability:</span>
                   <span className="font-semibold text-text-primary">
@@ -172,7 +172,7 @@ export function PatientHistoryView() {
 
               <Link
                 href={`/dashboard/patient/payment/pay_001`}
-                className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-lg hover:bg-primary-light transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-none hover:bg-primary-light cursor-pointer"
               >
                 <Receipt className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>View Trip Invoice</span>

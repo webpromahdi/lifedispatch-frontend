@@ -105,18 +105,18 @@ export function SuperAdminOverviewView() {
         className="grid grid-cols-1 sm:grid-cols-3 gap-6"
       >
         {/* Admin Accounts */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Admin Accounts
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {adminAccountsCount}
           </div>
         </div>
 
         {/* Suspended Accounts (Amber) */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Suspended Accounts
@@ -127,12 +127,12 @@ export function SuperAdminOverviewView() {
         </div>
 
         {/* Deleted Accounts */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Deleted Accounts
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {deletedAccountsCount}
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface StatusBadgeProps {
@@ -38,9 +37,9 @@ export function StatusBadge({
     if (normalized === "PENDING" || normalized === "PENDING_ACCEPTANCE") {
       squareClasses = "bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]";
     } else if (normalized === "PRIORITIZED") {
-      squareClasses = "bg-[#F1F5F9] border border-[#CBD5E1] text-[#1E2D3D]";
+      squareClasses = "bg-[#F1F5F9] border border-border-strong text-text-primary";
     } else if (normalized === "DISPATCHING") {
-      squareClasses = "bg-[#CCFBF1] border border-[#99F6E4] text-[#0D9488]";
+      squareClasses = "bg-[#CCFBF1] border border-[#99F6E4] text-primary-dark";
     } else if (
       normalized === "ACTIVE_TRIP" ||
       normalized === "ACTIVE" ||
@@ -50,7 +49,7 @@ export function StatusBadge({
     ) {
       squareClasses = "bg-[#DCFCE7] border border-[#BBF7D0] text-[#16A34A]";
     } else if (normalized === "COMPLETED") {
-      squareClasses = "bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D]";
+      squareClasses = "bg-status-bg border border-[#BBF7D0] text-status-text";
     } else if (
       normalized === "DIVERTING" ||
       normalized === "SUSPENDED" ||
@@ -121,22 +120,20 @@ export function StatusBadge({
   }
 
   return (
-    <motion.span
-      layout
-      transition={{ duration: 0.2 }}
+    <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border border-border bg-surface shadow-xs transition-colors",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-xs border border-border bg-surface shadow-xs",
         colorClasses,
         className,
       )}
     >
       {isPositive && (
         <span
-          className="h-1.5 w-1.5 rounded-full bg-status shrink-0 animate-pulse"
+          className="h-1.5 w-1.5 rounded-none bg-status shrink-0"
           aria-hidden="true"
         />
       )}
       <span>{formattedLabel}</span>
-    </motion.span>
+    </span>
   );
 }

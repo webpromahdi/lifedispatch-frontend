@@ -65,7 +65,7 @@ export function Pagination({
           onClick={() => onPageChange(safePage - 1)}
           disabled={!canPrev}
           aria-label="Previous page"
-          className="min-h-[44px] min-w-[44px] sm:min-h-[36px] sm:min-w-[36px] px-3 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer disabled:cursor-not-allowed"
+          className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9 px-3 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer disabled:cursor-not-allowed"
         >
           <ChevronLeft className="h-4 w-4 mr-1" aria-hidden="true" />
           <span>Prev</span>
@@ -77,7 +77,7 @@ export function Pagination({
           onClick={() => onPageChange(safePage + 1)}
           disabled={!canNext}
           aria-label="Next page"
-          className="min-h-[44px] min-w-[44px] sm:min-h-[36px] sm:min-w-[36px] px-3 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer disabled:cursor-not-allowed"
+          className="min-h-11 min-w-11 sm:min-h-9 sm:min-w-9 px-3 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer disabled:cursor-not-allowed"
         >
           <span>Next</span>
           <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />

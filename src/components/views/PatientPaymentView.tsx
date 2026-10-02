@@ -78,7 +78,7 @@ export function PatientPaymentView({
             <Button
               variant="outline"
               size="sm"
-              className="text-xs min-h-[38px] cursor-pointer"
+              className="text-xs min-h-9.5 cursor-pointer"
             >
               <ArrowLeft className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
               Return to Portal
@@ -88,7 +88,7 @@ export function PatientPaymentView({
       />
 
       {/* Main Invoice Card */}
-      <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="bg-surface border border-border rounded-none p-6 sm:p-8 shadow-xs space-y-6">
         {/* Invoice Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
           <div className="space-y-1">
@@ -121,7 +121,7 @@ export function PatientPaymentView({
         </div>
 
         {/* Invoice Meta Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-background border border-border text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-none bg-background border border-border text-xs">
           <div>
             <span className="text-text-muted block text-[11px]">
               Invoice Date
@@ -165,7 +165,7 @@ export function PatientPaymentView({
             Itemized Clinical Services & Mileage
           </h3>
 
-          <div className="border border-border rounded-xl overflow-hidden divide-y divide-border text-xs">
+          <div className="border border-border rounded-none overflow-hidden divide-y divide-border text-xs">
             <div className="flex justify-between items-center p-3 bg-muted/40 font-medium text-text-secondary">
               <span>Service Description</span>
               <span>Amount (BDT)</span>
@@ -180,12 +180,11 @@ export function PatientPaymentView({
                   Includes paramedic crew dispatch & initial pre-hospital triage
                 </span>
               </div>
-              <span
+              <div
                 className="font-mono font-semibold text-text-primary"
-                aria-label={`Base emergency dispatch fare: ${payment.baseFare} Bangladeshi Taka`}
               >
                 {formatBDT(payment.baseFare)}
-              </span>
+              </div>
             </div>
 
             <div className="flex justify-between items-center p-3">
@@ -197,12 +196,11 @@ export function PatientPaymentView({
                   Traveled distance surcharge at standard tariff (12.6 km)
                 </span>
               </div>
-              <span
+              <div
                 className="font-mono font-semibold text-text-primary"
-                aria-label={`Distance surcharge: ${payment.distanceCharge} Bangladeshi Taka`}
               >
                 {formatBDT(payment.distanceCharge)}
-              </span>
+              </div>
             </div>
 
             <div className="flex justify-between items-center p-3">
@@ -214,12 +212,11 @@ export function PatientPaymentView({
                   Cardiac telemetry & vitals monitoring (Subsidy applied)
                 </span>
               </div>
-              <span
+              <div
                 className="font-mono font-semibold text-status"
-                aria-label="Onboard clinical equipment and oxygen support: 0 Bangladeshi Taka, included"
               >
                 ৳0.00 (Included)
-              </span>
+              </div>
             </div>
 
             <div className="flex justify-between items-center p-3">
@@ -231,12 +228,11 @@ export function PatientPaymentView({
                   Emergency life-support transport exempt (0% VAT)
                 </span>
               </div>
-              <span
+              <div
                 className="font-mono font-semibold text-text-secondary"
-                aria-label="Government healthcare VAT: 0 Bangladeshi Taka, exempt"
               >
                 ৳0.00
-              </span>
+              </div>
             </div>
 
             {/* Total Row */}
@@ -249,12 +245,11 @@ export function PatientPaymentView({
                   Final payable in Bangladeshi Taka (BDT)
                 </span>
               </div>
-              <span
+              <div
                 className="text-lg font-bold text-primary font-mono"
-                aria-label={`Total payable amount: ${payment.totalAmount} Bangladeshi Taka`}
               >
                 {formatBDT(payment.totalAmount)}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -277,7 +272,7 @@ export function PatientPaymentView({
                   type="button"
                   key={method.id}
                   onClick={() => setSelectedMethod(method.id)}
-                  className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                  className={`p-3 rounded-none border text-left flex flex-col justify-between cursor-pointer ${
                     selectedMethod === method.id
                       ? "border-primary bg-primary-light/50 ring-2 ring-primary/20 shadow-xs"
                       : "border-border hover:border-border-strong bg-background"
@@ -313,7 +308,7 @@ export function PatientPaymentView({
                 onClick={handlePayNow}
                 disabled={isProcessing}
                 aria-label={`Pay now ${payment.totalAmount} Bangladeshi Taka via ${selectedMethod}`}
-                className="w-full sm:w-auto min-h-[44px] px-8 bg-primary hover:bg-primary-dark text-white font-semibold text-xs cursor-pointer shadow-xs"
+                className="w-full sm:w-auto min-h-11 px-8 bg-primary hover:bg-primary-dark text-white font-semibold text-xs cursor-pointer shadow-xs"
               >
                 {isProcessing
                   ? "Connecting to Gateway..."
@@ -322,7 +317,7 @@ export function PatientPaymentView({
             </div>
           </div>
         ) : (
-          <div className="p-4 rounded-xl bg-status-bg border border-status/30 flex items-center justify-between text-xs text-status-text">
+          <div className="p-4 rounded-none bg-status-bg border border-status/30 flex items-center justify-between text-xs text-status-text">
             <div className="flex items-center gap-2">
               <CheckCircle2
                 className="h-5 w-5 text-status shrink-0"

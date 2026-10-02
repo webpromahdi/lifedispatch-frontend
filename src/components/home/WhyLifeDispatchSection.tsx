@@ -126,7 +126,7 @@ export function WhyLifeDispatchSection() {
 
                   {/* Right part: Description */}
                   <div className="flex-1">
-                    <p className="text-slate-500 text-sm sm:text-[14px] leading-relaxed max-w-[250px]">
+                    <p className="text-slate-500 text-sm sm:text-[14px] leading-relaxed max-w-62.5">
                       {item.description}
                     </p>
                   </div>

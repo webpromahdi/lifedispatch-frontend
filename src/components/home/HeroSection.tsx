@@ -23,7 +23,7 @@ export function HeroSection() {
       {/* Subtle ambient teal background glow */}
       <div
         aria-hidden="true"
-        className="absolute -top-32 right-0 w-[500px] h-[500px] bg-primary-light/50 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-32 right-0 w-125 h-125 bg-primary-light/50 rounded-full blur-3xl pointer-events-none"
       />
 
       {/* ── Technical Wireframe & HUD Background Accents (From Reference Image) ── */}
@@ -33,7 +33,7 @@ export function HeroSection() {
       >
         {/* Top perimeter circuit line with 45° step notches */}
         <svg
-          className="absolute top-16 sm:top-[70px] left-0 w-full h-8 text-slate-200"
+          className="absolute top-16 sm:top-17.5 left-0 w-full h-8 text-slate-200"
           preserveAspectRatio="none"
           viewBox="0 0 1200 32"
           fill="none"
@@ -115,7 +115,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.16 }}
-              className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-[500px] font-normal"
+              className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-125 font-normal"
             >
               LifeDispatch connects patients, ambulances, dispatchers, and
               hospitals to coordinate emergency response in real time.
@@ -165,7 +165,7 @@ export function HeroSection() {
               className="flex flex-col sm:flex-row gap-3.5 pt-2"
             >
               <Link href="/login" className="w-full sm:w-auto">
-                <Button className="min-h-[48px] px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center gap-2.5 w-full sm:w-auto justify-center">
+                <Button className="min-h-12 px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center gap-2.5 w-full sm:w-auto justify-center">
                   <Ambulance
                     className="h-4 w-4"
                     strokeWidth={2.2}
@@ -182,7 +182,7 @@ export function HeroSection() {
               <Link href="#features" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
-                  className="min-h-[48px] px-6 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center gap-2.5 w-full sm:w-auto justify-center"
+                  className="min-h-12 px-6 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center gap-2.5 w-full sm:w-auto justify-center"
                 >
                   <span>Explore Platform</span>
                   <ArrowRight
@@ -264,10 +264,10 @@ export function HeroSection() {
             </div>
 
             {/* Image Container with 45° Chamfered Corners & 2px Dark Border */}
-            <div className="relative w-full max-w-[580px] aspect-4/3 filter drop-shadow-[4px_4px_0px_#0f172a]">
+            <div className="relative w-full max-w-145 aspect-4/3 filter drop-shadow-[4px_4px_0px_#0f172a]">
               {/* Dark border shell (2px outline via 2px padding on clipped container) */}
               <div
-                className="w-full h-full bg-slate-900 p-[2px]"
+                className="w-full h-full bg-slate-900 p-0.5"
                 style={{
                   clipPath:
                     "polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%)",

@@ -65,7 +65,7 @@ export function DispatcherAmbulancesView() {
       />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -82,15 +82,15 @@ export function DispatcherAmbulancesView() {
 
         <div className="flex items-center gap-3 text-xs text-text-secondary">
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-status" />
+            <span className="h-2 w-2 rounded-none bg-status" />
             Available: <strong>{availableUnits.length}</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-amber-500" />
+            <span className="h-2 w-2 rounded-none bg-amber-500" />
             Busy: <strong>{busyUnits.length}</strong>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-destructive" />
+            <span className="h-2 w-2 rounded-none bg-destructive" />
             Out of Service: <strong>{outOfServiceUnits.length}</strong>
           </span>
         </div>
@@ -100,9 +100,9 @@ export function DispatcherAmbulancesView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Column 1: AVAILABLE */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-status-bg border border-status/30">
+          <div className="flex items-center justify-between p-3 rounded-none bg-status-bg border border-status/30">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-status animate-pulse" />
+              <span className="h-2.5 w-2.5 rounded-none bg-status" />
               <h2 className="text-xs font-bold text-status-text uppercase tracking-wider">
                 Available Units
               </h2>
@@ -115,9 +115,9 @@ export function DispatcherAmbulancesView() {
             </Badge>
           </div>
 
-          <div className="space-y-3 min-h-[300px]">
+          <div className="space-y-3 min-h-75">
             {availableUnits.length === 0 ? (
-              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-xl bg-surface/50">
+              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units currently available in this filter.
               </div>
             ) : (
@@ -134,9 +134,9 @@ export function DispatcherAmbulancesView() {
 
         {/* Column 2: BUSY */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+          <div className="flex items-center justify-between p-3 rounded-none bg-amber-500/10 border border-amber-500/30">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+              <span className="h-2.5 w-2.5 rounded-none bg-amber-500" />
               <h2 className="text-xs font-bold text-amber-700 uppercase tracking-wider">
                 Busy / On Mission
               </h2>
@@ -149,9 +149,9 @@ export function DispatcherAmbulancesView() {
             </Badge>
           </div>
 
-          <div className="space-y-3 min-h-[300px]">
+          <div className="space-y-3 min-h-75">
             {busyUnits.length === 0 ? (
-              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-xl bg-surface/50">
+              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units currently busy.
               </div>
             ) : (
@@ -168,9 +168,9 @@ export function DispatcherAmbulancesView() {
 
         {/* Column 3: OUT_OF_SERVICE */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-destructive-bg border border-destructive/30">
+          <div className="flex items-center justify-between p-3 rounded-none bg-destructive-bg border border-destructive/30">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-destructive" />
+              <span className="h-2.5 w-2.5 rounded-none bg-destructive" />
               <h2 className="text-xs font-bold text-destructive uppercase tracking-wider">
                 Out of Service / Maintenance
               </h2>
@@ -183,9 +183,9 @@ export function DispatcherAmbulancesView() {
             </Badge>
           </div>
 
-          <div className="space-y-3 min-h-[300px]">
+          <div className="space-y-3 min-h-75">
             {outOfServiceUnits.length === 0 ? (
-              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-xl bg-surface/50">
+              <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units out of service.
               </div>
             ) : (
@@ -212,7 +212,7 @@ function AmbulanceStatusCard({
   onStatusChange: (id: string, status: AmbulanceStatus) => void;
 }) {
   return (
-    <div className="p-4 rounded-xl bg-surface border border-border hover:border-border-strong transition-all shadow-xs space-y-3">
+    <div className="p-4 rounded-none bg-surface border border-border shadow-xs space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Ambulance

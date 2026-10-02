@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 import type React from "react";
 import { cn } from "@/lib/utils";
@@ -26,15 +23,11 @@ export function StatCard({
   trend,
   subtitle,
   className,
-  delay = 0,
 }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut", delay }}
+    <div
       className={cn(
-        "bg-surface border border-border rounded-xl p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between min-h-[120px]",
+        "bg-surface border border-border rounded-none p-5 shadow-xs flex flex-col justify-between min-h-30",
         className,
       )}
     >
@@ -43,7 +36,7 @@ export function StatCard({
           {label}
         </span>
         {Icon && (
-          <div className="h-9 w-9 rounded-lg bg-primary-light text-primary flex items-center justify-center shrink-0">
+          <div className="h-9 w-9 rounded-none bg-primary-light text-primary flex items-center justify-center shrink-0">
             <Icon className="h-5 w-5" aria-hidden="true" />
           </div>
         )}
@@ -78,6 +71,6 @@ export function StatCard({
       </div>
 
       {subtitle && <p className="mt-2 text-xs text-text-muted">{subtitle}</p>}
-    </motion.div>
+    </div>
   );
 }

@@ -58,7 +58,7 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
           size="icon"
           onClick={onOpenMobileDrawer}
           aria-label="Open navigation menu"
-          className="lg:hidden min-h-[44px] min-w-[44px] text-text-primary hover:bg-muted rounded-none cursor-pointer"
+          className="lg:hidden min-h-11 min-w-11 text-text-primary hover:bg-muted rounded-none cursor-pointer"
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </Button>
@@ -70,7 +70,7 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
 
       {/* Right: Square Avatar + Name + Role + Caret */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 bg-[#CCFBF1] text-[#0D9488] font-bold text-sm flex items-center justify-center rounded-none shrink-0 shadow-xs">
+        <div className="w-9 h-9 bg-[#CCFBF1] text-primary-dark font-bold text-sm flex items-center justify-center rounded-none shrink-0 shadow-xs">
           {userInitials}
         </div>
         <div className="flex flex-col text-left">

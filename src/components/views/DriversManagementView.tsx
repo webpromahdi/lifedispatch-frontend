@@ -69,7 +69,7 @@ export function DriversManagementView() {
       />
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -178,13 +178,13 @@ export function DriversManagementView() {
                   </TableCell>
                   <TableCell>
                     {driver.isOnShift ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span className="h-2 w-2 rounded-full bg-status animate-pulse" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="h-2 w-2 rounded-none bg-status" />
                         ON DUTY
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                        <span className="h-2 w-2 rounded-full bg-slate-400" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="h-2 w-2 rounded-none bg-slate-400" />
                         OFF DUTY
                       </span>
                     )}

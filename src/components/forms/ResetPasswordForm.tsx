@@ -136,7 +136,7 @@ export function ResetPasswordForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors mt-2"
+          className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors mt-2"
         >
           {loading ? (
             <span>Updating Password...</span>
@@ -152,7 +152,7 @@ export function ResetPasswordForm() {
       <div className="mt-6 pt-5 border-t border-border text-center text-xs text-text-secondary">
         <Link
           href="/login"
-          className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary-dark hover:underline transition-colors min-h-[44px]"
+          className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary-dark hover:underline transition-colors min-h-11"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           <span>Back to Sign In</span>

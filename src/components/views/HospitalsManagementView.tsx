@@ -69,7 +69,7 @@ export function HospitalsManagementView() {
       />
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -147,7 +147,7 @@ export function HospitalsManagementView() {
                     />
                     {hosp.name}
                   </div>
-                  <div className="text-[11px] text-text-muted truncate max-w-[280px]">
+                  <div className="text-[11px] text-text-muted truncate max-w-70">
                     {hosp.address}
                   </div>
                 </TableCell>
@@ -166,7 +166,7 @@ export function HospitalsManagementView() {
                     {hosp.email}
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-text-muted max-w-[240px] truncate">
+                <TableCell className="text-xs text-text-muted max-w-60 truncate">
                   {hosp.diversionReason || "Accepting patient dispatches"}
                 </TableCell>
                 <TableCell className="text-right">

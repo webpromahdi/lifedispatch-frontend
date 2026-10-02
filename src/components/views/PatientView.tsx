@@ -50,7 +50,7 @@ import { cn, formatDate } from "@/lib/utils";
 export function CornerNotch() {
   return (
     <div
-      className="absolute -top-[2px] -right-[2px] w-4 h-4 bg-[#14B8A6] pointer-events-none"
+      className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary pointer-events-none"
       style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
       aria-hidden="true"
     />
@@ -61,7 +61,7 @@ export function CornerNotch() {
 export function LabelTab({ label }: { label: string }) {
   return (
     <div
-      className="inline-flex items-center px-3.5 py-1 bg-[#E6F8F6] text-[#0D9488] text-xs font-bold uppercase tracking-wider select-none"
+      className="inline-flex items-center px-3.5 py-1 bg-[#E6F8F6] text-primary-dark text-xs font-bold uppercase tracking-wider select-none"
       style={{
         clipPath: "polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)",
       }}
@@ -90,8 +90,8 @@ function TablePriorityBadge({ priority }: { priority: EmergencyPriority | null }
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B]">
-      <span className="w-2 h-2 bg-[#94A3B8] shrink-0" />
+    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary">
+      <span className="w-2 h-2 bg-text-muted shrink-0" />
       <span>{priority === EmergencyPriority.P3_URGENT ? "P3" : priority === EmergencyPriority.P4_NON_URGENT ? "P4" : "P5"}</span>
     </span>
   );
@@ -107,7 +107,7 @@ function TableStatusBadge({ status }: { status: EmergencyStatus }) {
 
   if (isActive) {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D] text-xs font-bold rounded-none">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-status-bg border border-[#BBF7D0] text-status-text text-xs font-bold rounded-none">
         Active
       </span>
     );
@@ -115,7 +115,7 @@ function TableStatusBadge({ status }: { status: EmergencyStatus }) {
 
   if (status === EmergencyStatus.COMPLETED) {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D] text-xs font-bold rounded-none">
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-status-bg border border-[#BBF7D0] text-status-text text-xs font-bold rounded-none">
         Completed
       </span>
     );
@@ -378,7 +378,7 @@ export function PatientView() {
         {/* ── 1. CURRENT EMERGENCY CARD ── */}
         <section
           aria-label="Current Emergency"
-          className="order-1 lg:col-span-8 w-full relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+          className="order-1 lg:col-span-8 w-full relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
         >
           <CornerNotch />
           <LabelTab label="CURRENT EMERGENCY" />
@@ -393,7 +393,7 @@ export function PatientView() {
                   </h2>
 
                   {/* Priority Badge */}
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] text-xs font-bold rounded-none select-none">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-destructive-bg border border-[#FECACA] text-[#DC2626] text-xs font-bold rounded-none select-none">
                     <span className="w-2 h-2 bg-[#DC2626] shrink-0" />
                     <span>
                       {activeEmergency.priority === EmergencyPriority.P1_CRITICAL
@@ -403,8 +403,8 @@ export function PatientView() {
                   </span>
 
                   {/* Status Badge */}
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#F0FDF4] border border-[#BBF7D0] text-[#15803D] text-xs font-bold rounded-none select-none">
-                    <Check className="w-3.5 h-3.5 text-[#15803D] shrink-0" strokeWidth={2.5} />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-status-bg border border-[#BBF7D0] text-status-text text-xs font-bold rounded-none select-none">
+                    <Check className="w-3.5 h-3.5 text-status-text shrink-0" strokeWidth={2.5} />
                     <span>Active</span>
                   </span>
                 </div>
@@ -434,17 +434,17 @@ export function PatientView() {
                 </div>
               ) : (
                 <div className="pt-2 pb-1 overflow-x-auto">
-                  <div className="min-w-[480px] sm:min-w-0 flex items-center justify-between">
+                  <div className="min-w-120 sm:min-w-0 flex items-center justify-between">
                     {/* Step 1: Request Sent */}
                     <div className="flex flex-col items-center flex-1">
                       <div
                         className={cn(
                           "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm rounded-none select-none",
                           currentStep >= 1 && currentStep !== 1
-                            ? "bg-[#14B8A6] text-white"
+                            ? "bg-primary text-white"
                             : currentStep === 1
-                              ? "bg-white border-2 border-[#14B8A6] text-[#14B8A6]"
-                              : "bg-white border border-[#CBD5E1] text-[#94A3B8]",
+                              ? "bg-white border-2 border-primary text-primary"
+                              : "bg-white border border-border-strong text-text-muted",
                         )}
                       >
                         01
@@ -452,7 +452,7 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-semibold",
-                          currentStep >= 1 ? "text-text-primary" : "text-[#94A3B8]",
+                          currentStep >= 1 ? "text-text-primary" : "text-text-muted",
                         )}
                       >
                         Request Sent
@@ -465,14 +465,14 @@ export function PatientView() {
                         className={cn(
                           "w-full border-t flex items-center justify-center relative",
                           currentStep >= 2
-                            ? "border-t-2 border-[#14B8A6]"
-                            : "border-t border-[#CBD5E1]",
+                            ? "border-t-2 border-primary"
+                            : "border-t border-border-strong",
                         )}
                       >
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 2 ? "text-[#14B8A6]" : "text-[#94A3B8]",
+                            currentStep >= 2 ? "text-primary" : "text-text-muted",
                           )}
                         >
                           →
@@ -486,10 +486,10 @@ export function PatientView() {
                         className={cn(
                           "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm rounded-none select-none",
                           currentStep > 2
-                            ? "bg-[#14B8A6] text-white"
+                            ? "bg-primary text-white"
                             : currentStep === 2
-                              ? "bg-white border-2 border-[#14B8A6] text-[#14B8A6]"
-                              : "bg-white border border-[#CBD5E1] text-[#94A3B8]",
+                              ? "bg-white border-2 border-primary text-primary"
+                              : "bg-white border border-border-strong text-text-muted",
                         )}
                       >
                         02
@@ -497,7 +497,7 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-semibold",
-                          currentStep >= 2 ? "text-text-primary" : "text-[#94A3B8]",
+                          currentStep >= 2 ? "text-text-primary" : "text-text-muted",
                         )}
                       >
                         Finding Ambulance
@@ -510,14 +510,14 @@ export function PatientView() {
                         className={cn(
                           "w-full border-t flex items-center justify-center relative",
                           currentStep >= 3
-                            ? "border-t-2 border-[#14B8A6]"
-                            : "border-t border-[#CBD5E1]",
+                            ? "border-t-2 border-primary"
+                            : "border-t border-border-strong",
                         )}
                       >
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 3 ? "text-[#14B8A6]" : "text-[#94A3B8]",
+                            currentStep >= 3 ? "text-primary" : "text-text-muted",
                           )}
                         >
                           →
@@ -531,10 +531,10 @@ export function PatientView() {
                         className={cn(
                           "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm rounded-none select-none",
                           currentStep > 3
-                            ? "bg-[#14B8A6] text-white"
+                            ? "bg-primary text-white"
                             : currentStep === 3
-                              ? "bg-white border-2 border-[#14B8A6] text-[#14B8A6]"
-                              : "bg-white border border-[#CBD5E1] text-[#94A3B8]",
+                              ? "bg-white border-2 border-primary text-primary"
+                              : "bg-white border border-border-strong text-text-muted",
                         )}
                       >
                         03
@@ -543,10 +543,10 @@ export function PatientView() {
                         className={cn(
                           "text-xs mt-2 text-center select-none font-bold",
                           currentStep === 3
-                            ? "text-[#14B8A6]"
+                            ? "text-primary"
                             : currentStep > 3
                               ? "text-text-primary"
-                              : "text-[#94A3B8]",
+                              : "text-text-muted",
                         )}
                       >
                         En Route
@@ -559,14 +559,14 @@ export function PatientView() {
                         className={cn(
                           "w-full border-t flex items-center justify-center relative",
                           currentStep >= 4
-                            ? "border-t-2 border-[#14B8A6]"
-                            : "border-t border-[#CBD5E1]",
+                            ? "border-t-2 border-primary"
+                            : "border-t border-border-strong",
                         )}
                       >
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 4 ? "text-[#14B8A6]" : "text-[#94A3B8]",
+                            currentStep >= 4 ? "text-primary" : "text-text-muted",
                           )}
                         >
                           →
@@ -580,8 +580,8 @@ export function PatientView() {
                         className={cn(
                           "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-bold text-xs sm:text-sm rounded-none select-none",
                           currentStep === 4
-                            ? "bg-[#14B8A6] text-white"
-                            : "bg-white border border-[#CBD5E1] text-[#94A3B8]",
+                            ? "bg-primary text-white"
+                            : "bg-white border border-border-strong text-text-muted",
                         )}
                       >
                         04
@@ -589,7 +589,7 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-medium",
-                          currentStep === 4 ? "text-text-primary font-bold" : "text-[#94A3B8]",
+                          currentStep === 4 ? "text-text-primary font-bold" : "text-text-muted",
                         )}
                       >
                         Completed
@@ -604,8 +604,8 @@ export function PatientView() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Ambulance Block */}
                   {assignedAmbulance && (
-                    <div className="bg-[#F0FDFA]/50 border border-[#CCFBF1] p-3.5 flex items-center gap-3.5 rounded-none">
-                      <div className="w-11 h-11 bg-[#CCFBF1] text-[#0D9488] flex items-center justify-center shrink-0 rounded-none">
+                    <div className="bg-primary-light/50 border border-[#CCFBF1] p-3.5 flex items-center gap-3.5 rounded-none">
+                      <div className="w-11 h-11 bg-[#CCFBF1] text-primary-dark flex items-center justify-center shrink-0 rounded-none">
                         <Ambulance className="w-5 h-5" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
@@ -627,7 +627,7 @@ export function PatientView() {
                   {/* Hospital Block */}
                   {assignedHospital && (
                     <div className="bg-[#FAF5FF]/50 border border-[#E9D5FF] p-3.5 flex items-center gap-3.5 rounded-none">
-                      <div className="w-11 h-11 bg-[#EDE9FE] text-[#7C3AED] flex items-center justify-center shrink-0 rounded-none">
+                      <div className="w-11 h-11 bg-secondary-light text-secondary flex items-center justify-center shrink-0 rounded-none">
                         <Building2 className="w-5 h-5" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
@@ -649,7 +649,7 @@ export function PatientView() {
                   <h3 className="text-sm font-bold text-text-primary mb-3">
                     Latest Updates
                   </h3>
-                  <div className="space-y-3 relative before:absolute before:left-[5px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-slate-200">
+                  <div className="space-y-3 relative before:absolute before:left-1.25 before:top-2 before:bottom-2 before:w-[1.5px] before:bg-slate-200">
                     {timelineUpdates.map((item, index) => {
                       const isRecent = index < 2;
                       return (
@@ -660,8 +660,8 @@ export function PatientView() {
                           <div className="flex items-center gap-2">
                             <span
                               className={cn(
-                                "absolute left-0 w-2.5 h-2.5 rounded-full ring-2 ring-white",
-                                isRecent ? "bg-[#14B8A6]" : "bg-[#94A3B8]",
+                                "absolute left-0 w-2.5 h-2.5 rounded-none ring-2 ring-white",
+                                isRecent ? "bg-primary" : "bg-text-muted",
                               )}
                               aria-hidden="true"
                             />
@@ -685,11 +685,11 @@ export function PatientView() {
                   type="button"
                   onClick={() => setCancelDialogOpen(true)}
                   aria-label="Cancel Emergency"
-                  className="relative px-4 py-1.5 border-2 border-[#EF4444] text-[#EF4444] hover:bg-red-50 text-xs font-semibold rounded-none cursor-pointer transition-colors"
+                  className="relative px-4 py-1.5 border-2 border-destructive text-destructive hover:bg-red-50 text-xs font-semibold rounded-none cursor-pointer transition-colors"
                 >
                   {/* Solid red corner notch */}
                   <div
-                    className="absolute -top-[2px] -right-[2px] w-3 h-3 bg-[#EF4444] pointer-events-none"
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-destructive pointer-events-none"
                     style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
                     aria-hidden="true"
                   />
@@ -714,7 +714,7 @@ export function PatientView() {
               </div>
               <Button
                 onClick={() => setRequestModalOpen(true)}
-                className="bg-[#14B8A6] hover:bg-[#0D9488] text-white font-bold text-xs px-5 h-10 rounded-none cursor-pointer"
+                className="bg-primary hover:bg-primary-dark text-white font-bold text-xs px-5 h-10 rounded-none cursor-pointer"
                 style={{
                   clipPath:
                     "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
@@ -737,7 +737,7 @@ export function PatientView() {
           {pendingPayment && (
             <section
               aria-label="Payment Due"
-              className="order-2 lg:order-2 w-full relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+              className="order-2 lg:order-2 w-full relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
             >
               <CornerNotch />
               <LabelTab label="PAYMENT DUE" />
@@ -776,7 +776,7 @@ export function PatientView() {
                   type="button"
                   onClick={handlePayNow}
                   aria-label="Pay trip invoice now"
-                  className="w-full h-10 mt-2 bg-[#14B8A6] hover:bg-[#0D9488] active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none transition-all cursor-pointer shadow-xs"
+                  className="w-full h-10 mt-2 bg-primary hover:bg-primary-dark active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none cursor-pointer shadow-xs"
                 >
                   <span>Pay Now</span>
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -788,7 +788,7 @@ export function PatientView() {
           {/* ── 3. MEDICAL INFO CARD ── */}
           <section
             aria-label="Medical Info"
-            className="order-3 lg:order-1 w-full relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+            className="order-3 lg:order-1 w-full relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
           >
             <CornerNotch />
             <LabelTab label="MEDICAL INFO" />
@@ -831,29 +831,29 @@ export function PatientView() {
         className="order-4 grid grid-cols-1 sm:grid-cols-3 gap-6"
       >
         {/* Total Requests Card */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Total Requests
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {totalRequestsCount}
           </div>
         </div>
 
         {/* Completed Card */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Completed
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {completedCount}
           </div>
         </div>
 
         {/* Avg Response Card */}
-        <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+        <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
           <CornerNotch />
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Avg Response
@@ -867,13 +867,13 @@ export function PatientView() {
       {/* ── 5. RECENT EMERGENCIES TABLE CARD ── */}
       <section
         aria-label="Recent Emergencies"
-        className="order-5 relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+        className="order-5 relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
       >
         <CornerNotch />
         <LabelTab label="RECENT EMERGENCIES" />
 
         <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-          <div className="min-w-[620px] px-5 sm:px-0">
+          <div className="min-w-155 px-5 sm:px-0">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
@@ -901,7 +901,7 @@ export function PatientView() {
                 {recentEmergencies.map((em) => (
                   <tr
                     key={em.id}
-                    className="hover:bg-[#F0FDFA]/30 transition-colors"
+                    className="hover:bg-primary-light/30 transition-colors"
                   >
                     <td className="py-3 pr-4 font-mono font-bold text-text-primary">
                       {em.incidentNumber}
@@ -921,7 +921,7 @@ export function PatientView() {
                     <td className="py-3 pl-4 text-right">
                       <Link
                         href={`/dashboard/patient/history?search=${em.incidentNumber}`}
-                        className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-[32px] cursor-pointer"
+                        className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-8 cursor-pointer"
                       >
                         <span>View</span>
                         <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -937,7 +937,7 @@ export function PatientView() {
 
       {/* ── Dialog Modal for CreateEmergencyForm ── */}
       <Dialog open={requestModalOpen} onOpenChange={setRequestModalOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto rounded-none border-2 border-[#14B8A6] p-6 shadow-xl">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto rounded-none border-2 border-primary p-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-text-primary">
               Request Emergency Ambulance
@@ -956,7 +956,7 @@ export function PatientView() {
 
       {/* ── Dialog Modal for Cancel Emergency Request ── */}
       <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <DialogContent className="max-w-md rounded-none border-2 border-red-500 p-6 shadow-xl">
+        <DialogContent className="max-w-md rounded-none border-2 border-red-500 p-6">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-red-600 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -1012,7 +1012,7 @@ export function PatientView() {
                 placeholder="Brief reason details..."
                 value={cancelNotes}
                 onChange={(e) => setCancelNotes(e.target.value)}
-                className="w-full h-9 px-3 border border-slate-300 text-xs rounded-none focus:outline-hidden focus:border-[#14B8A6]"
+                className="w-full h-9 px-3 border border-slate-300 text-xs rounded-none focus:outline-hidden focus:border-primary"
               />
             </div>
           </div>
@@ -1021,13 +1021,13 @@ export function PatientView() {
             <Button
               variant="outline"
               onClick={() => setCancelDialogOpen(false)}
-              className="text-xs rounded-none min-h-[40px] cursor-pointer"
+              className="text-xs rounded-none min-h-10 cursor-pointer"
             >
               Keep Active Request
             </Button>
             <Button
               onClick={handleConfirmCancel}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-none min-h-[40px] cursor-pointer"
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-none min-h-10 cursor-pointer"
             >
               Confirm Cancellation
             </Button>

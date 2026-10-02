@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import type { EmergencyPriority } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
 
@@ -20,11 +19,11 @@ export function PriorityBadge({
       return (
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B]",
+            "inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary",
             className,
           )}
         >
-          <span className="w-2 h-2 bg-[#94A3B8] shrink-0" />
+          <span className="w-2 h-2 bg-text-muted shrink-0" />
           <span>Unset</span>
         </span>
       );
@@ -69,11 +68,11 @@ export function PriorityBadge({
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B]",
+          "inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary",
           className,
         )}
       >
-        <span className="w-2 h-2 bg-[#94A3B8] shrink-0" />
+        <span className="w-2 h-2 bg-text-muted shrink-0" />
         <span>{label}</span>
       </span>
     );
@@ -100,10 +99,7 @@ export function PriorityBadge({
   }
 
   return (
-    <motion.span
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+    <span
       className={cn(
         "inline-flex items-center text-xs tracking-tight",
         textColor,
@@ -111,6 +107,6 @@ export function PriorityBadge({
       )}
     >
       {label}
-    </motion.span>
+    </span>
   );
 }

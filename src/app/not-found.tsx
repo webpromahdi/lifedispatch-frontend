@@ -17,7 +17,7 @@ export default function NotFound() {
       </p>
       <div className="mt-6 flex items-center gap-3">
         <Link href="/">
-          <Button className="min-h-[44px] bg-primary hover:bg-primary-dark text-primary-foreground font-medium px-5 cursor-pointer">
+          <Button className="min-h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-medium px-5 cursor-pointer">
             <Home className="h-4 w-4 mr-2" aria-hidden="true" />
             Return Home
           </Button>

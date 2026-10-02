@@ -167,7 +167,7 @@ export function HospitalStaffRosterView() {
           <Button
             onClick={() => setAddDialogOpen(true)}
             aria-label="Add new staff member to ER roster"
-            className="min-h-[44px] bg-primary hover:bg-primary-dark text-primary-foreground font-semibold px-5 cursor-pointer shadow-xs"
+            className="min-h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold px-5 cursor-pointer shadow-xs"
           >
             <Plus className="h-4 w-4 mr-1.5" aria-hidden="true" />
             Add Staff Member
@@ -176,7 +176,7 @@ export function HospitalStaffRosterView() {
       />
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -319,7 +319,7 @@ export function HospitalStaffRosterView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary-light text-primary">
+              <div className="p-2 rounded-none bg-primary-light text-primary">
                 <Users className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
@@ -443,13 +443,13 @@ export function HospitalStaffRosterView() {
                 type="button"
                 variant="outline"
                 onClick={() => setAddDialogOpen(false)}
-                className="text-xs min-h-[40px] cursor-pointer"
+                className="text-xs min-h-10 cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-primary hover:bg-primary-dark text-white text-xs min-h-[40px] cursor-pointer font-medium"
+                className="bg-primary hover:bg-primary-dark text-white text-xs min-h-10 cursor-pointer font-medium"
               >
                 Enroll Staff Member
               </Button>

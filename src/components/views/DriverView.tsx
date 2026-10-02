@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatEnumTitle } from "@/components/admin/AdminDashboardSections";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -30,14 +31,6 @@ import {
 } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
 import { cn } from "@/lib/utils";
-
-function formatEnumTitle(val: string): string {
-  if (!val) return "";
-  return val
-    .split("_")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-}
 
 interface PendingDispatchItem {
   dispatch: Dispatch;
@@ -210,7 +203,7 @@ export function DriverView() {
           {pendingDispatches.length > 0 && (
             <section
               aria-label="Incoming Dispatch"
-              className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+              className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
             >
               <CornerNotch />
               <LabelTab label="INCOMING DISPATCH" />
@@ -299,7 +292,7 @@ export function DriverView() {
                             {item.emergency.callerName} (
                             <a
                               href={`tel:${item.emergency.callerPhone}`}
-                              className="text-[#0D9488] font-bold hover:underline"
+                              className="text-primary-dark font-bold hover:underline"
                             >
                               {item.emergency.callerPhone}
                             </a>
@@ -318,17 +311,17 @@ export function DriverView() {
                         </div>
                       </div>
 
-                      {/* Large Action Buttons (min-h-[48px]) */}
+                      {/* Large Action Buttons (min-h-12) */}
                       <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                         <button
                           type="button"
                           disabled={isExpired}
                           onClick={() => handleAcceptDispatch(item)}
                           className={cn(
-                            "w-full sm:flex-1 min-h-[48px] px-6 text-sm font-bold text-white rounded-none cursor-pointer transition-colors",
+                            "w-full sm:flex-1 min-h-12 px-6 text-sm font-bold text-white rounded-none cursor-pointer transition-colors",
                             isExpired
                               ? "bg-slate-300 cursor-not-allowed text-slate-500"
-                              : "bg-[#14B8A6] hover:bg-[#0D9488]",
+                              : "bg-primary hover:bg-primary-dark",
                           )}
                         >
                           Accept Dispatch
@@ -339,7 +332,7 @@ export function DriverView() {
                           onClick={() =>
                             handleOpenRejectDialog(item.dispatch.id)
                           }
-                          className="w-full sm:w-auto min-h-[48px] px-6 text-sm font-bold border-2 border-red-500 text-red-600 hover:bg-red-50 rounded-none cursor-pointer"
+                          className="w-full sm:w-auto min-h-12 px-6 text-sm font-bold border-2 border-red-500 text-red-600 hover:bg-red-50 rounded-none cursor-pointer"
                         >
                           Reject
                         </button>
@@ -355,7 +348,7 @@ export function DriverView() {
           {pendingDispatches.length === 0 && !activeTrip && (
             <section
               aria-label="Incoming Dispatch Standby"
-              className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+              className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
             >
               <CornerNotch />
               <LabelTab label="INCOMING DISPATCH" />
@@ -375,7 +368,7 @@ export function DriverView() {
           {activeTrip && (
             <section
               aria-label="Active Trip"
-              className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+              className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
             >
               <CornerNotch />
               <LabelTab label="ACTIVE TRIP" />
@@ -407,7 +400,7 @@ export function DriverView() {
 
                 {/* ── Shared Notched Stepper (4 steps) ── */}
                 <div className="pt-2 pb-1 overflow-x-auto">
-                  <div className="min-w-[480px] sm:min-w-0 flex items-center justify-between">
+                  <div className="min-w-120 sm:min-w-0 flex items-center justify-between">
                     {TRIP_STEPS.map((step, idx) => {
                       const isPast = activeTrip.stepIndex > step.id;
                       const isCurrent = activeTrip.stepIndex === step.id;
@@ -422,10 +415,10 @@ export function DriverView() {
                               className={cn(
                                 "w-10 h-10 flex items-center justify-center font-bold text-xs sm:text-sm rounded-none select-none",
                                 isPast
-                                  ? "bg-[#14B8A6] text-white"
+                                  ? "bg-primary text-white"
                                   : isCurrent
-                                    ? "bg-white border-2 border-[#14B8A6] text-[#14B8A6]"
-                                    : "bg-white border border-[#CBD5E1] text-[#94A3B8]",
+                                    ? "bg-white border-2 border-primary text-primary"
+                                    : "bg-white border border-border-strong text-text-muted",
                               )}
                             >
                               0{step.id}
@@ -435,7 +428,7 @@ export function DriverView() {
                                 "text-xs mt-2 text-center select-none font-semibold",
                                 isPast || isCurrent
                                   ? "text-text-primary"
-                                  : "text-[#94A3B8]",
+                                  : "text-text-muted",
                               )}
                             >
                               {step.label.replace(/^0\d\s*/, "")}
@@ -449,16 +442,16 @@ export function DriverView() {
                                 className={cn(
                                   "w-full border-t flex items-center justify-center relative",
                                   activeTrip.stepIndex > step.id
-                                    ? "border-t-2 border-[#14B8A6]"
-                                    : "border-t border-[#CBD5E1]",
+                                    ? "border-t-2 border-primary"
+                                    : "border-t border-border-strong",
                                 )}
                               >
                                 <span
                                   className={cn(
                                     "absolute -top-2.5 text-xs font-bold",
                                     activeTrip.stepIndex > step.id
-                                      ? "text-[#14B8A6]"
-                                      : "text-[#94A3B8]",
+                                      ? "text-primary"
+                                      : "text-text-muted",
                                   )}
                                 >
                                   →
@@ -472,12 +465,12 @@ export function DriverView() {
                   </div>
                 </div>
 
-                {/* Large Milestone Button & Controls (min-h-[48px]) */}
+                {/* Large Milestone Button & Controls (min-h-12) */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                   <button
                     type="button"
                     onClick={handleAdvanceMilestone}
-                    className="flex-1 min-h-[48px] px-6 text-sm font-bold bg-[#14B8A6] hover:bg-[#0D9488] text-white rounded-none cursor-pointer"
+                    className="flex-1 min-h-12 px-6 text-sm font-bold bg-primary hover:bg-primary-dark text-white rounded-none cursor-pointer"
                   >
                     {activeTrip.stepIndex < 4
                       ? `Advance to ${TRIP_STEPS[activeTrip.stepIndex]?.label || "Next Milestone"}`
@@ -487,7 +480,7 @@ export function DriverView() {
                   <button
                     type="button"
                     onClick={() => setHospitalDialogOpen(true)}
-                    className="min-h-[48px] px-5 text-sm font-semibold border-2 border-border text-text-primary hover:bg-slate-100 rounded-none cursor-pointer"
+                    className="min-h-12 px-5 text-sm font-semibold border-2 border-border text-text-primary hover:bg-slate-100 rounded-none cursor-pointer"
                   >
                     Select Hospital
                   </button>
@@ -495,7 +488,7 @@ export function DriverView() {
                   <button
                     type="button"
                     onClick={() => setCompleteDialogOpen(true)}
-                    className="min-h-[48px] px-5 text-sm font-bold border-2 border-[#14B8A6] text-[#0D9488] hover:bg-[#F0FDFA] rounded-none cursor-pointer"
+                    className="min-h-12 px-5 text-sm font-bold border-2 border-primary text-primary-dark hover:bg-primary-light rounded-none cursor-pointer"
                   >
                     Complete Trip
                   </button>
@@ -510,7 +503,7 @@ export function DriverView() {
           {/* Card: MY SHIFT */}
           <section
             aria-label="My Shift"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
           >
             <CornerNotch />
             <LabelTab label="MY SHIFT" />
@@ -536,10 +529,10 @@ export function DriverView() {
                 type="button"
                 onClick={handleToggleShift}
                 className={cn(
-                  "w-full min-h-[48px] text-sm font-bold rounded-none cursor-pointer transition-colors",
+                  "w-full min-h-12 text-sm font-bold rounded-none cursor-pointer transition-colors",
                   isOnShift
                     ? "border-2 border-border text-text-primary hover:bg-slate-100"
-                    : "bg-[#14B8A6] hover:bg-[#0D9488] text-white",
+                    : "bg-primary hover:bg-primary-dark text-white",
                 )}
               >
                 {isOnShift
@@ -552,7 +545,7 @@ export function DriverView() {
           {/* Card: HOSPITALS (Same compact list as Dispatcher) */}
           <section
             aria-label="Hospitals"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
           >
             <CornerNotch />
             <LabelTab label="HOSPITALS" />
@@ -565,7 +558,7 @@ export function DriverView() {
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <svg
-                      className="w-4 h-4 text-[#8B5CF6] shrink-0"
+                      className="w-4 h-4 text-secondary shrink-0"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -604,7 +597,7 @@ export function DriverView() {
 
       {/* ── REJECT DISPATCH DIALOG ── */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <DialogContent className="rounded-none border-2 border-[#14B8A6] bg-white sm:max-w-md p-6">
+        <DialogContent className="rounded-none border-2 border-primary bg-white sm:max-w-md p-6">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-text-primary">
               Reject Dispatch
@@ -622,7 +615,7 @@ export function DriverView() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="e.g., Mechanical fault, road blockage, paramedic handover"
-              className="rounded-none border-2 border-border text-sm min-h-[44px]"
+              className="rounded-none border-2 border-border text-sm min-h-11"
             />
           </div>
 
@@ -631,14 +624,14 @@ export function DriverView() {
               type="button"
               variant="outline"
               onClick={() => setRejectDialogOpen(false)}
-              className="rounded-none border-border text-xs min-h-[44px]"
+              className="rounded-none border-border text-xs min-h-11"
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleConfirmReject}
-              className="rounded-none bg-red-600 hover:bg-red-700 text-white text-xs font-bold min-h-[44px]"
+              className="rounded-none bg-red-600 hover:bg-red-700 text-white text-xs font-bold min-h-11"
             >
               Confirm Reject
             </Button>
@@ -648,7 +641,7 @@ export function DriverView() {
 
       {/* ── SELECT HOSPITAL DIALOG ── */}
       <Dialog open={hospitalDialogOpen} onOpenChange={setHospitalDialogOpen}>
-        <DialogContent className="rounded-none border-2 border-[#14B8A6] bg-white sm:max-w-lg p-6">
+        <DialogContent className="rounded-none border-2 border-primary bg-white sm:max-w-lg p-6">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-text-primary">
               Select Destination Hospital
@@ -673,7 +666,7 @@ export function DriverView() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-[#8B5CF6] shrink-0"
+                        className="w-4 h-4 text-secondary shrink-0"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -724,10 +717,10 @@ export function DriverView() {
                       }
                     }}
                     className={cn(
-                      "px-3.5 py-1.5 text-xs font-bold rounded-none min-h-[38px] cursor-pointer",
+                      "px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9.5 cursor-pointer",
                       isClosed
                         ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                        : "bg-[#14B8A6] hover:bg-[#0D9488] text-white",
+                        : "bg-primary hover:bg-primary-dark text-white",
                     )}
                   >
                     Select
@@ -742,7 +735,7 @@ export function DriverView() {
               type="button"
               variant="outline"
               onClick={() => setHospitalDialogOpen(false)}
-              className="rounded-none border-border text-xs min-h-[38px]"
+              className="rounded-none border-border text-xs min-h-9.5"
             >
               Close
             </Button>
@@ -752,7 +745,7 @@ export function DriverView() {
 
       {/* ── COMPLETE TRIP DIALOG ── */}
       <Dialog open={completeDialogOpen} onOpenChange={setCompleteDialogOpen}>
-        <DialogContent className="rounded-none border-2 border-[#14B8A6] bg-white sm:max-w-md p-6">
+        <DialogContent className="rounded-none border-2 border-primary bg-white sm:max-w-md p-6">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-text-primary">
               Complete Emergency Trip
@@ -772,7 +765,7 @@ export function DriverView() {
               step="0.1"
               value={tripDistanceKm}
               onChange={(e) => setTripDistanceKm(e.target.value)}
-              className="rounded-none border-2 border-border text-base min-h-[48px]"
+              className="rounded-none border-2 border-border text-base min-h-12"
             />
           </div>
 
@@ -781,14 +774,14 @@ export function DriverView() {
               type="button"
               variant="outline"
               onClick={() => setCompleteDialogOpen(false)}
-              className="rounded-none border-border text-xs min-h-[44px]"
+              className="rounded-none border-border text-xs min-h-11"
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleConfirmCompleteTrip}
-              className="rounded-none bg-[#14B8A6] hover:bg-[#0D9488] text-white text-xs font-bold min-h-[44px]"
+              className="rounded-none bg-primary hover:bg-primary-dark text-white text-xs font-bold min-h-11"
             >
               Confirm Complete Trip
             </Button>

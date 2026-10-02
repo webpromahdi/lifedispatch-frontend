@@ -43,8 +43,8 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-[300px] w-full p-6 flex flex-col items-center justify-center text-center bg-surface border border-destructive/20 rounded-xl shadow-xs">
-          <div className="h-12 w-12 rounded-2xl bg-destructive-bg text-destructive flex items-center justify-center mb-4">
+        <div className="min-h-75 w-full p-6 flex flex-col items-center justify-center text-center bg-surface border border-destructive/20 rounded-none shadow-xs">
+          <div className="h-12 w-12 rounded-none bg-destructive-bg text-destructive flex items-center justify-center mb-4">
             <AlertTriangle className="h-6 w-6" aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold text-text-primary">
@@ -58,7 +58,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <Button
               variant="outline"
               onClick={this.handleReset}
-              className="min-h-[44px] px-4 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer"
+              className="min-h-11 px-4 border-border hover:bg-primary-light hover:text-primary transition-colors cursor-pointer"
             >
               <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
               Try again

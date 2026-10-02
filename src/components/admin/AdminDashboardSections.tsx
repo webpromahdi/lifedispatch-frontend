@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { CornerNotch, LabelTab } from "@/components/views/PatientView";
@@ -48,7 +48,7 @@ export function LiveOperationsCard({
   return (
     <section
       aria-label="Live Operations"
-      className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+      className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
     >
       <CornerNotch />
       <LabelTab label="LIVE OPERATIONS" />
@@ -67,7 +67,7 @@ export function LiveOperationsCard({
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Available Ambulances
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {analytics.liveOperations.availableAmbulances}
           </div>
         </div>
@@ -94,7 +94,7 @@ export function LiveOperationsCard({
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Drivers On Shift
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {analytics.liveOperations.driversOnShift}
           </div>
         </div>
@@ -111,13 +111,13 @@ export function ActiveEmergenciesCard({
   return (
     <section
       aria-label="Active Emergencies"
-      className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+      className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
     >
       <CornerNotch />
       <LabelTab label="ACTIVE EMERGENCIES" />
 
       <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-        <div className="min-w-[620px] px-5 sm:px-0">
+        <div className="min-w-155 px-5 sm:px-0">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
@@ -166,7 +166,7 @@ export function ActiveEmergenciesCard({
                     <td className="py-3 px-4">
                       <StatusBadge status={em.status} variant="square" />
                     </td>
-                    <td className="py-3 px-4 text-text-secondary truncate max-w-[180px]">
+                    <td className="py-3 px-4 text-text-secondary truncate max-w-45">
                       {em.locationAddress}
                     </td>
                     <td className="py-3 pl-4 text-text-secondary whitespace-nowrap">
@@ -191,7 +191,7 @@ export function RevenueCard({
   return (
     <section
       aria-label="Revenue"
-      className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+      className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
     >
       <CornerNotch />
       <LabelTab label="REVENUE" />
@@ -229,7 +229,7 @@ export function EmergencySummaryCard({
   return (
     <section
       aria-label="Emergency Summary"
-      className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+      className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
     >
       <CornerNotch />
       <LabelTab label="EMERGENCY SUMMARY" />
@@ -279,37 +279,37 @@ export function SystemScaleCards({
       aria-label="System Scale Metrics"
       className="grid grid-cols-1 sm:grid-cols-3 gap-6"
     >
-      <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+      <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
         <CornerNotch />
         <span className="text-xs font-semibold text-text-secondary block mb-1">
           Total Patients
         </span>
-        <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+        <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
           {usersAndResources.totalPatients.toLocaleString()}
         </div>
       </div>
 
-      <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
+      <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5">
         <CornerNotch />
         <span className="text-xs font-semibold text-text-secondary block mb-1">
           Total Drivers
         </span>
-        <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+        <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
           {usersAndResources.totalDrivers.toLocaleString()}
         </div>
       </div>
 
-      <div className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 flex items-center justify-between">
+      <div className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 flex items-center justify-between">
         <CornerNotch />
         <div>
           <span className="text-xs font-semibold text-text-secondary block mb-1">
             Total Hospitals
           </span>
-          <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+          <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
             {usersAndResources.totalHospitals.toLocaleString()}
           </div>
         </div>
-        <div className="text-[#8B5CF6] shrink-0 pr-1" aria-hidden="true">
+        <div className="text-secondary shrink-0 pr-1" aria-hidden="true">
           <svg
             className="w-10 h-10"
             viewBox="0 0 24 24"
@@ -350,13 +350,13 @@ export function AuditLogCard({
   return (
     <section
       aria-label={title}
-      className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+      className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
     >
       <CornerNotch />
       <LabelTab label={title} />
 
       <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-        <div className="min-w-[620px] px-5 sm:px-0">
+        <div className="min-w-155 px-5 sm:px-0">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
@@ -399,7 +399,7 @@ export function AuditLogCard({
                     className="hover:bg-slate-50 transition-colors"
                   >
                     <td className="py-3 pr-4 font-mono font-medium text-text-primary flex items-center">
-                      <span className="w-2.5 h-2.5 bg-[#94A3B8] inline-block mr-2.5 shrink-0 rounded-none" />
+                      <span className="w-2.5 h-2.5 bg-text-muted inline-block mr-2.5 shrink-0 rounded-none" />
                       <span>{log.action}</span>
                     </td>
                     <td className="py-3 px-4 font-medium text-text-primary">

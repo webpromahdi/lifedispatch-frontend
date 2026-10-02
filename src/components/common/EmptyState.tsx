@@ -20,11 +20,11 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-surface border border-dashed border-border rounded-xl",
+        "flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-surface border border-dashed border-border rounded-none",
         className,
       )}
     >
-      <div className="h-14 w-14 rounded-2xl bg-primary-light text-primary flex items-center justify-center mb-4 shadow-xs">
+      <div className="h-14 w-14 rounded-none bg-primary-light text-primary flex items-center justify-center mb-4 shadow-xs">
         <Icon className="h-7 w-7" aria-hidden="true" />
       </div>
 

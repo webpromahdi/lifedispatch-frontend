@@ -21,8 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CornerNotch, LabelTab } from "@/components/views/PatientView";
+import {
+  formatEnumTitle,
+  formatTime,
+} from "@/components/admin/AdminDashboardSections";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDrivers } from "@/lib/dummy/drivers";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { seedHospitals } from "@/lib/dummy/hospitals";
 import type { Ambulance } from "@/lib/types/ambulance.types";
@@ -35,27 +38,6 @@ import {
 import type { Hospital } from "@/lib/types/hospital.types";
 import { calculateHaversineDistance } from "@/lib/utils";
 
-function formatEnumTitle(val: string): string {
-  if (!val) return "";
-  return val
-    .split("_")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function formatTime(isoString: string): string {
-  try {
-    const d = new Date(isoString);
-    if (Number.isNaN(d.getTime())) return isoString;
-    return d.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  } catch {
-    return isoString;
-  }
-}
 
 interface DispatchCandidate {
   ambulance: Ambulance;
@@ -217,8 +199,10 @@ export function DispatcherView() {
       // Flag overdue service (index 2 as test case or past nextServiceDue)
       const isOverdue =
         index === 2 ||
-        (Boolean(amb.nextServiceDue) &&
-          new Date(amb.nextServiceDue!).getTime() < Date.now());
+        !!(
+          amb.nextServiceDue &&
+          new Date(amb.nextServiceDue).getTime() < Date.now()
+        );
       return {
         ambulance: amb,
         distanceKm: dist,
@@ -287,7 +271,7 @@ export function DispatcherView() {
       {/* ── ROW 1: DISPATCH QUEUE STATS CARD (Full Width) ── */}
       <section
         aria-label="Dispatch Queue Overview"
-        className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+        className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
       >
         <CornerNotch />
         <LabelTab label="DISPATCH QUEUE" />
@@ -318,7 +302,7 @@ export function DispatcherView() {
             <span className="text-xs font-semibold text-text-secondary block mb-1">
               Active Trips
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+            <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
               {activeTripsCount}
             </div>
           </div>
@@ -328,7 +312,7 @@ export function DispatcherView() {
             <span className="text-xs font-semibold text-text-secondary block mb-1">
               Available Ambulances
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-[#0D9488] font-mono leading-none">
+            <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
               {availableAmbulancesCount}
             </div>
           </div>
@@ -341,13 +325,13 @@ export function DispatcherView() {
         <div className="lg:col-span-8 w-full">
           <section
             aria-label="Emergency Queue"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
           >
             <CornerNotch />
             <LabelTab label="EMERGENCY QUEUE" />
 
             <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-              <div className="min-w-[680px] px-5 sm:px-0">
+              <div className="min-w-170 px-5 sm:px-0">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
@@ -413,7 +397,7 @@ export function DispatcherView() {
                                 variant="square"
                               />
                             </td>
-                            <td className="py-3 px-3 text-text-secondary truncate max-w-[150px]">
+                            <td className="py-3 px-3 text-text-secondary truncate max-w-37.5">
                               {em.locationAddress}
                             </td>
                             <td className="py-3 px-3 text-text-secondary whitespace-nowrap">
@@ -424,7 +408,7 @@ export function DispatcherView() {
                                 <button
                                   type="button"
                                   onClick={() => handleOpenSetPriority(em)}
-                                  className="border border-border text-text-primary hover:bg-slate-100 px-2.5 py-1 text-xs font-semibold rounded-none min-h-[32px] cursor-pointer"
+                                  className="border border-border text-text-primary hover:bg-slate-100 px-2.5 py-1 text-xs font-semibold rounded-none min-h-8 cursor-pointer"
                                 >
                                   Set Priority
                                 </button>
@@ -432,7 +416,7 @@ export function DispatcherView() {
                                   <button
                                     type="button"
                                     onClick={() => handleOpenDispatch(em)}
-                                    className="bg-[#14B8A6] hover:bg-[#0D9488] text-white px-2.5 py-1 text-xs font-bold rounded-none min-h-[32px] cursor-pointer"
+                                    className="bg-primary hover:bg-primary-dark text-white px-2.5 py-1 text-xs font-bold rounded-none min-h-8 cursor-pointer"
                                   >
                                     Dispatch
                                   </button>
@@ -455,7 +439,7 @@ export function DispatcherView() {
           {/* Card: AVAILABLE AMBULANCES */}
           <section
             aria-label="Available Ambulances"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
           >
             <CornerNotch />
             <LabelTab label="AVAILABLE AMBULANCES" />
@@ -469,8 +453,10 @@ export function DispatcherView() {
                 availableAmbulancesList.map((amb, index) => {
                   const isOverdue =
                     index === 1 ||
-                    (Boolean(amb.nextServiceDue) &&
-                      new Date(amb.nextServiceDue!).getTime() < Date.now());
+                    !!(
+                      amb.nextServiceDue &&
+                      new Date(amb.nextServiceDue).getTime() < Date.now()
+                    );
 
                   return (
                     <div
@@ -502,7 +488,7 @@ export function DispatcherView() {
           {/* Card: HOSPITAL STATUS */}
           <section
             aria-label="Hospital Status"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
           >
             <CornerNotch />
             <LabelTab label="HOSPITAL STATUS" />
@@ -521,7 +507,7 @@ export function DispatcherView() {
                     <div className="flex items-center gap-2.5 min-w-0">
                       {/* Purple hospital icon */}
                       <svg
-                        className="w-4 h-4 text-[#8B5CF6] shrink-0"
+                        className="w-4 h-4 text-secondary shrink-0"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -561,7 +547,7 @@ export function DispatcherView() {
 
       {/* ── SET PRIORITY DIALOG ── */}
       <Dialog open={priorityDialogOpen} onOpenChange={setPriorityDialogOpen}>
-        <DialogContent className="rounded-none border-2 border-[#14B8A6] bg-white sm:max-w-md p-6">
+        <DialogContent className="rounded-none border-2 border-primary bg-white sm:max-w-md p-6">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-text-primary">
               Set Priority
@@ -591,10 +577,10 @@ export function DispatcherView() {
                   setPendingPriority(val as EmergencyPriority)
                 }
               >
-                <SelectTrigger className="rounded-none border-2 border-border text-xs min-h-[40px] focus:ring-0">
+                <SelectTrigger className="rounded-none border-2 border-border text-xs min-h-10 focus:ring-0">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border-2 border-[#14B8A6] bg-white">
+                <SelectContent className="rounded-none border-2 border-primary bg-white">
                   <SelectItem value={EmergencyPriority.P1_CRITICAL}>
                     P1 - Critical (Immediate Life Threat)
                   </SelectItem>
@@ -620,14 +606,14 @@ export function DispatcherView() {
               type="button"
               variant="outline"
               onClick={() => setPriorityDialogOpen(false)}
-              className="rounded-none border-border text-xs min-h-[38px]"
+              className="rounded-none border-border text-xs min-h-9.5"
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleSavePriority}
-              className="rounded-none bg-[#14B8A6] hover:bg-[#0D9488] text-white text-xs font-bold min-h-[38px]"
+              className="rounded-none bg-primary hover:bg-primary-dark text-white text-xs font-bold min-h-9.5"
             >
               Save Priority
             </Button>
@@ -637,7 +623,7 @@ export function DispatcherView() {
 
       {/* ── DISPATCH UNIT RECOMMENDATIONS DIALOG ── */}
       <Dialog open={dispatchDialogOpen} onOpenChange={setDispatchDialogOpen}>
-        <DialogContent className="rounded-none border-2 border-[#14B8A6] bg-white sm:max-w-lg p-6">
+        <DialogContent className="rounded-none border-2 border-primary bg-white sm:max-w-lg p-6">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-text-primary">
               Dispatch Recommended Unit
@@ -680,7 +666,7 @@ export function DispatcherView() {
                       <span className="text-xs font-semibold text-text-secondary">
                         {cand.ambulance.type}
                       </span>
-                      <span className="text-xs text-[#0D9488] font-bold">
+                      <span className="text-xs text-primary-dark font-bold">
                         Score: {cand.score}%
                       </span>
                     </div>
@@ -700,7 +686,7 @@ export function DispatcherView() {
                     type="button"
                     disabled={isAssigning}
                     onClick={() => handleAssignDispatch(cand)}
-                    className="bg-[#14B8A6] hover:bg-[#0D9488] disabled:opacity-50 text-white px-3.5 py-1.5 text-xs font-bold rounded-none min-h-[36px] cursor-pointer"
+                    className="bg-primary hover:bg-primary-dark disabled:opacity-50 text-white px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9 cursor-pointer"
                   >
                     Assign
                   </button>
@@ -714,7 +700,7 @@ export function DispatcherView() {
               type="button"
               variant="outline"
               onClick={() => setDispatchDialogOpen(false)}
-              className="rounded-none border-border text-xs min-h-[38px]"
+              className="rounded-none border-border text-xs min-h-9.5"
             >
               Close
             </Button>

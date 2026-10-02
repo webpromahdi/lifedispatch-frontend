@@ -99,7 +99,7 @@ export function RegisterForm() {
         >
           {/* Left trace */}
           <svg
-            className="absolute top-[86px] left-0 w-[calc(50%-280px)] h-6 text-primary/40"
+            className="absolute top-21.5 left-0 w-[calc(50%-280px)] h-6 text-primary/40"
             preserveAspectRatio="none"
             viewBox="0 0 400 24"
             fill="none"
@@ -113,7 +113,7 @@ export function RegisterForm() {
           </svg>
           {/* Right trace */}
           <svg
-            className="absolute top-[86px] right-0 w-[calc(50%-280px)] h-6 text-primary/40"
+            className="absolute top-21.5 right-0 w-[calc(50%-280px)] h-6 text-primary/40"
             preserveAspectRatio="none"
             viewBox="0 0 400 24"
             fill="none"
@@ -132,11 +132,11 @@ export function RegisterForm() {
           <motion.div
             initial={false}
             animate={{ opacity: 1, y: 0 }}
-            className="relative w-full max-w-[540px] filter drop-shadow-[0_8px_24px_rgba(20,184,166,0.12)]"
+            className="relative w-full max-w-135 filter drop-shadow-[0_8px_24px_rgba(20,184,166,0.12)]"
           >
             {/* Outer teal 2px framed border with chamfered corners */}
             <div
-              className="w-full bg-primary p-[2px]"
+              className="w-full bg-primary p-0.5"
               style={{
                 clipPath:
                   "polygon(16px 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 24px 100%, 0 calc(100% - 24px), 0 16px)",
@@ -195,7 +195,7 @@ export function RegisterForm() {
                       </div>
                       {/* Teal corner notch */}
                       <svg
-                        className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                         viewBox="0 0 14 14"
                         fill="none"
                         aria-hidden="true"
@@ -244,7 +244,7 @@ export function RegisterForm() {
                       </div>
                       {/* Teal corner notch */}
                       <svg
-                        className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                         viewBox="0 0 14 14"
                         fill="none"
                         aria-hidden="true"
@@ -297,7 +297,7 @@ export function RegisterForm() {
                         </div>
                         {/* Teal corner notch */}
                         <svg
-                          className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                          className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                           viewBox="0 0 14 14"
                           fill="none"
                           aria-hidden="true"
@@ -360,7 +360,7 @@ export function RegisterForm() {
                         </div>
                         {/* Teal corner notch */}
                         <svg
-                          className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                          className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                           viewBox="0 0 14 14"
                           fill="none"
                           aria-hidden="true"
@@ -415,7 +415,7 @@ export function RegisterForm() {
                             aria-label={
                               showPassword ? "Hide password" : "Show password"
                             }
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-11 min-w-11 flex items-center justify-center cursor-pointer transition-colors"
                           >
                             {showPassword ? (
                               <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -426,7 +426,7 @@ export function RegisterForm() {
                         </div>
                         {/* Teal corner notch */}
                         <svg
-                          className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                          className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                           viewBox="0 0 14 14"
                           fill="none"
                           aria-hidden="true"
@@ -482,7 +482,7 @@ export function RegisterForm() {
                                 ? "Hide confirm password"
                                 : "Show confirm password"
                             }
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-11 min-w-11 flex items-center justify-center cursor-pointer transition-colors"
                           >
                             {showConfirmPassword ? (
                               <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -493,7 +493,7 @@ export function RegisterForm() {
                         </div>
                         {/* Teal corner notch */}
                         <svg
-                          className="absolute top-0 right-0 w-[14px] h-[14px] text-primary pointer-events-none"
+                          className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
                           viewBox="0 0 14 14"
                           fill="none"
                           aria-hidden="true"
@@ -522,7 +522,7 @@ export function RegisterForm() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full h-12 min-h-[48px] bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-md flex items-center justify-between px-5 transition-all shadow-[0_3px_0_0_#0f766e] active:translate-y-[2px] active:shadow-none cursor-pointer disabled:opacity-60"
+                      className="w-full h-12 min-h-12 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-md flex items-center justify-between px-5 transition-all shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-60"
                       style={{
                         clipPath:
                           "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
@@ -555,7 +555,7 @@ export function RegisterForm() {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="relative w-full h-12 min-h-[48px] group flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
+                  className="relative w-full h-12 min-h-12 group flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
                 >
                   {/* Outer border container */}
                   <div
@@ -566,7 +566,7 @@ export function RegisterForm() {
                     }}
                   >
                     <div
-                      className="absolute inset-[2px] bg-white group-hover:bg-slate-50 transition-colors"
+                      className="absolute inset-0.5 bg-white group-hover:bg-slate-50 transition-colors"
                       style={{
                         clipPath:
                           "polygon(6px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px)",
@@ -576,7 +576,7 @@ export function RegisterForm() {
 
                   {/* Top-right corner black notch */}
                   <div
-                    className="absolute top-0 right-0 w-[14px] h-[14px] bg-slate-900 pointer-events-none"
+                    className="absolute top-0 right-0 w-3.5 h-3.5 bg-slate-900 pointer-events-none"
                     style={{
                       clipPath: "polygon(0 0, 100% 0, 100% 100%)",
                     }}

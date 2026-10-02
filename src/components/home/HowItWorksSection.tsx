@@ -92,7 +92,7 @@ export function HowItWorksSection() {
                 className="relative flex flex-col items-center text-center px-3 sm:px-4"
               >
                 {/* Numbered Box Row with Connecting Timeline Line */}
-                <div className="relative w-full flex items-center justify-center h-[46px] mb-4 sm:mb-5">
+                <div className="relative w-full flex items-center justify-center h-11.5 mb-4 sm:mb-5">
                   {/* Timeline connector to the next box (for columns 0, 1, 2) */}
                   {!isLast && (
                     <div
@@ -129,7 +129,7 @@ export function HowItWorksSection() {
                   <div className="relative z-10 select-none">
                     <svg
                       viewBox="0 0 58 44"
-                      className="w-[52px] h-[40px] sm:w-[56px] sm:h-[43px] overflow-visible text-primary"
+                      className="w-13 h-10 sm:w-14 sm:h-[43px] overflow-visible text-primary"
                       fill="none"
                       aria-hidden="true"
                     >
@@ -201,7 +201,7 @@ export function HowItWorksSection() {
                   <div className="relative z-10 select-none">
                     <svg
                       viewBox="0 0 58 44"
-                      className="w-[46px] h-[35px] overflow-visible text-primary"
+                      className="w-11.5 h-[35px] overflow-visible text-primary"
                       fill="none"
                       aria-hidden="true"
                     >

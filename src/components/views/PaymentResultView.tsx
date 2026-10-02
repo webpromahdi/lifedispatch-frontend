@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
@@ -46,24 +45,21 @@ export function PaymentResultView() {
 
       {/* Main Status Container */}
       <main className="max-w-md w-full mx-auto my-auto">
-        <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs text-center">
+        <div className="bg-surface border border-border rounded-none p-6 sm:p-8 shadow-xs text-center">
           {/* SUCCESS STATE */}
           {isSuccess && (
             <div className="space-y-5">
-              <motion.div
-                initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="h-16 w-16 rounded-full bg-status-bg text-status-text flex items-center justify-center mx-auto shadow-xs"
+              <div
+                className="h-16 w-16 rounded-none bg-status-bg text-status-text flex items-center justify-center mx-auto shadow-xs"
               >
                 <CheckCircle2
                   className="h-9 w-9 text-status"
                   aria-hidden="true"
                 />
-              </motion.div>
+              </div>
 
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-status-text bg-status-bg px-2.5 py-1 rounded-full border border-status/20">
+                <span className="text-xs font-semibold uppercase tracking-wider text-status-text bg-status-bg px-2.5 py-1 rounded-none border border-status/20">
                   Payment Verified
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight mt-2">
@@ -76,7 +72,7 @@ export function PaymentResultView() {
               </div>
 
               {/* Receipt Details Box */}
-              <div className="bg-background border border-border rounded-xl p-4 text-left space-y-2.5 text-xs">
+              <div className="bg-background border border-border rounded-none p-4 text-left space-y-2.5 text-xs">
                 <div className="flex items-center justify-between text-text-muted pb-2 border-b border-border">
                   <span className="flex items-center gap-1.5 font-medium text-text-primary">
                     <Receipt
@@ -97,7 +93,7 @@ export function PaymentResultView() {
 
                 <div className="flex justify-between py-1">
                   <span className="text-text-secondary">Transaction Ref:</span>
-                  <span className="font-mono text-text-primary text-[11px] truncate max-w-[180px]">
+                  <span className="font-mono text-text-primary text-[11px] truncate max-w-45">
                     {transactionId}
                   </span>
                 </div>
@@ -112,7 +108,7 @@ export function PaymentResultView() {
 
               <div className="pt-2">
                 <Link href="/dashboard/patient">
-                  <Button className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors">
+                  <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
                     <span>Return to Dashboard</span>
                     <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
                   </Button>
@@ -124,20 +120,17 @@ export function PaymentResultView() {
           {/* FAILED STATE */}
           {isFailed && (
             <div className="space-y-5">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="h-16 w-16 rounded-full bg-destructive-bg text-destructive flex items-center justify-center mx-auto shadow-xs"
+              <div
+                className="h-16 w-16 rounded-none bg-destructive-bg text-destructive flex items-center justify-center mx-auto shadow-xs"
               >
                 <XCircle
                   className="h-9 w-9 text-destructive"
                   aria-hidden="true"
                 />
-              </motion.div>
+              </div>
 
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-destructive bg-destructive-bg px-2.5 py-1 rounded-full border border-destructive/20">
+                <span className="text-xs font-semibold uppercase tracking-wider text-destructive bg-destructive-bg px-2.5 py-1 rounded-none border border-destructive/20">
                   Transaction Failed
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight mt-2">
@@ -151,7 +144,7 @@ export function PaymentResultView() {
 
               <div className="pt-2 space-y-2.5">
                 <Link href="/payment/result?status=success">
-                  <Button className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors">
+                  <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
                     <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
                     <span>Try Again (Simulate Success)</span>
                   </Button>
@@ -164,7 +157,7 @@ export function PaymentResultView() {
                       "LifeDispatch Emergency Billing Hotline: +880 2 999 111",
                     )
                   }
-                  className="w-full min-h-[44px] h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
+                  className="w-full min-h-11 h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
                 >
                   <Headphones className="h-4 w-4 mr-2" aria-hidden="true" />
                   <span>Contact Billing Support</span>
@@ -176,20 +169,17 @@ export function PaymentResultView() {
           {/* CANCELLED STATE */}
           {isCancelled && (
             <div className="space-y-5">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="h-16 w-16 rounded-full bg-warning-bg text-warning-foreground flex items-center justify-center mx-auto shadow-xs"
+              <div
+                className="h-16 w-16 rounded-none bg-warning-bg text-warning-foreground flex items-center justify-center mx-auto shadow-xs"
               >
                 <AlertTriangle
                   className="h-9 w-9 text-warning"
                   aria-hidden="true"
                 />
-              </motion.div>
+              </div>
 
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-warning-foreground bg-warning-bg px-2.5 py-1 rounded-full border border-warning/30">
+                <span className="text-xs font-semibold uppercase tracking-wider text-warning-foreground bg-warning-bg px-2.5 py-1 rounded-none border border-warning/30">
                   Cancelled
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight mt-2">
@@ -203,7 +193,7 @@ export function PaymentResultView() {
 
               <div className="pt-2 space-y-2.5">
                 <Link href="/payment/result?status=success">
-                  <Button className="w-full min-h-[44px] h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors">
+                  <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
                     <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
                     <span>Resume Payment</span>
                   </Button>
@@ -212,7 +202,7 @@ export function PaymentResultView() {
                 <Link href="/dashboard/patient">
                   <Button
                     variant="outline"
-                    className="w-full min-h-[44px] h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
+                    className="w-full min-h-11 h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
                   >
                     <span>Return to Dashboard</span>
                   </Button>

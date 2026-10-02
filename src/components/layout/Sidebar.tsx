@@ -2,15 +2,12 @@
 
 import {
   Ambulance,
-  BarChart3,
   Building2,
   Clock,
   CreditCard,
   FileText,
   Home,
-  LayoutDashboard,
   LogOut,
-  Radio,
   SquarePlus,
   User,
   UserCheck,
@@ -99,20 +96,7 @@ export function Sidebar({
     window.dispatchEvent(new CustomEvent("lifedispatch:open-request-modal"));
   };
 
-  // Determine current role based on pathname
-  let roleTitle = "Dispatcher";
 
-  if (pathname.startsWith("/dashboard/super-admin")) {
-    roleTitle = "Super Admin";
-  } else if (pathname.startsWith("/dashboard/admin")) {
-    roleTitle = "System Admin";
-  } else if (pathname.startsWith("/dashboard/driver")) {
-    roleTitle = "Fleet Driver";
-  } else if (isPatient) {
-    roleTitle = "Patient Portal";
-  } else if (pathname.startsWith("/dashboard/hospital-staff")) {
-    roleTitle = "Hospital ER";
-  }
 
   // Define nav sections per role
   let navSections: NavSection[] = customNavSections || [];
@@ -152,7 +136,7 @@ export function Sidebar({
               label: "Hospitals",
               href: "/dashboard/admin/hospitals",
               icon: Building2,
-              iconClassName: "text-[#8B5CF6]",
+              iconClassName: "text-secondary",
             },
           ],
         },
@@ -206,7 +190,7 @@ export function Sidebar({
               label: "Hospitals",
               href: "/dashboard/admin/hospitals",
               icon: Building2,
-              iconClassName: "text-[#8B5CF6]",
+              iconClassName: "text-secondary",
             },
           ],
         },
@@ -347,7 +331,7 @@ export function Sidebar({
               label: "Hospitals",
               href: "/dashboard/dispatcher#hospitals",
               icon: Building2,
-              iconClassName: "text-[#8B5CF6]",
+              iconClassName: "text-secondary",
             },
           ],
         },
@@ -415,8 +399,7 @@ export function Sidebar({
                           : "Request emergency ambulance"
                       }
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-[44px] text-left cursor-pointer",
-                        isPatient || isAdmin ? "rounded-none" : "rounded-lg",
+                        "w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 text-left cursor-pointer rounded-none",
                         hasActiveEmergency
                           ? "text-text-muted opacity-50 cursor-not-allowed"
                           : "text-text-secondary hover:text-text-primary hover:bg-sidebar-hover font-medium",
@@ -437,9 +420,9 @@ export function Sidebar({
                     href={item.href}
                     onClick={onNavClick}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-[44px] rounded-none",
+                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 rounded-none",
                       isActive
-                        ? "bg-[#F0FDFA] text-[#0D9488] border-l-2 border-[#14B8A6] font-semibold"
+                        ? "bg-primary-light text-primary-dark border-l-2 border-primary font-semibold"
                         : "text-text-secondary hover:text-text-primary hover:bg-slate-50 font-medium",
                     )}
                   >
@@ -447,7 +430,7 @@ export function Sidebar({
                       className={cn(
                         "h-4 w-4 shrink-0 transition-colors",
                         isActive
-                          ? "text-[#14B8A6]"
+                          ? "text-primary"
                           : item.iconClassName ||
                               "text-text-muted group-hover:text-text-primary",
                       )}
@@ -479,7 +462,7 @@ export function Sidebar({
               "w-full h-11 px-4 flex items-center justify-center gap-2.5 font-bold text-sm text-white select-none transition-all rounded-none",
               hasActiveEmergency
                 ? "bg-slate-300 text-slate-500 cursor-not-allowed opacity-60 shadow-none"
-                : "bg-[#14B8A6] hover:bg-[#0D9488] active:translate-y-px shadow-sm cursor-pointer",
+                : "bg-primary hover:bg-primary-dark active:translate-y-px shadow-sm cursor-pointer",
             )}
             style={{
               clipPath:
@@ -494,10 +477,10 @@ export function Sidebar({
           <Link
             href="/login"
             onClick={onNavClick}
-            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-[#1E2D3D] hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-[44px]"
+            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11"
           >
             <LogOut
-              className="h-4 w-4 shrink-0 text-[#1E2D3D]"
+              className="h-4 w-4 shrink-0 text-text-primary"
               aria-hidden="true"
             />
             <span>Logout</span>
@@ -508,10 +491,10 @@ export function Sidebar({
           <Link
             href="/login"
             onClick={onNavClick}
-            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-[#1E2D3D] hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-[44px]"
+            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11"
           >
             <LogOut
-              className="h-4 w-4 shrink-0 text-[#1E2D3D]"
+              className="h-4 w-4 shrink-0 text-text-primary"
               aria-hidden="true"
             />
             <span>Logout</span>

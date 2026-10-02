@@ -72,7 +72,7 @@ export function AmbulanceFleetView() {
       />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -183,7 +183,7 @@ export function AmbulanceFleetView() {
                 <TableCell>
                   <StatusBadge status={amb.status} />
                 </TableCell>
-                <TableCell className="text-xs text-text-muted max-w-[200px] truncate">
+                <TableCell className="text-xs text-text-muted max-w-50 truncate">
                   {amb.capabilities.join(", ") || "Standard First Aid Kit"}
                 </TableCell>
                 <TableCell className="text-right">

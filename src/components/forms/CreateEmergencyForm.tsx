@@ -243,7 +243,7 @@ export function CreateEmergencyForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            className="text-xs min-h-[44px] cursor-pointer order-2 sm:order-1"
+            className="text-xs min-h-11 cursor-pointer order-2 sm:order-1"
           >
             Cancel
           </Button>
@@ -251,7 +251,7 @@ export function CreateEmergencyForm({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-primary hover:bg-primary-dark text-white text-xs min-h-[44px] px-5 font-semibold cursor-pointer gap-1.5 order-1 sm:order-2"
+          className="bg-primary hover:bg-primary-dark text-white text-xs min-h-11 px-5 font-semibold cursor-pointer gap-1.5 order-1 sm:order-2"
         >
           <Send className="h-3.5 w-3.5" aria-hidden="true" />
           {isSubmitting ? "Broadcasting..." : "Dispatch Emergency Request"}

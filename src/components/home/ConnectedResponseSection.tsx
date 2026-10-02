@@ -77,7 +77,7 @@ export function ConnectedResponseSection() {
             {/* Heading: Controlled width with spacing separating the two ideas */}
             <h2
               id="connected-response-heading"
-              className="text-2xl sm:text-4xl lg:text-[40px] font-black text-slate-900 tracking-tight leading-[1.14] max-w-[420px]"
+              className="text-2xl sm:text-4xl lg:text-[40px] font-black text-slate-900 tracking-tight leading-[1.14] max-w-105"
             >
               <span className="block">Everyone Sees</span>
               <span className="block">the Same Emergency.</span>
@@ -98,7 +98,7 @@ export function ConnectedResponseSection() {
           {/* ── Right Column: Central Panel & Connected Participants ── */}
           <div className="lg:col-span-7 flex flex-col items-center w-full">
             {/* Central Emergency Status Panel */}
-            <div className="relative w-full max-w-[430px] bg-white border-2 border-slate-900 rounded-lg p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#0f172a] z-10">
+            <div className="relative w-full max-w-107.5 bg-white border-2 border-slate-900 rounded-lg p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#0f172a] z-10">
               {/* Technical corner chamfer notch in top-right */}
               <div
                 className="absolute top-0 right-0 w-3.5 h-3.5 bg-primary pointer-events-none rounded-tr-[5px]"
@@ -108,7 +108,7 @@ export function ConnectedResponseSection() {
               <div className="flex items-center justify-between gap-3">
                 {/* Alert Icon & Incident Title */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-md bg-[#EF4444] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <div className="w-10 h-10 rounded-md bg-destructive text-white flex items-center justify-center shrink-0 shadow-xs">
                     <AlertTriangle
                       className="h-5 w-5"
                       strokeWidth={2.4}

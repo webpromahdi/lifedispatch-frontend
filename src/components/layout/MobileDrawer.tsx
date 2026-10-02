@@ -68,7 +68,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 size="icon"
                 onClick={onClose}
                 aria-label="Close navigation menu"
-                className="h-10 w-10 min-h-[44px] min-w-[44px] rounded-lg text-text-muted hover:text-text-primary hover:bg-muted cursor-pointer"
+                className="h-10 w-10 min-h-11 min-w-11 rounded-none text-text-muted hover:text-text-primary hover:bg-muted cursor-pointer"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </Button>

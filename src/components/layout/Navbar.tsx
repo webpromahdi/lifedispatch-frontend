@@ -36,7 +36,7 @@ export function Navbar() {
           : "bg-transparent border-b-0 shadow-none",
       ].join(" ")}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 sm:h-[70px] grid grid-cols-[auto_1fr_auto] items-center gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 sm:h-17.5 grid grid-cols-[auto_1fr_auto] items-center gap-6">
         {/* ── Logo (left zone) ── */}
         <Link
           href="/"
@@ -48,7 +48,7 @@ export function Navbar() {
             alt="LifeDispatch"
             width={220}
             height={52}
-            className="h-[40px] sm:h-[46px] w-auto object-contain"
+            className="h-10 sm:h-11.5 w-auto object-contain"
             priority
           />
         </Link>
@@ -80,7 +80,7 @@ export function Navbar() {
             <Button
               variant="outline"
               size="sm"
-              className="h-[38px] px-5 rounded-[3px] border-2 border-slate-900 bg-white text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:text-slate-900 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="h-9.5 px-5 rounded-[3px] border-2 border-slate-900 bg-white text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:text-slate-900 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             >
               Login
             </Button>
@@ -95,7 +95,7 @@ export function Navbar() {
             aria-label={
               mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
             }
-            className="md:hidden min-h-[44px] min-w-[44px] p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
+            className="md:hidden min-h-11 min-w-11 p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
           >
             {mobileMenuOpen ? (
               <X
@@ -135,7 +135,7 @@ export function Navbar() {
                 key={item.id}
                 type="button"
                 onClick={() => scrollToSection(item.id)}
-                className="w-full text-left px-3 py-3 rounded-[3px] text-sm font-bold text-slate-700 hover:bg-slate-100 hover:text-primary transition-colors min-h-[44px] flex items-center cursor-pointer"
+                className="w-full text-left px-3 py-3 rounded-[3px] text-sm font-bold text-slate-700 hover:bg-slate-100 hover:text-primary transition-colors min-h-11 flex items-center cursor-pointer"
               >
                 {item.label}
               </button>
@@ -145,7 +145,7 @@ export function Navbar() {
             <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
               <Button
                 variant="outline"
-                className="w-full min-h-[44px] border-2 border-slate-900 rounded-[3px] bg-white text-slate-900 font-bold shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50"
+                className="w-full min-h-11 border-2 border-slate-900 rounded-[3px] bg-white text-slate-900 font-bold shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50"
               >
                 Login
               </Button>

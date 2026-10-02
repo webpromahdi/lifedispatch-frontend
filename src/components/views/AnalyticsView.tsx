@@ -97,7 +97,7 @@ export function AnalyticsView({
       />
 
       {/* Date Range Filter (UI only per specification) */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" aria-hidden="true" />
           <span className="text-xs font-semibold text-text-primary">
@@ -164,7 +164,7 @@ export function AnalyticsView({
 
       {/* Dual Charts: Priority Pie Chart + Status Breakdown Bar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-xs">
+        <div className="bg-surface border border-border rounded-none p-5 shadow-xs">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-text-primary">
               Triage Priority Distribution (P1–P5)
@@ -176,7 +176,7 @@ export function AnalyticsView({
           <PriorityPieChart />
         </div>
 
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-xs">
+        <div className="bg-surface border border-border rounded-none p-5 shadow-xs">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-text-primary">
               Active Lifecycle Stages
@@ -233,9 +233,9 @@ export function AnalyticsView({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="w-24 bg-muted h-2 rounded-full overflow-hidden">
+                    <div className="w-24 bg-muted h-2 rounded-none overflow-hidden">
                       <div
-                        className="bg-primary h-full rounded-full"
+                        className="bg-primary h-full rounded-none"
                         style={{ width: `${item.percentage}%` }}
                       />
                     </div>

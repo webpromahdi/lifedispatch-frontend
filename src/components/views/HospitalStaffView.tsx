@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CornerNotch, LabelTab } from "@/components/views/PatientView";
 import { seedHospitals } from "@/lib/dummy/hospitals";
@@ -148,7 +147,7 @@ export function HospitalStaffView() {
         <div className="lg:col-span-8 w-full">
           <section
             aria-label="Hospital Status"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
           >
             <CornerNotch />
             <LabelTab label="HOSPITAL STATUS" />
@@ -164,7 +163,7 @@ export function HospitalStaffView() {
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-50 border border-purple-200 shrink-0">
                     <svg
-                      className="w-6 h-6 text-[#8B5CF6]"
+                      className="w-6 h-6 text-secondary"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -203,7 +202,7 @@ export function HospitalStaffView() {
                         setDiversionStatus(HospitalDiversionStatus.ACCEPTING)
                       }
                       className={cn(
-                        "min-h-[48px] px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer transition-all flex items-center justify-center gap-2",
+                        "min-h-12 px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer flex items-center justify-center gap-2",
                         diversionStatus === HospitalDiversionStatus.ACCEPTING
                           ? "bg-emerald-100 text-emerald-900 border-2 border-emerald-600 shadow-xs"
                           : "bg-emerald-50/70 text-emerald-800 border border-emerald-300 hover:bg-emerald-100",
@@ -220,7 +219,7 @@ export function HospitalStaffView() {
                         setDiversionStatus(HospitalDiversionStatus.DIVERTING)
                       }
                       className={cn(
-                        "min-h-[48px] px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer transition-all flex items-center justify-center gap-2",
+                        "min-h-12 px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer flex items-center justify-center gap-2",
                         diversionStatus === HospitalDiversionStatus.DIVERTING
                           ? "bg-amber-100 text-amber-900 border-2 border-amber-600 shadow-xs"
                           : "bg-amber-50/70 text-amber-800 border border-amber-300 hover:bg-amber-100",
@@ -237,7 +236,7 @@ export function HospitalStaffView() {
                         setDiversionStatus(HospitalDiversionStatus.CLOSED)
                       }
                       className={cn(
-                        "min-h-[48px] px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer transition-all flex items-center justify-center gap-2",
+                        "min-h-12 px-4 text-xs sm:text-sm font-bold rounded-none cursor-pointer flex items-center justify-center gap-2",
                         diversionStatus === HospitalDiversionStatus.CLOSED
                           ? "bg-red-100 text-red-900 border-2 border-red-600 shadow-xs"
                           : "bg-red-50/70 text-red-800 border border-red-300 hover:bg-red-100",
@@ -260,7 +259,7 @@ export function HospitalStaffView() {
                       value={diversionReason}
                       onChange={(e) => setDiversionReason(e.target.value)}
                       placeholder="e.g., Trauma bay near capacity; acute electrical maintenance"
-                      className="rounded-none border-2 border-border text-sm min-h-[44px]"
+                      className="rounded-none border-2 border-border text-sm min-h-11"
                     />
                   </div>
                 )}
@@ -278,7 +277,7 @@ export function HospitalStaffView() {
                     onChange={(e) =>
                       setAvailableBeds(Math.max(0, Number(e.target.value)))
                     }
-                    className="rounded-none border-2 border-border text-sm min-h-[44px] max-w-xs font-mono font-bold"
+                    className="rounded-none border-2 border-border text-sm min-h-11 max-w-xs font-mono font-bold"
                   />
                 </div>
 
@@ -302,7 +301,7 @@ export function HospitalStaffView() {
                     type="button"
                     disabled={isUpdating}
                     onClick={handleUpdateHospitalStatus}
-                    className="w-full sm:w-auto min-h-[44px] px-6 text-sm font-bold bg-[#14B8A6] hover:bg-[#0D9488] text-white rounded-none cursor-pointer disabled:opacity-50"
+                    className="w-full sm:w-auto min-h-11 px-6 text-sm font-bold bg-primary hover:bg-primary-dark text-white rounded-none cursor-pointer disabled:opacity-50"
                   >
                     {isUpdating ? "Saving..." : "Update Hospital Status"}
                   </button>
@@ -316,7 +315,7 @@ export function HospitalStaffView() {
         <div className="lg:col-span-4 w-full">
           <section
             aria-label="My Shift"
-            className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+            className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
           >
             <CornerNotch />
             <LabelTab label="MY SHIFT" />
@@ -343,10 +342,10 @@ export function HospitalStaffView() {
                 type="button"
                 onClick={handleToggleShift}
                 className={cn(
-                  "w-full min-h-[48px] text-sm font-bold rounded-none cursor-pointer transition-colors",
+                  "w-full min-h-12 text-sm font-bold rounded-none cursor-pointer transition-colors",
                   isOnShift
                     ? "border-2 border-border text-text-primary hover:bg-slate-100"
-                    : "bg-[#14B8A6] hover:bg-[#0D9488] text-white",
+                    : "bg-primary hover:bg-primary-dark text-white",
                 )}
               >
                 {isOnShift
@@ -361,13 +360,13 @@ export function HospitalStaffView() {
       {/* ── ROW 2: FULL WIDTH STAFF ROSTER TABLE ── */}
       <section
         aria-label="Staff Roster"
-        className="relative bg-white border-2 border-[#14B8A6] rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+        className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
       >
         <CornerNotch />
         <LabelTab label="STAFF ROSTER" />
 
         <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-          <div className="min-w-[620px] px-5 sm:px-0">
+          <div className="min-w-155 px-5 sm:px-0">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">

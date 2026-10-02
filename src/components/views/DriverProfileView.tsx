@@ -35,10 +35,10 @@ export function DriverProfileView() {
       />
 
       {/* Driver Identity Card */}
-      <div className="bg-surface border border-border rounded-xl p-6 shadow-xs">
+      <div className="bg-surface border border-border rounded-none p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-border">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-2xl border-2 border-primary/20 shrink-0">
+            <div className="h-16 w-16 rounded-none bg-primary-light text-primary flex items-center justify-center font-bold text-2xl border-2 border-primary/20 shrink-0">
               RI
             </div>
             <div>
@@ -79,7 +79,7 @@ export function DriverProfileView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-background p-3 rounded-lg border border-border text-xs">
+          <div className="flex items-center gap-2 bg-background p-3 rounded-none border border-border text-xs">
             <div className="text-right">
               <span className="text-[11px] text-text-muted block">
                 Total Missions
@@ -108,7 +108,7 @@ export function DriverProfileView() {
               <User className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
               Contact & Identity
             </h3>
-            <div className="p-3.5 rounded-lg bg-background border border-border space-y-2 text-xs">
+            <div className="p-3.5 rounded-none bg-background border border-border space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-text-muted flex items-center gap-1">
                   <Mail className="h-3.5 w-3.5" aria-hidden="true" /> Email:
@@ -146,7 +146,7 @@ export function DriverProfileView() {
               <Truck className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
               Operational Assignment
             </h3>
-            <div className="p-3.5 rounded-lg bg-background border border-border space-y-2 text-xs">
+            <div className="p-3.5 rounded-none bg-background border border-border space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">Unit Plate:</span>
                 <span className="font-mono font-semibold text-text-primary">
@@ -180,7 +180,7 @@ export function DriverProfileView() {
               />
               Clinical Credentials
             </h3>
-            <div className="p-3.5 rounded-lg bg-background border border-border space-y-2 text-xs">
+            <div className="p-3.5 rounded-none bg-background border border-border space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">Clinical Level:</span>
                 <Badge
@@ -211,8 +211,8 @@ export function DriverProfileView() {
 
       {/* Certifications & Badges Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-surface border border-border flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-primary-light text-primary shrink-0">
+        <div className="p-4 rounded-none bg-surface border border-border flex items-start gap-3">
+          <div className="p-2 rounded-none bg-primary-light text-primary shrink-0">
             <HeartPulse className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -226,8 +226,8 @@ export function DriverProfileView() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-surface border border-border flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-secondary-light text-secondary shrink-0">
+        <div className="p-4 rounded-none bg-surface border border-border flex items-start gap-3">
+          <div className="p-2 rounded-none bg-secondary-light text-secondary shrink-0">
             <Shield className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -241,8 +241,8 @@ export function DriverProfileView() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-surface border border-border flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-status-bg text-status shrink-0">
+        <div className="p-4 rounded-none bg-surface border border-border flex items-start gap-3">
+          <div className="p-2 rounded-none bg-status-bg text-status shrink-0">
             <Award className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>

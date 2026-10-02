@@ -126,7 +126,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="size-11 sm:size-9 min-w-[44px] min-h-[44px] sm:min-w-9 sm:min-h-9 rounded-[6px] border border-[#2dd4bf]/80 hover:border-primary text-slate-800 hover:text-primary bg-background hover:bg-primary-light/40 transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
+                className="size-11 sm:size-9 min-w-11 min-h-11 sm:min-w-9 sm:min-h-9 rounded-[6px] border border-[#2dd4bf]/80 hover:border-primary text-slate-800 hover:text-primary bg-background hover:bg-primary-light/40 transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
               >
                 <Icon className="h-4 w-4" />
               </a>
@@ -164,7 +164,7 @@ export function Footer() {
         >
           <Link
             href="/contact"
-            className="min-h-[44px] inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
+            className="min-h-11 inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
           >
             Contact Us
           </Link>
@@ -173,7 +173,7 @@ export function Footer() {
           </span>
           <Link
             href="/about"
-            className="min-h-[44px] inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
+            className="min-h-11 inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
           >
             About Us
           </Link>
@@ -182,7 +182,7 @@ export function Footer() {
           </span>
           <Link
             href="/privacy"
-            className="min-h-[44px] inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
+            className="min-h-11 inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
           >
             Privacy Policy
           </Link>
@@ -191,7 +191,7 @@ export function Footer() {
           </span>
           <Link
             href="/terms"
-            className="min-h-[44px] inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
+            className="min-h-11 inline-flex items-center px-1.5 text-slate-500 hover:text-slate-900 underline underline-offset-4 decoration-slate-300 hover:decoration-slate-600 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-hidden"
           >
             Terms of Service
           </Link>

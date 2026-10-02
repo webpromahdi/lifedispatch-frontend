@@ -78,7 +78,7 @@ export function CtaSection() {
             {/* Right Buttons: Stacked on desktop matching the reference image */}
             <div className="flex flex-col gap-3 w-full sm:w-auto shrink-0">
               <Link href="/register" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-[220px] min-h-[48px] px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2">
+                <Button className="w-full sm:w-55 min-h-12 px-6 bg-primary hover:bg-primary-dark text-white font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2">
                   <span>Get Started</span>
                   <ArrowRight
                     className="h-4 w-4"
@@ -90,7 +90,7 @@ export function CtaSection() {
               <Link href="#how-it-works" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
-                  className="w-full sm:w-[220px] min-h-[48px] px-6 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full sm:w-55 min-h-12 px-6 bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm sm:text-base rounded-[3px] border-2 border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:shadow-[1px_1px_0px_0px_#0f172a] hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Explore the Platform</span>
                   <ArrowRight

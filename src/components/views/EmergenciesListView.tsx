@@ -64,7 +64,7 @@ export function EmergenciesListView() {
       />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -210,7 +210,7 @@ export function EmergenciesListView() {
                 <TableCell>
                   <StatusBadge status={em.status} />
                 </TableCell>
-                <TableCell className="text-xs text-text-secondary max-w-[220px] truncate">
+                <TableCell className="text-xs text-text-secondary max-w-55 truncate">
                   {em.locationAddress}
                 </TableCell>
                 <TableCell className="text-xs text-text-primary">

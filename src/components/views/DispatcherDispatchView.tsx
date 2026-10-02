@@ -133,7 +133,7 @@ export function DispatcherDispatchView() {
       />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-xl shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
@@ -316,7 +316,7 @@ export function DispatcherDispatchView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-destructive-bg text-destructive">
+              <div className="p-2 rounded-none bg-destructive-bg text-destructive">
                 <AlertTriangle className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
@@ -344,13 +344,13 @@ export function DispatcherDispatchView() {
             <Button
               variant="outline"
               onClick={() => setCancelDialogOpen(false)}
-              className="text-xs min-h-[40px] cursor-pointer"
+              className="text-xs min-h-10 cursor-pointer"
             >
               Abort
             </Button>
             <Button
               onClick={handleConfirmCancel}
-              className="bg-destructive hover:bg-destructive/90 text-white text-xs min-h-[40px] cursor-pointer font-medium"
+              className="bg-destructive hover:bg-destructive/90 text-white text-xs min-h-10 cursor-pointer font-medium"
             >
               Confirm Cancel
             </Button>
