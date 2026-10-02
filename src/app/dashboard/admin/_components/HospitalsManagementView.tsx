@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { CreateHospitalDialog } from "@/components/forms/admin/CreateHospitalDialog";
+import { CreateHospitalDialog } from "./dialogs/CreateHospitalDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

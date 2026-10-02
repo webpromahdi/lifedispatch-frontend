@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DispatcherAmbulancesView } from "@/components/views/DispatcherAmbulancesView";
+import { DispatcherAmbulancesView } from "../_components/DispatcherAmbulancesView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Fleet Telematics Board",

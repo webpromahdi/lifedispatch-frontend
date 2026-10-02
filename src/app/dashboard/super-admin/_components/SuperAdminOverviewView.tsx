@@ -8,8 +8,8 @@ import {
   LiveOperationsCard,
   RevenueCard,
   SystemScaleCards,
-} from "@/components/admin/AdminDashboardSections";
-import { CornerNotch } from "@/components/views/PatientView";
+} from "@/components/shared/AdminDashboardSections";
+import { CornerNotch } from "@/components/shared/DashboardUIPrimitives";
 import {
   type AnalyticsOverviewData,
   getAnalyticsOverview,

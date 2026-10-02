@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AuditLogsView } from "@/components/views/AuditLogsView";
+import { AuditLogsView } from "@/components/shared/AuditLogsView";
 
 export const metadata: Metadata = {
   title: "Audit Logs & Security Trail | LifeDispatch Admin",

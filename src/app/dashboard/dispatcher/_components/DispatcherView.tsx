@@ -20,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CornerNotch, LabelTab } from "@/components/views/PatientView";
+import { CornerNotch, LabelTab } from "@/components/shared/DashboardUIPrimitives";
 import {
   formatEnumTitle,
   formatTime,
-} from "@/components/admin/AdminDashboardSections";
+} from "@/components/shared/AdminDashboardSections";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { seedHospitals } from "@/lib/dummy/hospitals";

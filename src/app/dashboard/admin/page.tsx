@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminOverviewView } from "@/components/views/AdminOverviewView";
+import { AdminOverviewView } from "./_components/AdminOverviewView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Admin Overview",

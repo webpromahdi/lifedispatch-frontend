@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
-import { CreateDriverDialog } from "@/components/forms/admin/CreateDriverDialog";
+import { CreateDriverDialog } from "./dialogs/CreateDriverDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

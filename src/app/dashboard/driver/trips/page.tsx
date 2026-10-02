@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DriverTripsView } from "@/components/views/DriverTripsView";
+import { DriverTripsView } from "../_components/DriverTripsView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Driver Trip History",

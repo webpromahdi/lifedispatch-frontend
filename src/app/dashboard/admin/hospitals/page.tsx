@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HospitalsManagementView } from "@/components/views/HospitalsManagementView";
+import { HospitalsManagementView } from "../_components/HospitalsManagementView";
 
 export const metadata: Metadata = {
   title: "Partner Hospital ER Diversion | LifeDispatch Admin",

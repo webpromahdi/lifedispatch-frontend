@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DispatcherView } from "@/components/views/DispatcherView";
+import { DispatcherView } from "./_components/DispatcherView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Dispatcher Overview",

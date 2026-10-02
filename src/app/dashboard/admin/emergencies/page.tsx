@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EmergenciesListView } from "@/components/views/EmergenciesListView";
+import { EmergenciesListView } from "../_components/EmergenciesListView";
 
 export const metadata: Metadata = {
   title: "Live Emergency CAD Incidents | LifeDispatch Admin",

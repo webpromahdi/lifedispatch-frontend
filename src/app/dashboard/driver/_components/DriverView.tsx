@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { formatEnumTitle } from "@/components/admin/AdminDashboardSections";
+import { formatEnumTitle } from "@/components/shared/AdminDashboardSections";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { CornerNotch, LabelTab } from "@/components/views/PatientView";
+import { CornerNotch, LabelTab } from "@/components/shared/DashboardUIPrimitives";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedDispatches } from "@/lib/dummy/dispatches";
 import { seedDrivers } from "@/lib/dummy/drivers";

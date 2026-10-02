@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UserManagementView } from "@/components/views/UserManagementView";
+import { UserManagementView } from "@/components/shared/UserManagementView";
 
 export const metadata: Metadata = {
   title: "User Governance & Access | LifeDispatch",

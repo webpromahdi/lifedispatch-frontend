@@ -8,7 +8,7 @@ import {
   LiveOperationsCard,
   RevenueCard,
   SystemScaleCards,
-} from "@/components/admin/AdminDashboardSections";
+} from "@/components/shared/AdminDashboardSections";
 import {
   type AnalyticsOverviewData,
   getAnalyticsOverview,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DriverProfileView } from "@/components/views/DriverProfileView";
+import { DriverProfileView } from "../_components/DriverProfileView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Paramedic Driver Profile",

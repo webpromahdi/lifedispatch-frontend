@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HospitalStaffView } from "@/components/views/HospitalStaffView";
+import { HospitalStaffView } from "./_components/HospitalStaffView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Hospital ER Staff",

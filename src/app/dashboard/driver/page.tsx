@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DriverView } from "@/components/views/DriverView";
+import { DriverView } from "./_components/DriverView";
 
 export const metadata: Metadata = {
   title: "LifeDispatch | Driver Operations",

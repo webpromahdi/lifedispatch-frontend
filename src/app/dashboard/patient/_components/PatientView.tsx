@@ -1,4 +1,5 @@
 "use client";
+import { CornerNotch, LabelTab } from "@/components/shared/DashboardUIPrimitives";
 
 import {
   AlertTriangle,
@@ -46,30 +47,7 @@ import {
 } from "@/lib/types/enums";
 import { cn, formatDate } from "@/lib/utils";
 
-// ── Reusable Architectural Corner Triangle Notch ──
-export function CornerNotch() {
-  return (
-    <div
-      className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary pointer-events-none"
-      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
-      aria-hidden="true"
-    />
-  );
-}
-
-// ── Reusable Notched Label Tab ──
-export function LabelTab({ label }: { label: string }) {
-  return (
-    <div
-      className="inline-flex items-center px-3.5 py-1 bg-[#E6F8F6] text-primary-dark text-xs font-bold uppercase tracking-wider select-none"
-      style={{
-        clipPath: "polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%)",
-      }}
-    >
-      {label}
-    </div>
-  );
-}
+// CornerNotch and LabelTab imported from @/components/shared/DashboardUIPrimitives
 
 // ── Priority Badge Helper Matching Reference (■ P1, ■ P2, etc.) ──
 function TablePriorityBadge({ priority }: { priority: EmergencyPriority | null }) {

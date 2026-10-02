@@ -1,9 +1,8 @@
 "use client";
 
-
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { CornerNotch, LabelTab } from "@/components/views/PatientView";
+import { CornerNotch, LabelTab } from "@/components/shared/DashboardUIPrimitives";
 import type { AnalyticsOverviewData } from "@/lib/dummy/analytics";
 import type { AuditLog } from "@/lib/types/audit.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { PaymentResultView } from "@/components/views/PaymentResultView";
+import { PaymentResultView } from "../_components/PaymentResultView";
 
 export const metadata: Metadata = {
   title: "Payment Confirmation | LifeDispatch",

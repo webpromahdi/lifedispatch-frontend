@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SuperAdminOverviewView } from "@/components/views/SuperAdminOverviewView";
+import { SuperAdminOverviewView } from "./_components/SuperAdminOverviewView";
 
 export const metadata: Metadata = {
   title: "Platform Command & Security | LifeDispatch Super Admin",

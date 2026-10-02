@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AnalyticsView } from "@/components/views/AnalyticsView";
+import { AnalyticsView } from "@/components/shared/AnalyticsView";
 
 export const metadata: Metadata = {
   title: "System Analytics & Telematics | LifeDispatch",

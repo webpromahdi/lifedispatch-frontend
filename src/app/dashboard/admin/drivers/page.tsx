@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DriversManagementView } from "@/components/views/DriversManagementView";
+import { DriversManagementView } from "../_components/DriversManagementView";
 
 export const metadata: Metadata = {
   title: "Paramedic Driver Roster | LifeDispatch Admin",
