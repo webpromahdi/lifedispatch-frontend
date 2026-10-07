@@ -1,14 +1,77 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useGetMe, useLogout } from "@/hooks/auth.hook";
 
 export function Navbar() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const { data: meRes, isLoading } = useGetMe();
+  const authUser = meRes?.data?.user || null;
+  const { mutate: logoutMutate } = useLogout();
+
+  const getDashboardUrl = (role: string) => {
+    switch (role.toLowerCase()) {
+      case "super admin":
+        return "/dashboard/super-admin";
+      case "admin":
+        return "/dashboard/admin";
+      case "dispatcher":
+        return "/dashboard/dispatcher";
+      case "driver":
+        return "/dashboard/driver";
+      case "hospital staff":
+        return "/dashboard/hospital-staff";
+      default:
+        return "/dashboard/patient";
+    }
+  };
+
+  const dashboardUrl = authUser
+    ? getDashboardUrl(authUser.role)
+    : "/dashboard/patient";
+  const userInitials = authUser
+    ? authUser.name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase()
+    : "";
+
+  const handleLogout = () => {
+    logoutMutate(undefined, {
+      onSettled: () => {
+        queryClient.setQueryData(["user", "me"], null);
+        toast.success("Logged out successfully");
+        router.push("/login");
+      },
+    });
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -75,16 +138,62 @@ export function Navbar() {
 
         {/* ── Right zone: Login CTA + mobile hamburger ── */}
         <div className="flex items-center gap-3 justify-end">
-          {/* Desktop: Technical Login Button */}
-          <Link href="/login" className="hidden md:block">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9.5 px-5 rounded-[3px] border-2 border-slate-900 bg-white text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:text-slate-900 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
-            >
-              Login
-            </Button>
-          </Link>
+          {/* Desktop: Technical Login Button or User Control */}
+          <div className="hidden md:block">
+            {isLoading ? (
+              <div className="w-32 h-9.5 rounded-[3px] bg-slate-100/80 animate-pulse border-2 border-slate-200"></div>
+            ) : authUser ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-slate-900 rounded-[3px] text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:translate-y-px hover:translate-x-px hover:shadow-[1px_1px_0px_0px_#0f172a] transition-all cursor-pointer outline-hidden">
+                  <div className="w-6 h-6 bg-primary/10 text-primary flex items-center justify-center rounded-sm text-xs">
+                    {userInitials}
+                  </div>
+                  <span>{authUser.name}</span>
+                  <ChevronDown
+                    className="h-4 w-4 text-slate-500"
+                    strokeWidth={2.5}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48 bg-white border-2 border-slate-900 rounded-[3px] shadow-[4px_4px_0px_0px_#0f172a] p-1 mt-1"
+                >
+                  <DropdownMenuItem
+                    className="cursor-pointer focus:bg-slate-100 font-medium text-slate-700 py-2 rounded-sm outline-hidden"
+                    onClick={() => router.push(dashboardUrl)}
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer focus:bg-slate-100 font-medium text-slate-700 py-2 rounded-sm outline-hidden"
+                    onClick={() => router.push(`${dashboardUrl}#profile`)}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-200" />
+                  <DropdownMenuItem
+                    className="cursor-pointer focus:bg-red-50 text-red-600 focus:text-red-700 font-bold py-2 rounded-sm outline-hidden"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9.5 px-5 rounded-[3px] border-2 border-slate-900 bg-white text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:text-slate-900 active:translate-x-px active:translate-y-px active:shadow-none transition-all cursor-pointer"
+                >
+                  Login
+                </Button>
+              </Link>
+            )}
+          </div>
 
           {/* Mobile: hamburger toggle */}
           <button
@@ -95,7 +204,7 @@ export function Navbar() {
             aria-label={
               mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
             }
-            className="md:hidden min-h-11 min-w-11 p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
+            className="md:hidden min-h-11 min-w-11 p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-px active:translate-y-px active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
           >
             {mobileMenuOpen ? (
               <X
@@ -142,14 +251,69 @@ export function Navbar() {
             ))}
           </nav>
           <div className="pt-3 border-t-2 border-slate-200">
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-              <Button
-                variant="outline"
-                className="w-full min-h-11 border-2 border-slate-900 rounded-[3px] bg-white text-slate-900 font-bold shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50"
-              >
-                Login
-              </Button>
-            </Link>
+            {isLoading ? (
+              <div className="w-full h-11 rounded-[3px] bg-slate-100 animate-pulse border-2 border-slate-200"></div>
+            ) : authUser ? (
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center gap-3 px-3 py-2 border-2 border-slate-100 rounded-[3px] bg-slate-50">
+                  <div className="w-8 h-8 bg-primary/10 text-primary flex items-center justify-center rounded-sm font-bold text-sm">
+                    {userInitials}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-900 leading-none mb-1">
+                      {authUser.name}
+                    </span>
+                    <span className="text-xs font-medium text-slate-500 leading-none">
+                      {authUser.role}
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Button
+                    variant="outline"
+                    className="w-full min-h-11 border-2 border-slate-200 rounded-[3px] bg-white text-slate-700 font-bold hover:bg-slate-50 hover:text-primary hover:border-primary/30 shadow-none cursor-pointer"
+                    onClick={() => {
+                      router.push(dashboardUrl);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full min-h-11 border-2 border-slate-200 rounded-[3px] bg-white text-slate-700 font-bold hover:bg-slate-50 hover:text-primary hover:border-primary/30 shadow-none cursor-pointer"
+                    onClick={() => {
+                      router.push(`${dashboardUrl}#profile`);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Button>
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full min-h-11 border-2 border-slate-900 rounded-[3px] bg-white text-red-600 font-bold shadow-[2px_2px_0px_0px_#0f172a] hover:bg-red-50 hover:text-red-700 active:translate-x-px active:translate-y-px active:shadow-none transition-all cursor-pointer"
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button
+                  variant="outline"
+                  className="w-full min-h-11 border-2 border-slate-900 rounded-[3px] bg-white text-slate-900 font-bold shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 active:translate-x-px active:translate-y-px active:shadow-none transition-all cursor-pointer"
+                >
+                  Login
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { mutate: login, isPending: loginPending } = useLogin();
 
@@ -43,6 +45,9 @@ export function LoginForm() {
           toast.success("Login Successful", {
             description: "Welcome back!",
           });
+
+          queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+
           router.push("/");
         },
         onError: (err) => {

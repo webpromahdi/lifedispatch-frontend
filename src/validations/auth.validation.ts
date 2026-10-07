@@ -36,3 +36,34 @@ export const registerSchema = z
   });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("Invalid email address!"),
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    email: z.email("Invalid email address!"),
+    otp: z.string().length(6, "OTP must be exactly 6 characters."),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .regex(/[a-z]/, "Must contain at least 1 lowercase letter.")
+      .regex(/[A-Z]/, "Must contain at least 1 uppercase letter.")
+      .regex(/[0-9]/, "Must contain at least 1 number.")
+      .regex(/[^A-Za-z0-9]/, "Must contain at least 1 special character."),
+    confirmPassword: z.string(),
+  })
+  .superRefine(({ newPassword, confirmPassword }, ctx) => {
+    if (confirmPassword !== newPassword) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "Passwords do not match.",
+      });
+    }
+  });
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

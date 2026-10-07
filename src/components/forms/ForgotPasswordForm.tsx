@@ -1,159 +1,144 @@
 "use client";
 
-import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  KeyRound,
-  Mail,
-} from "lucide-react";
+import { useForm } from "@tanstack/react-form";
+import { ArrowRight, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type React from "react";
-import { useState } from "react";
 import { toast } from "sonner";
+import { TealCornerNotch } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForgotPassword } from "@/hooks";
+import {
+  type ForgotPasswordFormValues,
+  forgotPasswordSchema,
+} from "@/validations";
 
 export function ForgotPasswordForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("nafisa.anjum@gmail.com");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      toast.success("Security OTP Dispatched", {
-        description: `6-digit verification code has been sent to ${email}`,
+  const form = useForm({
+    defaultValues: {
+      email: "",
+    } as ForgotPasswordFormValues,
+    validators: {
+      onBlur: forgotPasswordSchema,
+    },
+    onSubmit: async ({ value }) => {
+      forgotPassword(value, {
+        onSuccess: () => {
+          toast.success("Security OTP Dispatched", {
+            description: `A 6-digit verification code has been sent to ${value.email}`,
+          });
+          router.push(
+            `/reset-password?email=${encodeURIComponent(value.email)}`,
+          );
+        },
+        onError: (err) => {
+          toast.error("Failed to send OTP", {
+            description:
+              err?.message || "Something went wrong. Please try again.",
+          });
+        },
       });
-    }, 600);
-  };
+    },
+  });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="w-full max-w-md mx-auto bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-xs"
-    >
-      {!submitted ? (
-        <>
-          <div className="text-center mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-primary-light text-primary flex items-center justify-center mx-auto mb-3 shadow-2xs">
-              <KeyRound className="h-6 w-6" aria-hidden="true" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-              Reset Your Password
-            </h1>
-            <p className="mt-1.5 text-sm text-text-secondary max-w-sm mx-auto">
-              Enter your verified LifeDispatch email address to receive a
-              6-digit one-time password (OTP).
-            </p>
-          </div>
+    <div className="w-full flex flex-col">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="w-full"
+      >
+        <FieldGroup>
+          <form.Field name="email">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="block text-xs sm:text-sm font-bold text-slate-800"
+                  >
+                    Account Email Address
+                  </FieldLabel>
+                  <div className="relative">
+                    <div
+                      className="flex items-center bg-white border-2 border-slate-300 focus-within:border-primary rounded-lg transition-colors overflow-hidden"
+                      style={{
+                        clipPath:
+                          "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)",
+                      }}
+                    >
+                      <Mail
+                        className="ml-3.5 h-4 w-4 text-slate-400 shrink-0 pointer-events-none"
+                        aria-hidden="true"
+                      />
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        type="email"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        required
+                        placeholder="name@example.com"
+                        autoComplete="email"
+                        aria-invalid={isInvalid}
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                      />
+                    </div>
+                    <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
+                  </div>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="forgot-email"
-                className="text-xs font-semibold text-text-primary"
-              >
-                Account Email Address
-              </Label>
-              <div className="relative">
-                <Mail
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none"
-                  aria-hidden="true"
-                />
-                <Input
-                  id="forgot-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="pl-10 h-11 w-full text-base sm:text-sm bg-surface border-border focus-visible:border-primary focus-visible:ring-primary/20"
-                />
-              </div>
-            </div>
-
+          <div className="pt-2">
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors mt-2"
+              disabled={isPending}
+              className="w-full h-12 min-h-12 bg-primary hover:bg-primary/90 text-white font-bold text-base rounded-none flex items-center justify-between px-5 shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none"
+              style={{
+                clipPath:
+                  "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+              }}
             >
-              {loading ? (
-                <span>Generating OTP...</span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <span>Send OTP Verification</span>
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </span>
-              )}
+              <span className="flex-1 text-center font-bold">
+                {isPending ? "Generating OTP..." : "Send OTP Verification"}
+              </span>
+              <ArrowRight
+                className="h-4 w-4 text-white shrink-0"
+                aria-hidden="true"
+              />
             </Button>
-          </form>
-
-          <div className="mt-6 pt-5 border-t border-border text-center text-xs text-text-secondary">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1.5 text-primary font-semibold hover:text-primary-dark hover:underline transition-colors min-h-11"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              <span>Back to Sign In</span>
-            </Link>
           </div>
-        </>
-      ) : (
-        /* Dummy Success State */
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="text-center py-2 space-y-4"
+        </FieldGroup>
+      </form>
+
+      <div className="mt-5 text-center text-xs sm:text-sm text-slate-500 font-medium">
+        Remembered your password?{" "}
+        <Link
+          href="/login"
+          className="text-primary font-bold hover:text-primary-dark hover:underline transition-colors ml-0.5"
         >
-          <div className="h-14 w-14 rounded-2xl bg-status-bg text-status-text flex items-center justify-center mx-auto shadow-2xs">
-            <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
-          </div>
-
-          <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
-            Verification OTP Sent!
-          </h2>
-
-          <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed">
-            We have dispatched a 6-digit recovery code to{" "}
-            <strong className="font-semibold text-text-primary">{email}</strong>
-            . It will expire in 10 minutes.
-          </p>
-
-          <div className="pt-3 space-y-3">
-            <Button
-              onClick={() =>
-                router.push(
-                  `/reset-password?email=${encodeURIComponent(email)}`,
-                )
-              }
-              className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg shadow-xs cursor-pointer transition-colors"
-            >
-              <span>Proceed to Enter OTP</span>
-              <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => setSubmitted(false)}
-              className="w-full min-h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
-            >
-              Didn&apos;t receive it? Try again
-            </Button>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
+          Sign In
+        </Link>
+      </div>
+    </div>
   );
 }
