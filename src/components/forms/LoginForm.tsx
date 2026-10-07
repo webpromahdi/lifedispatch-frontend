@@ -1,13 +1,24 @@
 "use client";
+import { useForm } from "@tanstack/react-form";
 import { motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
-
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import type React from "react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
+import {
+  CircuitTraceLeft,
+  CircuitTraceRight,
+  GoogleIcon,
+  TealCornerNotch,
+} from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { loginSchema } from "@/validations";
 
 interface DemoRole {
   name: string;
@@ -70,82 +81,25 @@ const DEMO_ROLES: DemoRole[] = [
 ];
 
 export function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isStaff = searchParams.get("role") === "staff";
-
-  const [email, setEmail] = useState(
-    isStaff ? "dispatcher@lifedispatch.org" : "",
-  );
-  const [password, setPassword] = useState(isStaff ? "••••••••••••" : "");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      toast.error("Please enter your email or select a Quick Access role.");
-      return;
-    }
-
-    setLoading(true);
-
-    const matchedRole = DEMO_ROLES.find(
-      (r) => r.email.toLowerCase() === email.trim().toLowerCase(),
-    );
-
-    const targetRoleName = matchedRole
-      ? matchedRole.roleName
-      : isStaff
-        ? "Dispatcher"
-        : "Patient";
-    const targetDisplayName = matchedRole
-      ? matchedRole.displayName
-      : isStaff
-        ? "Operational Staff"
-        : "Authorized User";
-    const targetPath = matchedRole
-      ? matchedRole.redirectPath
-      : isStaff
-        ? "/dashboard/dispatcher"
-        : "/dashboard/patient";
-
-    toast.success("Welcome back!", {
-      description: `Authenticated as ${targetRoleName} (${targetDisplayName}).`,
-    });
-
-    setTimeout(() => {
-      setLoading(false);
-      router.push(targetPath);
-    }, 600);
-  };
-
-  const handleGoogleLogin = () => {
-    toast.info("Google OAuth", {
-      description: "Redirecting to Google Account Authentication...",
-    });
-    setTimeout(() => {
-      router.push("/dashboard/patient");
-    }, 800);
-  };
-
-  const handleQuickLogin = (role: DemoRole) => {
-    setEmail(role.email);
-    setPassword("••••••••••••");
-    toast.info(`${role.name} credentials loaded!`, {
-      description: "Click the Login button above to proceed.",
-    });
-
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    validators: {
+      onBlur: loginSchema,
+    },
+    onSubmit: async ({ value }) => {
+      console.log("Form Submitted:", value);
+    },
+  });
 
   return (
     <div className="w-full flex flex-col">
-      {/* ══════════════════════════════════════════════════════
-          SECTION 1: Centered Main Login Card
-      ══════════════════════════════════════════════════════ */}
+      {/*SECTION 1: Centered Main Login Card*/}
+
       <div className="relative w-full">
         {/* Ambient horizontal circuit trace lines (desktop only) */}
         <div
@@ -153,33 +107,9 @@ export function LoginForm() {
           aria-hidden="true"
         >
           {/* Left trace */}
-          <svg
-            className="absolute top-21.5 left-0 w-[calc(50%-240px)] h-6 text-primary/40"
-            preserveAspectRatio="none"
-            viewBox="0 0 400 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M0 12 L360 12 L380 4 L400 4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-          </svg>
+          <CircuitTraceLeft className="absolute top-21.5 left-0 w-[calc(50%-240px)] h-6 text-primary/40" />
           {/* Right trace */}
-          <svg
-            className="absolute top-21.5 right-0 w-[calc(50%-240px)] h-6 text-primary/40"
-            preserveAspectRatio="none"
-            viewBox="0 0 400 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M400 12 L40 12 L20 4 L0 4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-          </svg>
+          <CircuitTraceRight className="absolute top-21.5 right-0 w-[calc(50%-240px)] h-6 text-primary/40" />
         </div>
 
         {/* Centered Login Card */}
@@ -226,144 +156,155 @@ export function LoginForm() {
                 </p>
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Email */}
-                  <div className="space-y-1.5">
-                    <Label
-                      htmlFor="login-email"
-                      className="block text-xs sm:text-sm font-bold text-slate-800"
-                    >
-                      Email
-                    </Label>
-                    <div className="relative">
-                      {/* Clipped input container */}
-                      <div
-                        className="flex items-center bg-white border-2 border-slate-300 focus-within:border-primary rounded-lg transition-colors"
-                        style={{
-                          clipPath:
-                            "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)",
-                        }}
-                      >
-                        <Mail
-                          className="ml-3.5 h-4 w-4 text-slate-400 shrink-0 pointer-events-none"
-                          aria-hidden="true"
-                        />
-                        <input
-                          id="login-email"
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@example.com"
-                          className="w-full h-11 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden"
-                        />
-                      </div>
-                      {/* Teal corner notch */}
-                      <svg
-                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <line
-                          x1="0"
-                          y1="0"
-                          x2="14"
-                          y2="14"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    form.handleSubmit();
+                  }}
+                >
+                  <FieldGroup>
+                    {/* Email */}
+                    <form.Field name="email">
+                      {(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid;
+                        return (
+                          <Field data-invalid={isInvalid}>
+                            <FieldLabel
+                              htmlFor={field.name}
+                              className="block text-xs sm:text-sm font-bold text-slate-800"
+                            >
+                              Email
+                            </FieldLabel>
+                            <div className="relative">
+                              {/* Clipped input container */}
+                              <div
+                                className="flex items-center bg-white border-2 border-slate-300 focus-within:border-primary rounded-lg transition-colors overflow-hidden"
+                                style={{
+                                  clipPath:
+                                    "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)",
+                                }}
+                              >
+                                <Mail
+                                  className="ml-3.5 h-4 w-4 text-slate-400 shrink-0 pointer-events-none"
+                                  aria-hidden="true"
+                                />
+                                <Input
+                                  id={field.name}
+                                  name={field.name}
+                                  type="email"
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  onBlur={field.handleBlur}
+                                  required
+                                  placeholder="you@example.com"
+                                  autoComplete="off"
+                                  aria-invalid={isInvalid}
+                                  className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 rounded-none"
+                                />
+                              </div>
+                              {/* Teal corner notch */}
+                              <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
+                            </div>
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        );
+                      }}
+                    </form.Field>
 
-                  {/* Password */}
-                  <div className="space-y-1.5">
-                    <Label
-                      htmlFor="login-password"
-                      className="block text-xs sm:text-sm font-bold text-slate-800"
-                    >
-                      Password
-                    </Label>
-                    <div className="relative">
-                      <div
-                        className="flex items-center bg-white border-2 border-slate-300 focus-within:border-primary rounded-lg transition-colors"
+                    {/* Password */}
+                    <form.Field name="password">
+                      {(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid;
+                        return (
+                          <Field data-invalid={isInvalid}>
+                            <FieldLabel
+                              htmlFor={field.name}
+                              className="block text-xs sm:text-sm font-bold text-slate-800"
+                            >
+                              Password
+                            </FieldLabel>
+                            <div className="relative">
+                              <div
+                                className="flex items-center bg-white border-2 border-slate-300 focus-within:border-primary rounded-lg transition-colors overflow-hidden"
+                                style={{
+                                  clipPath:
+                                    "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)",
+                                }}
+                              >
+                                <Lock
+                                  className="ml-3.5 h-4 w-4 text-slate-400 shrink-0 pointer-events-none"
+                                  aria-hidden="true"
+                                />
+                                <Input
+                                  id={field.name}
+                                  name={field.name}
+                                  type={showPassword ? "text" : "password"}
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  onBlur={field.handleBlur}
+                                  required
+                                  placeholder="Enter your password"
+                                  autoComplete="new-password"
+                                  aria-invalid={isInvalid}
+                                  className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 rounded-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-11 min-w-11 flex items-center justify-center cursor-pointer transition-colors"
+                                >
+                                  {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                </button>
+                              </div>
+                              <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
+                            </div>
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        );
+                      }}
+                    </form.Field>
+
+                    {/* Login Button */}
+                    <div className="pt-2">
+                      <Button
+                        type="submit"
+                        className="w-full h-12 min-h-12 bg-primary hover:bg-primary/90 text-white font-bold text-base rounded-none flex items-center justify-between px-5 shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none"
                         style={{
                           clipPath:
-                            "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)",
+                            "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
                         }}
                       >
                         <Lock
-                          className="ml-3.5 h-4 w-4 text-slate-400 shrink-0 pointer-events-none"
+                          className="h-4 w-4 text-white shrink-0"
                           aria-hidden="true"
                         />
-                        <input
-                          id="login-password"
-                          type={showPassword ? "text" : "password"}
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter your password"
-                          className="w-full h-11 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden"
+                        <span className="flex-1 text-center font-bold">
+                          Login
+                        </span>
+                        <ArrowRight
+                          className="h-4 w-4 text-white shrink-0"
+                          aria-hidden="true"
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-11 min-w-11 flex items-center justify-center cursor-pointer transition-colors"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" aria-hidden="true" />
-                          ) : (
-                            <Eye className="h-4 w-4" aria-hidden="true" />
-                          )}
-                        </button>
-                      </div>
-                      {/* Teal corner notch */}
-                      <svg
-                        className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <line
-                          x1="0"
-                          y1="0"
-                          x2="14"
-                          y2="14"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        />
-                      </svg>
+                      </Button>
                     </div>
-                  </div>
-
-                  {/* Login Button */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full h-12 min-h-12 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-md flex items-center justify-between px-5 transition-all shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-60"
-                      style={{
-                        clipPath:
-                          "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
-                      }}
-                    >
-                      <Lock
-                        className="h-4 w-4 text-white shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span className="flex-1 text-center font-bold">
-                        {loading ? "Authenticating..." : "Login"}
-                      </span>
-                      <ArrowRight
-                        className="h-4 w-4 text-white shrink-0"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </div>
+                  </FieldGroup>
                 </form>
 
                 {/* OR Divider */}
@@ -375,10 +316,10 @@ export function LoginForm() {
                 </div>
 
                 {/* Continue with Google button — with continuous chamfered border and top-right dark notch */}
-                <button
+                <Button
                   type="button"
-                  onClick={handleGoogleLogin}
-                  className="relative w-full h-12 min-h-12 group flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
+                  variant="ghost"
+                  className="relative w-full h-12 min-h-12 group flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
                 >
                   {/* Outer border container */}
                   <div
@@ -407,31 +348,10 @@ export function LoginForm() {
                   />
 
                   <span className="relative z-10 flex items-center justify-center gap-2.5 text-sm sm:text-base font-bold text-slate-900">
-                    <svg
-                      className="h-4 w-4 shrink-0"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                      />
-                    </svg>
+                    <GoogleIcon className="h-4 w-4 shrink-0" />
                     <span>Continue with Google</span>
                   </span>
-                </button>
+                </Button>
 
                 {/* Registration link */}
                 <p className="mt-5 text-center text-xs sm:text-sm text-slate-500 font-medium">
@@ -510,10 +430,10 @@ export function LoginForm() {
                       </h3>
 
                       {/* Quick Login button with continuous chamfered border and top-right dark notch */}
-                      <button
+                      <Button
                         type="button"
-                        onClick={() => handleQuickLogin(role)}
-                        className="mt-2.5 relative w-full h-10 min-h-10.5 group/btn flex items-center justify-center cursor-pointer select-none active:translate-x-[1px] active:translate-y-[1px] transition-transform"
+                        variant="ghost"
+                        className="mt-2.5 relative w-full h-10 min-h-10 group/btn flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
                       >
                         {/* Outer continuous dark border with 4-corner chamfer */}
                         <div
@@ -550,7 +470,7 @@ export function LoginForm() {
                             aria-hidden="true"
                           />
                         </span>
-                      </button>
+                      </Button>
                     </div>
 
                     {/* Teal diagonal corner accent on the role card */}

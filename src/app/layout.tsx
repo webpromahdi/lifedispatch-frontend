@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import Providers from "@/providers";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -32,8 +33,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} font-sans`}>
       <body className="min-h-screen bg-background text-text-primary antialiased">
-        {children}
-        <Toaster position="bottom-right" richColors />
+        <Providers>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </Providers>
       </body>
     </html>
   );
