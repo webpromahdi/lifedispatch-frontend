@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 export function CircuitTraceLeft(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -38,12 +38,7 @@ export function CircuitTraceRight(props: React.SVGProps<SVGSVGElement>) {
 
 export function TealCornerNotch(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 14 14"
-      fill="none"
-      aria-hidden="true"
-      {...props}
-    >
+    <svg viewBox="0 0 14 14" fill="none" aria-hidden="true" {...props}>
       <line
         x1="0"
         y1="0"

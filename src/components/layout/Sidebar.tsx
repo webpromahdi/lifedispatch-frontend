@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Ambulance,
   Building2,
@@ -15,10 +16,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useLogout } from "@/hooks/auth.hook";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { EmergencyStatus } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
@@ -48,6 +50,10 @@ export function Sidebar({
   customNavSections,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { mutate: logoutMutate, isPending: isLoggingOut } = useLogout();
+
   const isPatient = pathname.startsWith("/dashboard/patient");
   const isAdmin = pathname.startsWith("/dashboard/admin");
 
@@ -96,7 +102,15 @@ export function Sidebar({
     window.dispatchEvent(new CustomEvent("lifedispatch:open-request-modal"));
   };
 
-
+  const handleLogout = () => {
+    logoutMutate(undefined, {
+      onSettled: () => {
+        queryClient.setQueryData(["user", "me"], null);
+        toast.success("Logged out successfully");
+        router.push("/login");
+      },
+    });
+  };
 
   // Define nav sections per role
   let navSections: NavSection[] = customNavSections || [];
@@ -339,6 +353,21 @@ export function Sidebar({
     }
   }
 
+  const logoutButton = (
+    <button
+      type="button"
+      onClick={handleLogout}
+      disabled={isLoggingOut}
+      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+      <LogOut
+        className="h-4 w-4 shrink-0 text-text-primary"
+        aria-hidden="true"
+      />
+      <span>{isLoggingOut ? "Logging out…" : "Logout"}</span>
+    </button>
+  );
+
   return (
     <aside
       className={cn(
@@ -473,32 +502,11 @@ export function Sidebar({
             <span>Request Emergency</span>
           </button>
 
-          {/* Clean Logout link */}
-          <Link
-            href="/login"
-            onClick={onNavClick}
-            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11"
-          >
-            <LogOut
-              className="h-4 w-4 shrink-0 text-text-primary"
-              aria-hidden="true"
-            />
-            <span>Logout</span>
-          </Link>
+          {logoutButton}
         </div>
       ) : (
         <div className="p-4 border-t border-border bg-white shrink-0">
-          <Link
-            href="/login"
-            onClick={onNavClick}
-            className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11"
-          >
-            <LogOut
-              className="h-4 w-4 shrink-0 text-text-primary"
-              aria-hidden="true"
-            />
-            <span>Logout</span>
-          </Link>
+          {logoutButton}
         </div>
       )}
     </aside>

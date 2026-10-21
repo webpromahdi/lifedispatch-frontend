@@ -1,5 +1,4 @@
 "use client";
-import { CornerNotch, LabelTab } from "@/components/shared/DashboardUIPrimitives";
 
 import {
   AlertTriangle,
@@ -13,6 +12,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CreateEmergencyForm } from "@/components/forms/CreateEmergencyForm";
+import {
+  CornerNotch,
+  LabelTab,
+} from "@/components/shared/DashboardUIPrimitives";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,27 +33,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
-import {
-  seedEmergencies,
-  seedTimelineEvents,
-} from "@/lib/dummy/emergencies";
+import { seedEmergencies, seedTimelineEvents } from "@/lib/dummy/emergencies";
 import { seedHospitals } from "@/lib/dummy/hospitals";
 import { seedPayments } from "@/lib/dummy/payments";
 import { seedTrips } from "@/lib/dummy/trips";
 import { seedUsers } from "@/lib/dummy/users";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
-import type { User } from "@/lib/types/user.types";
 import {
   EmergencyPriority,
   EmergencyStatus,
   PaymentStatus,
 } from "@/lib/types/enums";
+import type { User } from "@/lib/types/user.types";
 import { cn, formatDate } from "@/lib/utils";
 
 // CornerNotch and LabelTab imported from @/components/shared/DashboardUIPrimitives
 
 // ── Priority Badge Helper Matching Reference (■ P1, ■ P2, etc.) ──
-function TablePriorityBadge({ priority }: { priority: EmergencyPriority | null }) {
+function TablePriorityBadge({
+  priority,
+}: {
+  priority: EmergencyPriority | null;
+}) {
   if (priority === EmergencyPriority.P1_CRITICAL) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DC2626]">
@@ -70,7 +74,13 @@ function TablePriorityBadge({ priority }: { priority: EmergencyPriority | null }
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary">
       <span className="w-2 h-2 bg-text-muted shrink-0" />
-      <span>{priority === EmergencyPriority.P3_URGENT ? "P3" : priority === EmergencyPriority.P4_NON_URGENT ? "P4" : "P5"}</span>
+      <span>
+        {priority === EmergencyPriority.P3_URGENT
+          ? "P3"
+          : priority === EmergencyPriority.P4_NON_URGENT
+            ? "P4"
+            : "P5"}
+      </span>
     </span>
   );
 }
@@ -114,8 +124,8 @@ export function PatientView() {
   }, []);
 
   // Active emergency state tracking
-  const [activeEmergency, setActiveEmergency] = useState<EmergencyRequest | null>(
-    () => {
+  const [activeEmergency, setActiveEmergency] =
+    useState<EmergencyRequest | null>(() => {
       const active = seedEmergencies.find(
         (e) =>
           e.patientId === "usr_patient_01" &&
@@ -125,15 +135,16 @@ export function PatientView() {
             e.status === EmergencyStatus.ACTIVE_TRIP),
       );
       return active || null;
-    },
-  );
+    });
 
   const hasActiveEmergency = Boolean(activeEmergency);
 
   // Dialog and form states
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("Alternative transport arranged");
+  const [cancelReason, setCancelReason] = useState(
+    "Alternative transport arranged",
+  );
   const [cancelNotes, setCancelNotes] = useState("");
 
   // Synchronize state with Sidebar through custom event
@@ -190,17 +201,14 @@ export function PatientView() {
     return (
       seedTrips.find(
         (t) =>
-          t.patientId === activeEmergency.patientId &&
-          t.status === "ACTIVE",
+          t.patientId === activeEmergency.patientId && t.status === "ACTIVE",
       ) || null
     );
   }, [activeEmergency]);
 
   const assignedAmbulance = useMemo(() => {
     if (!activeTrip?.ambulanceId) return null;
-    return (
-      seedAmbulances.find((a) => a.id === activeTrip.ambulanceId) || null
-    );
+    return seedAmbulances.find((a) => a.id === activeTrip.ambulanceId) || null;
   }, [activeTrip]);
 
   const assignedHospital = useMemo(() => {
@@ -306,8 +314,10 @@ export function PatientView() {
       id: `em_${Date.now()}`,
       incidentNumber,
       patientId: "usr_patient_01",
-      emergencyType: EmergencyStatus.PENDING as unknown as EmergencyRequest["emergencyType"],
-      requiredCapability: EmergencyPriority.P1_CRITICAL as unknown as EmergencyRequest["requiredCapability"],
+      emergencyType:
+        EmergencyStatus.PENDING as unknown as EmergencyRequest["emergencyType"],
+      requiredCapability:
+        EmergencyPriority.P1_CRITICAL as unknown as EmergencyRequest["requiredCapability"],
       priority: EmergencyPriority.P1_CRITICAL,
       status: EmergencyStatus.PENDING,
       description: "Emergency distress call logged via patient dashboard.",
@@ -374,7 +384,8 @@ export function PatientView() {
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-destructive-bg border border-[#FECACA] text-[#DC2626] text-xs font-bold rounded-none select-none">
                     <span className="w-2 h-2 bg-[#DC2626] shrink-0" />
                     <span>
-                      {activeEmergency.priority === EmergencyPriority.P1_CRITICAL
+                      {activeEmergency.priority ===
+                      EmergencyPriority.P1_CRITICAL
                         ? "P1 Critical"
                         : "P2 Emergency"}
                     </span>
@@ -382,7 +393,10 @@ export function PatientView() {
 
                   {/* Status Badge */}
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-status-bg border border-[#BBF7D0] text-status-text text-xs font-bold rounded-none select-none">
-                    <Check className="w-3.5 h-3.5 text-status-text shrink-0" strokeWidth={2.5} />
+                    <Check
+                      className="w-3.5 h-3.5 text-status-text shrink-0"
+                      strokeWidth={2.5}
+                    />
                     <span>Active</span>
                   </span>
                 </div>
@@ -390,7 +404,9 @@ export function PatientView() {
 
               {/* Subtitle: Type · Location · Time */}
               <div className="text-xs sm:text-sm text-text-secondary font-medium -mt-2">
-                <span className="capitalize">{activeEmergency.emergencyType.toLowerCase()}</span>
+                <span className="capitalize">
+                  {activeEmergency.emergencyType.toLowerCase()}
+                </span>
                 <span className="mx-2 text-slate-300">·</span>
                 <span>{activeEmergency.locationAddress}</span>
                 <span className="mx-2 text-slate-300">·</span>
@@ -401,7 +417,8 @@ export function PatientView() {
 
               {/* ── Stepper ── */}
               {activeEmergency.status === EmergencyStatus.CANCELLED ||
-              activeEmergency.status === EmergencyStatus.REASSIGNMENT_REQUIRED ? (
+              activeEmergency.status ===
+                EmergencyStatus.REASSIGNMENT_REQUIRED ? (
                 <div className="p-3 bg-red-50 border border-red-200 text-xs font-medium text-red-700 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
                   <span>
@@ -430,7 +447,9 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-semibold",
-                          currentStep >= 1 ? "text-text-primary" : "text-text-muted",
+                          currentStep >= 1
+                            ? "text-text-primary"
+                            : "text-text-muted",
                         )}
                       >
                         Request Sent
@@ -450,7 +469,9 @@ export function PatientView() {
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 2 ? "text-primary" : "text-text-muted",
+                            currentStep >= 2
+                              ? "text-primary"
+                              : "text-text-muted",
                           )}
                         >
                           →
@@ -475,7 +496,9 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-semibold",
-                          currentStep >= 2 ? "text-text-primary" : "text-text-muted",
+                          currentStep >= 2
+                            ? "text-text-primary"
+                            : "text-text-muted",
                         )}
                       >
                         Finding Ambulance
@@ -495,7 +518,9 @@ export function PatientView() {
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 3 ? "text-primary" : "text-text-muted",
+                            currentStep >= 3
+                              ? "text-primary"
+                              : "text-text-muted",
                           )}
                         >
                           →
@@ -544,7 +569,9 @@ export function PatientView() {
                         <span
                           className={cn(
                             "absolute -top-2.5 text-xs font-bold",
-                            currentStep >= 4 ? "text-primary" : "text-text-muted",
+                            currentStep >= 4
+                              ? "text-primary"
+                              : "text-text-muted",
                           )}
                         >
                           →
@@ -567,7 +594,9 @@ export function PatientView() {
                       <span
                         className={cn(
                           "text-xs mt-2 text-center select-none font-medium",
-                          currentStep === 4 ? "text-text-primary font-bold" : "text-text-muted",
+                          currentStep === 4
+                            ? "text-text-primary font-bold"
+                            : "text-text-muted",
                         )}
                       >
                         Completed
@@ -686,8 +715,9 @@ export function PatientView() {
                   No Active Emergency
                 </h3>
                 <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                  You currently have no active emergency dispatches. If you or someone
-                  nearby requires urgent medical attention, request immediate ambulance dispatch below.
+                  You currently have no active emergency dispatches. If you or
+                  someone nearby requires urgent medical attention, request
+                  immediate ambulance dispatch below.
                 </p>
               </div>
               <Button
@@ -786,7 +816,8 @@ export function PatientView() {
               <div className="flex justify-between items-center gap-2">
                 <span className="text-text-secondary">Emergency Contact</span>
                 <span className="font-semibold text-text-primary text-right truncate">
-                  {patientUser.emergencyContactName && patientUser.emergencyContactPhone
+                  {patientUser.emergencyContactName &&
+                  patientUser.emergencyContactPhone
                     ? `${patientUser.emergencyContactName}, ${patientUser.emergencyContactPhone}`
                     : "Not provided"}
                 </span>
@@ -902,7 +933,10 @@ export function PatientView() {
                         className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-8 cursor-pointer"
                       >
                         <span>View</span>
-                        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        <ArrowRight
+                          className="w-3.5 h-3.5"
+                          aria-hidden="true"
+                        />
                       </Link>
                     </td>
                   </tr>
@@ -921,7 +955,8 @@ export function PatientView() {
               Request Emergency Ambulance
             </DialogTitle>
             <DialogDescription className="text-xs text-text-secondary">
-              Dispatch urgent critical care life-support units to your exact location coordinates.
+              Dispatch urgent critical care life-support units to your exact
+              location coordinates.
             </DialogDescription>
           </DialogHeader>
 
@@ -951,7 +986,10 @@ export function PatientView() {
 
           <div className="space-y-4 py-2 text-xs">
             <div className="space-y-1.5">
-              <label htmlFor="cancel-reason-select" className="font-semibold text-text-primary block">
+              <label
+                htmlFor="cancel-reason-select"
+                className="font-semibold text-text-primary block"
+              >
                 Reason for cancellation
               </label>
               <Select
@@ -960,7 +998,10 @@ export function PatientView() {
                   if (val) setCancelReason(val);
                 }}
               >
-                <SelectTrigger id="cancel-reason-select" className="w-full text-xs rounded-none border-slate-300">
+                <SelectTrigger
+                  id="cancel-reason-select"
+                  className="w-full text-xs rounded-none border-slate-300"
+                >
                   <SelectValue placeholder="Select reason" />
                 </SelectTrigger>
                 <SelectContent className="rounded-none">
@@ -973,15 +1014,16 @@ export function PatientView() {
                   <SelectItem value="Accidental dispatch call">
                     Accidental dispatch call
                   </SelectItem>
-                  <SelectItem value="Other reason">
-                    Other reason
-                  </SelectItem>
+                  <SelectItem value="Other reason">Other reason</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="cancel-notes" className="font-semibold text-text-primary block">
+              <label
+                htmlFor="cancel-notes"
+                className="font-semibold text-text-primary block"
+              >
                 Additional Notes (Optional)
               </label>
               <input

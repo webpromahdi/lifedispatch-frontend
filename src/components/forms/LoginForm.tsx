@@ -5,6 +5,7 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { getMe } from "@/api";
 import { TealCornerNotch } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,23 @@ import { Input } from "@/components/ui/input";
 import { useLogin } from "@/hooks";
 import { DEMO_ROLES } from "@/lib/demo-roles";
 import { loginSchema } from "@/validations";
+
+function getRoleDashboardPath(role?: string): string {
+  switch (role) {
+    case "SUPER_ADMIN":
+      return "/dashboard/super-admin";
+    case "ADMIN":
+      return "/dashboard/admin";
+    case "DISPATCHER":
+      return "/dashboard/dispatcher";
+    case "DRIVER":
+      return "/dashboard/driver";
+    case "HOSPITAL_STAFF":
+      return "/dashboard/hospital-staff";
+    default:
+      return "/dashboard/patient";
+  }
+}
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -41,14 +59,21 @@ export function LoginForm() {
       };
 
       login(loginData, {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success("Login Successful", {
             description: "Welcome back!",
           });
 
-          queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+          const response = await queryClient.fetchQuery({
+            queryKey: ["user", "me"],
+            queryFn: getMe,
+          });
 
-          router.push("/");
+          const user = response?.data?.user;
+
+          const targetPath = getRoleDashboardPath(user?.role);
+
+          router.push(targetPath);
         },
         onError: (err) => {
           toast.error("Authorization Failure", {

@@ -49,9 +49,7 @@ export function PaymentResultView() {
           {/* SUCCESS STATE */}
           {isSuccess && (
             <div className="space-y-5">
-              <div
-                className="h-16 w-16 rounded-none bg-status-bg text-status-text flex items-center justify-center mx-auto shadow-xs"
-              >
+              <div className="h-16 w-16 rounded-none bg-status-bg text-status-text flex items-center justify-center mx-auto shadow-xs">
                 <CheckCircle2
                   className="h-9 w-9 text-status"
                   aria-hidden="true"
@@ -120,9 +118,7 @@ export function PaymentResultView() {
           {/* FAILED STATE */}
           {isFailed && (
             <div className="space-y-5">
-              <div
-                className="h-16 w-16 rounded-none bg-destructive-bg text-destructive flex items-center justify-center mx-auto shadow-xs"
-              >
+              <div className="h-16 w-16 rounded-none bg-destructive-bg text-destructive flex items-center justify-center mx-auto shadow-xs">
                 <XCircle
                   className="h-9 w-9 text-destructive"
                   aria-hidden="true"
@@ -169,9 +165,7 @@ export function PaymentResultView() {
           {/* CANCELLED STATE */}
           {isCancelled && (
             <div className="space-y-5">
-              <div
-                className="h-16 w-16 rounded-none bg-warning-bg text-warning-foreground flex items-center justify-center mx-auto shadow-xs"
-              >
+              <div className="h-16 w-16 rounded-none bg-warning-bg text-warning-foreground flex items-center justify-center mx-auto shadow-xs">
                 <AlertTriangle
                   className="h-9 w-9 text-warning"
                   aria-hidden="true"

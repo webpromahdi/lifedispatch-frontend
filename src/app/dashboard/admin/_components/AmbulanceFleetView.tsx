@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { CreateAmbulanceDialog } from "./dialogs/CreateAmbulanceDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +27,7 @@ import {
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import type { Ambulance as AmbulanceTypeModel } from "@/lib/types/ambulance.types";
 import type { AmbulanceStatus } from "@/lib/types/enums";
+import { CreateAmbulanceDialog } from "./dialogs/CreateAmbulanceDialog";
 
 export function AmbulanceFleetView() {
   const [ambulances, setAmbulances] =

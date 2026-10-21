@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ForgotPasswordForm } from "@/components/forms/ForgotPasswordForm";
-import {
-  CircuitTraceLeft,
-  CircuitTraceRight,
-} from "@/components/icons";
+import { CircuitTraceLeft, CircuitTraceRight } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Forgot Password | LifeDispatch",
@@ -52,7 +49,8 @@ export default function ForgotPasswordPage() {
                     Reset Your Password
                   </h1>
                   <p className="text-sm sm:text-[15px] text-slate-500 font-normal mt-1.5">
-                    Enter your verified LifeDispatch email address to receive a 6-digit one-time password (OTP).
+                    Enter your verified LifeDispatch email address to receive a
+                    6-digit one-time password (OTP).
                   </p>
                 </div>
 

@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { CreateHospitalDialog } from "./dialogs/CreateHospitalDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +19,7 @@ import {
 import { seedHospitals } from "@/lib/dummy/hospitals";
 import type { HospitalDiversionStatus } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
+import { CreateHospitalDialog } from "./dialogs/CreateHospitalDialog";
 
 export function HospitalsManagementView() {
   const [hospitals, setHospitals] = useState<Hospital[]>(seedHospitals);

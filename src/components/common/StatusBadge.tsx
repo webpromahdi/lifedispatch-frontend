@@ -37,7 +37,8 @@ export function StatusBadge({
     if (normalized === "PENDING" || normalized === "PENDING_ACCEPTANCE") {
       squareClasses = "bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]";
     } else if (normalized === "PRIORITIZED") {
-      squareClasses = "bg-[#F1F5F9] border border-border-strong text-text-primary";
+      squareClasses =
+        "bg-[#F1F5F9] border border-border-strong text-text-primary";
     } else if (normalized === "DISPATCHING") {
       squareClasses = "bg-[#CCFBF1] border border-[#99F6E4] text-primary-dark";
     } else if (
@@ -58,10 +59,7 @@ export function StatusBadge({
       normalized === "SERVICE OVERDUE"
     ) {
       squareClasses = "bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]";
-    } else if (
-      normalized === "CLOSED" ||
-      normalized === "DELETED"
-    ) {
+    } else if (normalized === "CLOSED" || normalized === "DELETED") {
       squareClasses = "bg-red-50 border border-red-200 text-red-600";
     } else if (
       normalized === "CANCELLED" ||

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
-import { CreateDriverDialog } from "./dialogs/CreateDriverDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +21,7 @@ import { seedDrivers } from "@/lib/dummy/drivers";
 import { seedUsers } from "@/lib/dummy/users";
 import type { Driver } from "@/lib/types/driver.types";
 import { formatDate } from "@/lib/utils";
+import { CreateDriverDialog } from "./dialogs/CreateDriverDialog";
 
 export function DriversManagementView() {
   const [drivers, setDrivers] = useState<Driver[]>(seedDrivers);

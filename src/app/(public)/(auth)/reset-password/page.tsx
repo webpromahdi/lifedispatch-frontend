@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ResetPasswordForm } from "@/components/forms/ResetPasswordForm";
-import {
-  CircuitTraceLeft,
-  CircuitTraceRight,
-} from "@/components/icons";
+import { CircuitTraceLeft, CircuitTraceRight } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Reset Password | LifeDispatch",
@@ -52,7 +49,8 @@ export default function ResetPasswordPage() {
                     Enter Verification OTP
                   </h1>
                   <p className="text-sm sm:text-[15px] text-slate-500 font-normal mt-1.5">
-                    Enter your 6-digit security OTP code along with your new password.
+                    Enter your 6-digit security OTP code along with your new
+                    password.
                   </p>
                 </div>
 

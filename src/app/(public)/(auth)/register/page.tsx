@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RegisterForm } from "@/components/forms/RegisterForm";
-import {
-  CircuitTraceLeft,
-  CircuitTraceRight,
-} from "@/components/icons";
+import { CircuitTraceLeft, CircuitTraceRight } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Create Account | LifeDispatch",

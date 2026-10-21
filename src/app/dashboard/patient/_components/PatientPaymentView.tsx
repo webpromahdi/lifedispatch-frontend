@@ -180,9 +180,7 @@ export function PatientPaymentView({
                   Includes paramedic crew dispatch & initial pre-hospital triage
                 </span>
               </div>
-              <div
-                className="font-mono font-semibold text-text-primary"
-              >
+              <div className="font-mono font-semibold text-text-primary">
                 {formatBDT(payment.baseFare)}
               </div>
             </div>
@@ -196,9 +194,7 @@ export function PatientPaymentView({
                   Traveled distance surcharge at standard tariff (12.6 km)
                 </span>
               </div>
-              <div
-                className="font-mono font-semibold text-text-primary"
-              >
+              <div className="font-mono font-semibold text-text-primary">
                 {formatBDT(payment.distanceCharge)}
               </div>
             </div>
@@ -212,9 +208,7 @@ export function PatientPaymentView({
                   Cardiac telemetry & vitals monitoring (Subsidy applied)
                 </span>
               </div>
-              <div
-                className="font-mono font-semibold text-status"
-              >
+              <div className="font-mono font-semibold text-status">
                 ৳0.00 (Included)
               </div>
             </div>
@@ -228,9 +222,7 @@ export function PatientPaymentView({
                   Emergency life-support transport exempt (0% VAT)
                 </span>
               </div>
-              <div
-                className="font-mono font-semibold text-text-secondary"
-              >
+              <div className="font-mono font-semibold text-text-secondary">
                 ৳0.00
               </div>
             </div>
@@ -245,9 +237,7 @@ export function PatientPaymentView({
                   Final payable in Bangladeshi Taka (BDT)
                 </span>
               </div>
-              <div
-                className="text-lg font-bold text-primary font-mono"
-              >
+              <div className="text-lg font-bold text-primary font-mono">
                 {formatBDT(payment.totalAmount)}
               </div>
             </div>

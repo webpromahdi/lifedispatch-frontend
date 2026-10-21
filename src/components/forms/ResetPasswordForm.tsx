@@ -1,7 +1,14 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { ArrowLeft, CheckCircle2, Eye, EyeOff, KeyRound, Lock } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Lock,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -17,15 +24,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { useResetPassword } from "@/hooks";
 import {
-  resetPasswordSchema,
   type ResetPasswordFormValues,
+  resetPasswordSchema,
 } from "@/validations";
 
 export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const prefilledEmail = searchParams.get("email") || "";
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -51,8 +58,7 @@ export function ResetPasswordForm() {
         },
         onError: (err) => {
           toast.error("Password Reset Failed", {
-            description:
-              err?.message || "Invalid OTP or something went wrong.",
+            description: err?.message || "Invalid OTP or something went wrong.",
           });
         },
       });

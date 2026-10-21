@@ -35,16 +35,16 @@ export function Navbar() {
   const { mutate: logoutMutate } = useLogout();
 
   const getDashboardUrl = (role: string) => {
-    switch (role.toLowerCase()) {
-      case "super admin":
+    switch (role) {
+      case "SUPER_ADMIN":
         return "/dashboard/super-admin";
-      case "admin":
+      case "ADMIN":
         return "/dashboard/admin";
-      case "dispatcher":
+      case "DISPATCHER":
         return "/dashboard/dispatcher";
-      case "driver":
+      case "DRIVER":
         return "/dashboard/driver";
-      case "hospital staff":
+      case "HOSPITAL_STAFF":
         return "/dashboard/hospital-staff";
       default:
         return "/dashboard/patient";
