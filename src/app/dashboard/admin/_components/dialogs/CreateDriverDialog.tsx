@@ -34,7 +34,8 @@ export function CreateDriverDialog() {
   const [certLevel, setCertLevel] = useState<CertificationLevel>(
     CertificationLevel.PARAMEDIC,
   );
-  const [assignedAmbulanceId, setAssignedAmbulanceId] = useState<string>("NONE");
+  const [assignedAmbulanceId, setAssignedAmbulanceId] =
+    useState<string>("NONE");
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
 
   const createDriverMutation = useCreateDriver();
@@ -59,7 +60,8 @@ export function CreateDriverDialog() {
 
     if (!licenseFile) {
       toast.error("License Document Required", {
-        description: "Please upload a copy of the commercial driving license (PDF or image).",
+        description:
+          "Please upload a copy of the commercial driving license (PDF or image).",
       });
       return;
     }
@@ -116,8 +118,8 @@ export function CreateDriverDialog() {
               <DialogTitle>Register Paramedic Driver</DialogTitle>
             </div>
             <DialogDescription>
-              Create a new EMS driver profile, attach professional paramedic certification,
-              and optionally assign to an active ambulance.
+              Create a new EMS driver profile, attach professional paramedic
+              certification, and optionally assign to an active ambulance.
             </DialogDescription>
           </DialogHeader>
 
@@ -163,7 +165,9 @@ export function CreateDriverDialog() {
               <Label htmlFor="driver-cert">Certification Level *</Label>
               <Select
                 value={certLevel}
-                onValueChange={(val) => val && setCertLevel(val as CertificationLevel)}
+                onValueChange={(val) =>
+                  val && setCertLevel(val as CertificationLevel)
+                }
               >
                 <SelectTrigger
                   id="driver-cert"
@@ -268,7 +272,8 @@ export function CreateDriverDialog() {
                 )}
               </div>
               <p className="text-[11px] text-text-muted">
-                Official document proof required for backend verification (PDF, PNG, JPG).
+                Official document proof required for backend verification (PDF,
+                PNG, JPG).
               </p>
             </div>
 

@@ -43,10 +43,7 @@ export function updateTripStatus(id: string, payload: UpdateTripStatusPayload) {
   });
 }
 
-export function selectTripHospital(
-  id: string,
-  payload: SelectHospitalPayload,
-) {
+export function selectTripHospital(id: string, payload: SelectHospitalPayload) {
   return apiClient<ApiResponse<TripDetail>>(`/trips/${id}/hospital`, {
     method: "PATCH",
     body: payload,
@@ -59,4 +56,3 @@ export function completeTrip(id: string, payload: CompleteTripPayload) {
     body: payload,
   });
 }
-

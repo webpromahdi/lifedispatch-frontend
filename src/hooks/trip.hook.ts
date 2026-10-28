@@ -13,10 +13,7 @@ import type {
   UpdateTripStatusPayload,
 } from "@/lib/types/trip.types";
 
-export function useGetTripById(
-  id?: string,
-  options?: { enabled?: boolean },
-) {
+export function useGetTripById(id?: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["trips", id],
     queryFn: () => getTripById(id as string),
@@ -92,4 +89,3 @@ export function useCompleteTrip() {
     },
   });
 }
-

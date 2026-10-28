@@ -55,10 +55,7 @@ export function DriverTripsView() {
 
   const totalKm = useMemo(
     () =>
-      completedTrips.reduce(
-        (sum, t) => sum + (Number(t.distanceKm) || 0),
-        0,
-      ),
+      completedTrips.reduce((sum, t) => sum + (Number(t.distanceKm) || 0), 0),
     [completedTrips],
   );
 

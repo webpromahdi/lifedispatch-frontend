@@ -122,8 +122,8 @@ export function CreateAmbulanceDialog() {
               <DialogTitle>Register New Ambulance</DialogTitle>
             </div>
             <DialogDescription>
-              Provision a new emergency vehicle with equipment capabilities,
-              GPS station coordinates, and optional registration paperwork.
+              Provision a new emergency vehicle with equipment capabilities, GPS
+              station coordinates, and optional registration paperwork.
             </DialogDescription>
           </DialogHeader>
 
@@ -147,7 +147,9 @@ export function CreateAmbulanceDialog() {
               </Label>
               <Select
                 value={ambulanceType}
-                onValueChange={(val) => val && setAmbulanceType(val as AmbulanceType)}
+                onValueChange={(val) =>
+                  val && setAmbulanceType(val as AmbulanceType)
+                }
               >
                 <SelectTrigger
                   id="ambulance-type"
@@ -218,7 +220,9 @@ export function CreateAmbulanceDialog() {
             {/* Hospital & Year */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="station-hosp">Base Hospital ID (Optional)</Label>
+                <Label htmlFor="station-hosp">
+                  Base Hospital ID (Optional)
+                </Label>
                 <Input
                   id="station-hosp"
                   value={hospitalId}
@@ -239,7 +243,9 @@ export function CreateAmbulanceDialog() {
 
             {/* Registration Document File */}
             <div className="space-y-1.5">
-              <Label htmlFor="reg-doc">Registration Certificate / Telematics PDF</Label>
+              <Label htmlFor="reg-doc">
+                Registration Certificate / Telematics PDF
+              </Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="reg-doc"

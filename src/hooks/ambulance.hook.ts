@@ -69,17 +69,11 @@ export function useUpdateAmbulanceStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: AmbulanceStatus;
-    }) => updateAmbulanceStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: AmbulanceStatus }) =>
+      updateAmbulanceStatus(id, status),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["ambulances"] });
       queryClient.invalidateQueries({ queryKey: ["ambulances", variables.id] });
     },
   });
 }
-

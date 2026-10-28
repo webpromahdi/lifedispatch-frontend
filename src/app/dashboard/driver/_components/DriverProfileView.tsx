@@ -276,8 +276,8 @@ export function DriverProfileView() {
               Excellence in Emergency Care
             </h4>
             <p className="text-[11px] text-text-secondary mt-0.5">
-              Over {driver?.totalTripsCompleted ?? 0} successful missions completed
-              under EMS protocol.
+              Over {driver?.totalTripsCompleted ?? 0} successful missions
+              completed under EMS protocol.
             </p>
           </div>
         </div>

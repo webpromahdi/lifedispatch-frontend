@@ -1,6 +1,13 @@
 "use client";
 
-import { AlertCircle, Power, RefreshCw, Search, ShieldCheck, UserCheck } from "lucide-react";
+import {
+  AlertCircle,
+  Power,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  UserCheck,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -83,10 +90,8 @@ export function DriversManagementView() {
         <div className="flex items-center gap-3">
           <div className="text-xs text-text-muted">
             Active On-Duty:{" "}
-            <span className="font-bold text-status">
-              {onDutyCount}
-            </span>{" "}
-            / {drivers.length} drivers
+            <span className="font-bold text-status">{onDutyCount}</span> /{" "}
+            {drivers.length} drivers
           </div>
 
           <Button
@@ -242,7 +247,9 @@ export function DriversManagementView() {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-text-muted italic">Unassigned (Standby)</span>
+                      <span className="text-text-muted italic">
+                        Unassigned (Standby)
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>

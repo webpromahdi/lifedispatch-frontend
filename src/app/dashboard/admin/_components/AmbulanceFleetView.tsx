@@ -1,6 +1,12 @@
 "use client";
 
-import { AlertCircle, Ambulance, Loader2, RefreshCw, Search } from "lucide-react";
+import {
+  AlertCircle,
+  Ambulance,
+  Loader2,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
@@ -28,12 +34,7 @@ import { useGetAmbulances, useUpdateAmbulanceStatus } from "@/hooks";
 import { AmbulanceStatus } from "@/lib/types/enums";
 import { CreateAmbulanceDialog } from "./dialogs/CreateAmbulanceDialog";
 
-const SKELETON_ROWS = [
-  "skel-row-1",
-  "skel-row-2",
-  "skel-row-3",
-  "skel-row-4",
-];
+const SKELETON_ROWS = ["skel-row-1", "skel-row-2", "skel-row-3", "skel-row-4"];
 
 export function AmbulanceFleetView() {
   const [search, setSearch] = useState("");
@@ -46,7 +47,8 @@ export function AmbulanceFleetView() {
     error,
     refetch,
   } = useGetAmbulances({
-    status: statusFilter === "ALL" ? undefined : (statusFilter as AmbulanceStatus),
+    status:
+      statusFilter === "ALL" ? undefined : (statusFilter as AmbulanceStatus),
   });
 
   const updateStatusMutation = useUpdateAmbulanceStatus();
@@ -132,9 +134,13 @@ export function AmbulanceFleetView() {
               <SelectItem value="ALL">
                 All Statuses ({ambulances.length})
               </SelectItem>
-              <SelectItem value={AmbulanceStatus.AVAILABLE}>AVAILABLE</SelectItem>
+              <SelectItem value={AmbulanceStatus.AVAILABLE}>
+                AVAILABLE
+              </SelectItem>
               <SelectItem value={AmbulanceStatus.BUSY}>BUSY</SelectItem>
-              <SelectItem value={AmbulanceStatus.OUT_OF_SERVICE}>OUT_OF_SERVICE</SelectItem>
+              <SelectItem value={AmbulanceStatus.OUT_OF_SERVICE}>
+                OUT_OF_SERVICE
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -179,7 +185,8 @@ export function AmbulanceFleetView() {
               Active Fleet Units ({filteredAmbulances.length})
             </span>
             <span className="text-xs text-text-muted">
-              Click status controls to dynamically update live unit telemetry via API
+              Click status controls to dynamically update live unit telemetry
+              via API
             </span>
           </div>
         }

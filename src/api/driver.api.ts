@@ -72,5 +72,3 @@ export function getMyDriverProfile() {
     method: "GET",
   });
 }
-
-

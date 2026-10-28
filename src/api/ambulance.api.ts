@@ -108,4 +108,3 @@ export function updateAmbulanceStatus(id: string, status: AmbulanceStatus) {
     },
   );
 }
-

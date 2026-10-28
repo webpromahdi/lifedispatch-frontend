@@ -33,10 +33,7 @@ import {
   useUpdateTripStatus,
 } from "@/hooks";
 import type { PendingDispatchItem } from "@/lib/types/dispatch.types";
-import {
-  EmergencyPriority,
-  HospitalDiversionStatus,
-} from "@/lib/types/enums";
+import { EmergencyPriority, HospitalDiversionStatus } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
 import { cn } from "@/lib/utils";
 
@@ -119,9 +116,8 @@ export function DriverView() {
 
   // Select Hospital Dialog State & Query
   const [hospitalDialogOpen, setHospitalDialogOpen] = useState(false);
-  const { data: hospitalsData, isLoading: isHospitalsLoading } = useGetHospitals(
-    { limit: 50 },
-  );
+  const { data: hospitalsData, isLoading: isHospitalsLoading } =
+    useGetHospitals({ limit: 50 });
 
   // Complete Trip Dialog State
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
@@ -171,7 +167,9 @@ export function DriverView() {
           stepIndex: 1,
           destinationHospital: null,
         });
-        toast.success(`Dispatch accepted for ${result.emergency.incidentNumber}`);
+        toast.success(
+          `Dispatch accepted for ${result.emergency.incidentNumber}`,
+        );
       },
       onError: (err: unknown) => {
         const error = err as { data?: { message?: string }; message?: string };
@@ -208,9 +206,14 @@ export function DriverView() {
           setRejectReason("");
         },
         onError: (err: unknown) => {
-          const error = err as { data?: { message?: string }; message?: string };
+          const error = err as {
+            data?: { message?: string };
+            message?: string;
+          };
           toast.error(
-            error.data?.message || error.message || "Failed to reject dispatch.",
+            error.data?.message ||
+              error.message ||
+              "Failed to reject dispatch.",
           );
         },
       },
@@ -909,9 +912,7 @@ export function DriverView() {
 
                     <button
                       type="button"
-                      disabled={
-                        isClosed || selectHospitalMutation.isPending
-                      }
+                      disabled={isClosed || selectHospitalMutation.isPending}
                       onClick={() => handleConfirmSelectHospital(hosp)}
                       className={cn(
                         "px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9.5 cursor-pointer",
