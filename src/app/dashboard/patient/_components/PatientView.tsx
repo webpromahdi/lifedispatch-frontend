@@ -32,22 +32,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedEmergencies, seedTimelineEvents } from "@/lib/dummy/emergencies";
-import { seedHospitals } from "@/lib/dummy/hospitals";
+import {
+  useCancelEmergency,
+  useGetEmergencies,
+  useGetEmergencyById,
+  useGetMe,
+} from "@/hooks";
 import { seedPayments } from "@/lib/dummy/payments";
-import { seedTrips } from "@/lib/dummy/trips";
-import { seedUsers } from "@/lib/dummy/users";
-import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
   EmergencyPriority,
   EmergencyStatus,
   PaymentStatus,
 } from "@/lib/types/enums";
-import type { User } from "@/lib/types/user.types";
 import { cn, formatDate } from "@/lib/utils";
-
-// CornerNotch and LabelTab imported from @/components/shared/DashboardUIPrimitives
 
 // ── Priority Badge Helper Matching Reference (■ P1, ■ P2, etc.) ──
 function TablePriorityBadge({
@@ -117,26 +114,43 @@ function TableStatusBadge({ status }: { status: EmergencyStatus }) {
 }
 
 export function PatientView() {
-  // Current user data (Nafisa Anjum)
-  const patientUser = useMemo(() => {
-    const user = seedUsers.find((u) => u.id === "usr_patient_01");
-    return user as User;
-  }, []);
+  // Current user session data
+  const { data: meData } = useGetMe();
+  const patientUser = meData?.data?.user;
 
-  // Active emergency state tracking
-  const [activeEmergency, setActiveEmergency] =
-    useState<EmergencyRequest | null>(() => {
-      const active = seedEmergencies.find(
+  // Active emergencies list polling every 10 seconds
+  const { data: emergenciesResponse } = useGetEmergencies(
+    { limit: 50 },
+    { refetchInterval: 10_000 },
+  );
+
+  const patientEmergencies = useMemo(() => {
+    return emergenciesResponse?.data ?? [];
+  }, [emergenciesResponse]);
+
+  // Active emergency discovery (PENDING | PRIORITIZED | DISPATCHING | ACTIVE_TRIP)
+  const activeEmergencyBasic = useMemo(() => {
+    return (
+      patientEmergencies.find(
         (e) =>
-          e.patientId === "usr_patient_01" &&
-          (e.status === EmergencyStatus.PENDING ||
-            e.status === EmergencyStatus.PRIORITIZED ||
-            e.status === EmergencyStatus.DISPATCHING ||
-            e.status === EmergencyStatus.ACTIVE_TRIP),
-      );
-      return active || null;
-    });
+          e.status === EmergencyStatus.PENDING ||
+          e.status === EmergencyStatus.PRIORITIZED ||
+          e.status === EmergencyStatus.DISPATCHING ||
+          e.status === EmergencyStatus.ACTIVE_TRIP,
+      ) ?? null
+    );
+  }, [patientEmergencies]);
 
+  // Deep detail query for active emergency (timeline + dispatches)
+  const { data: detailResponse } = useGetEmergencyById(
+    activeEmergencyBasic?.id,
+    {
+      refetchInterval: 10_000,
+      enabled: Boolean(activeEmergencyBasic?.id),
+    },
+  );
+
+  const activeEmergency = detailResponse?.data ?? activeEmergencyBasic;
   const hasActiveEmergency = Boolean(activeEmergency);
 
   // Dialog and form states
@@ -146,6 +160,9 @@ export function PatientView() {
     "Alternative transport arranged",
   );
   const [cancelNotes, setCancelNotes] = useState("");
+
+  const { mutate: cancelEmergencyMutation, isPending: isCancelling } =
+    useCancelEmergency();
 
   // Synchronize state with Sidebar through custom event
   useEffect(() => {
@@ -173,73 +190,25 @@ export function PatientView() {
     };
   }, [hasActiveEmergency]);
 
-  // Refresh active emergency data every ~10s while active (existing fetching pattern, no websockets)
-  useEffect(() => {
-    if (!hasActiveEmergency) return;
+  // Most recent dispatch from active emergency
+  const latestDispatch = useMemo(() => {
+    if (!detailResponse?.data?.dispatches?.length) return null;
+    return detailResponse.data.dispatches[0];
+  }, [detailResponse]);
 
-    const interval = setInterval(() => {
-      // Re-fetch latest emergency from store
-      const current = seedEmergencies.find(
-        (e) =>
-          e.patientId === "usr_patient_01" &&
-          (e.status === EmergencyStatus.PENDING ||
-            e.status === EmergencyStatus.PRIORITIZED ||
-            e.status === EmergencyStatus.DISPATCHING ||
-            e.status === EmergencyStatus.ACTIVE_TRIP),
-      );
-      if (current) {
-        setActiveEmergency({ ...current });
-      }
-    }, 10000);
+  const assignedAmbulance = latestDispatch?.ambulance ?? null;
 
-    return () => clearInterval(interval);
-  }, [hasActiveEmergency]);
-
-  // Trip, Ambulance, and Hospital blocks (render ONLY when data exists)
-  const activeTrip = useMemo(() => {
-    if (!activeEmergency) return null;
-    return (
-      seedTrips.find(
-        (t) =>
-          t.patientId === activeEmergency.patientId && t.status === "ACTIVE",
-      ) || null
-    );
-  }, [activeEmergency]);
-
-  const assignedAmbulance = useMemo(() => {
-    if (!activeTrip?.ambulanceId) return null;
-    return seedAmbulances.find((a) => a.id === activeTrip.ambulanceId) || null;
-  }, [activeTrip]);
-
-  const assignedHospital = useMemo(() => {
-    if (!activeTrip?.hospitalId) return null;
-    return seedHospitals.find((h) => h.id === activeTrip.hospitalId) || null;
-  }, [activeTrip]);
-
-  // Timeline events for active emergency (render ONLY when data exists)
+  // Timeline events for active emergency
   const timelineUpdates = useMemo(() => {
-    if (!activeEmergency) return [];
-    return seedTimelineEvents.filter(
-      (ev) => ev.emergencyId === activeEmergency.id,
-    );
-  }, [activeEmergency]);
+    return detailResponse?.data?.timeline ?? [];
+  }, [detailResponse]);
 
-  // Pending payment for this patient (render ONLY when a pending payment exists)
+  // Pending payment for this patient
   const pendingPayment = useMemo(() => {
-    return (
-      seedPayments.find(
-        (p) =>
-          p.patientId === "usr_patient_01" &&
-          p.status === PaymentStatus.PENDING,
-      ) || null
-    );
+    return seedPayments.find((p) => p.status === PaymentStatus.PENDING) ?? null;
   }, []);
 
-  // Compute stat card metrics dynamically from patient emergencies
-  const patientEmergencies = useMemo(() => {
-    return seedEmergencies.filter((e) => e.patientId === "usr_patient_01");
-  }, []);
-
+  // Compute stat card metrics dynamically from real patient emergencies
   const totalRequestsCount = patientEmergencies.length;
 
   const completedEmergencies = useMemo(() => {
@@ -261,7 +230,7 @@ export function PatientView() {
     return `${avg} min`;
   }, [completedEmergencies]);
 
-  // Recent Emergencies for table (latest 4 to 5 rows)
+  // Recent Emergencies for table (latest 4 rows)
   const recentEmergencies = useMemo(() => {
     return [...patientEmergencies]
       .sort(
@@ -290,55 +259,39 @@ export function PatientView() {
     }
   }, [activeEmergency]);
 
-  // Handle Cancel Emergency
+  // Handle Cancel Emergency Mutation
   const handleConfirmCancel = () => {
-    if (!activeEmergency) return;
+    if (!activeEmergency?.id) return;
 
-    activeEmergency.status = EmergencyStatus.CANCELLED;
-    activeEmergency.cancellationReason = cancelNotes
+    const fullReason = cancelNotes
       ? `${cancelReason}: ${cancelNotes}`
       : cancelReason;
-    activeEmergency.cancelledAt = new Date().toISOString();
 
-    setActiveEmergency(null);
-    setCancelDialogOpen(false);
-    toast.error("Emergency Cancelled", {
-      description: `Incident ${activeEmergency.incidentNumber} was cancelled. Assigned unit has been recalled.`,
-    });
+    cancelEmergencyMutation(
+      { id: activeEmergency.id, reason: fullReason },
+      {
+        onSuccess: () => {
+          setCancelDialogOpen(false);
+          setCancelNotes("");
+          toast.success("Emergency Cancelled", {
+            description: `Incident ${activeEmergency.incidentNumber} was cancelled. Assigned unit has been recalled.`,
+          });
+        },
+        onError: (err) => {
+          toast.error("Failed to Cancel Emergency", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "Unable to cancel emergency request.",
+          });
+        },
+      },
+    );
   };
 
   // Handle Create Emergency Success
-  const handleCreateSuccess = (incidentNumber: string) => {
+  const handleCreateSuccess = (_incidentNumber: string) => {
     setRequestModalOpen(false);
-    const newEmergency: EmergencyRequest = {
-      id: `em_${Date.now()}`,
-      incidentNumber,
-      patientId: "usr_patient_01",
-      emergencyType:
-        EmergencyStatus.PENDING as unknown as EmergencyRequest["emergencyType"],
-      requiredCapability:
-        EmergencyPriority.P1_CRITICAL as unknown as EmergencyRequest["requiredCapability"],
-      priority: EmergencyPriority.P1_CRITICAL,
-      status: EmergencyStatus.PENDING,
-      description: "Emergency distress call logged via patient dashboard.",
-      locationAddress: "House 24, Road 11, Dhanmondi, Dhaka",
-      locationLat: 23.7509,
-      locationLng: 90.3755,
-      callerName: patientUser.name,
-      callerPhone: patientUser.phone || "+880 1711-555555",
-      isEscalated: false,
-      escalationReason: null,
-      slaTargetMinutes: 8,
-      responseTimeMinutes: null,
-      cancelledAt: null,
-      cancellationReason: null,
-      cancelledBy: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    seedEmergencies.unshift(newEmergency);
-    setActiveEmergency(newEmergency);
   };
 
   // Handle Pay Now redirect
@@ -387,7 +340,10 @@ export function PatientView() {
                       {activeEmergency.priority ===
                       EmergencyPriority.P1_CRITICAL
                         ? "P1 Critical"
-                        : "P2 Emergency"}
+                        : activeEmergency.priority ===
+                            EmergencyPriority.P2_EMERGENCY
+                          ? "P2 Emergency"
+                          : activeEmergency.priority || "Pending Priority"}
                     </span>
                   </span>
 
@@ -606,47 +562,41 @@ export function PatientView() {
                 </div>
               )}
 
-              {/* ── Ambulance Block & Hospital Block (render only when data exists) ── */}
-              {(assignedAmbulance || assignedHospital) && (
+              {/* ── Ambulance Block (render only when unit assigned) ── */}
+              {assignedAmbulance && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Ambulance Block */}
-                  {assignedAmbulance && (
-                    <div className="bg-primary-light/50 border border-[#CCFBF1] p-3.5 flex items-center gap-3.5 rounded-none">
-                      <div className="w-11 h-11 bg-[#CCFBF1] text-primary-dark flex items-center justify-center shrink-0 rounded-none">
-                        <Ambulance className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-semibold text-text-secondary uppercase block leading-none mb-1">
-                          Ambulance
-                        </span>
-                        <div className="text-sm font-bold text-text-primary leading-tight font-mono truncate">
-                          {assignedAmbulance.registrationNumber}
-                        </div>
-                        <span className="text-xs text-text-secondary block leading-tight mt-0.5">
-                          {assignedAmbulance.type === "ADVANCED_LIFE_SUPPORT"
-                            ? "Advanced Life Support"
-                            : "Basic Life Support"}
-                        </span>
-                      </div>
+                  <div className="bg-primary-light/50 border border-[#CCFBF1] p-3.5 flex items-center gap-3.5 rounded-none">
+                    <div className="w-11 h-11 bg-[#CCFBF1] text-primary-dark flex items-center justify-center shrink-0 rounded-none">
+                      <Ambulance className="w-5 h-5" aria-hidden="true" />
                     </div>
-                  )}
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-semibold text-text-secondary uppercase block leading-none mb-1">
+                        Ambulance Unit
+                      </span>
+                      <div className="text-sm font-bold text-text-primary leading-tight font-mono truncate">
+                        {assignedAmbulance.registrationNumber}
+                      </div>
+                      <span className="text-xs text-text-secondary block leading-tight mt-0.5">
+                        {assignedAmbulance.type === "ADVANCED_LIFE_SUPPORT"
+                          ? "Advanced Life Support"
+                          : "Basic Life Support"}
+                      </span>
+                    </div>
+                  </div>
 
-                  {/* Hospital Block */}
-                  {assignedHospital && (
-                    <div className="bg-[#FAF5FF]/50 border border-[#E9D5FF] p-3.5 flex items-center gap-3.5 rounded-none">
-                      <div className="w-11 h-11 bg-secondary-light text-secondary flex items-center justify-center shrink-0 rounded-none">
-                        <Building2 className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-semibold text-text-secondary uppercase block leading-none mb-1">
-                          Hospital
-                        </span>
-                        <div className="text-sm font-bold text-text-primary leading-tight truncate">
-                          {assignedHospital.name}
-                        </div>
+                  <div className="bg-[#FAF5FF]/50 border border-[#E9D5FF] p-3.5 flex items-center gap-3.5 rounded-none">
+                    <div className="w-11 h-11 bg-secondary-light text-secondary flex items-center justify-center shrink-0 rounded-none">
+                      <Building2 className="w-5 h-5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-semibold text-text-secondary uppercase block leading-none mb-1">
+                        Status
+                      </span>
+                      <div className="text-sm font-bold text-text-primary leading-tight truncate">
+                        Assigned Unit Responding
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
 
@@ -658,7 +608,7 @@ export function PatientView() {
                   </h3>
                   <div className="space-y-3 relative before:absolute before:left-1.25 before:top-2 before:bottom-2 before:w-[1.5px] before:bg-slate-200">
                     {timelineUpdates.map((item, index) => {
-                      const isRecent = index < 2;
+                      const isRecent = index === timelineUpdates.length - 1;
                       return (
                         <div
                           key={item.id}
@@ -694,7 +644,6 @@ export function PatientView() {
                   aria-label="Cancel Emergency"
                   className="relative px-4 py-1.5 border-2 border-destructive text-destructive hover:bg-red-50 text-xs font-semibold rounded-none cursor-pointer transition-colors"
                 >
-                  {/* Solid red corner notch */}
                   <div
                     className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-destructive pointer-events-none"
                     style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%)" }}
@@ -803,30 +752,23 @@ export function PatientView() {
 
             <div className="mt-4 space-y-3.5 text-xs">
               <div className="flex justify-between items-center gap-2">
-                <span className="text-text-secondary">Blood Group</span>
+                <span className="text-text-secondary">Patient Name</span>
                 <span className="font-bold text-text-primary font-mono">
-                  {patientUser.bloodType === "O_NEGATIVE"
-                    ? "O-"
-                    : patientUser.bloodType === "O_POSITIVE"
-                      ? "O+"
-                      : patientUser.bloodType || "Not provided"}
+                  {patientUser?.name || "Patient"}
                 </span>
               </div>
 
               <div className="flex justify-between items-center gap-2">
-                <span className="text-text-secondary">Emergency Contact</span>
+                <span className="text-text-secondary">Contact Phone</span>
+                <span className="font-semibold text-text-primary font-mono">
+                  {patientUser?.phone || "Not provided"}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-text-secondary">Email</span>
                 <span className="font-semibold text-text-primary text-right truncate">
-                  {patientUser.emergencyContactName &&
-                  patientUser.emergencyContactPhone
-                    ? `${patientUser.emergencyContactName}, ${patientUser.emergencyContactPhone}`
-                    : "Not provided"}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-text-secondary">Known Conditions</span>
-                <span className="font-semibold text-text-primary">
-                  {patientUser.knownConditions || "None listed"}
+                  {patientUser?.email || "Not provided"}
                 </span>
               </div>
             </div>
@@ -907,40 +849,51 @@ export function PatientView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
-                {recentEmergencies.map((em) => (
-                  <tr
-                    key={em.id}
-                    className="hover:bg-primary-light/30 transition-colors"
-                  >
-                    <td className="py-3 pr-4 font-mono font-bold text-text-primary">
-                      {em.incidentNumber}
-                    </td>
-                    <td className="py-3 px-4 capitalize text-text-secondary font-medium">
-                      {em.emergencyType.toLowerCase()}
-                    </td>
-                    <td className="py-3 px-4">
-                      <TablePriorityBadge priority={em.priority} />
-                    </td>
-                    <td className="py-3 px-4">
-                      <TableStatusBadge status={em.status} />
-                    </td>
-                    <td className="py-3 px-4 text-text-secondary font-mono">
-                      {formatDate(em.createdAt, "dd MMM yyyy")}
-                    </td>
-                    <td className="py-3 pl-4 text-right">
-                      <Link
-                        href={`/dashboard/patient/history?search=${em.incidentNumber}`}
-                        className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-8 cursor-pointer"
-                      >
-                        <span>View</span>
-                        <ArrowRight
-                          className="w-3.5 h-3.5"
-                          aria-hidden="true"
-                        />
-                      </Link>
+                {recentEmergencies.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="py-8 text-center text-text-muted text-xs"
+                    >
+                      No emergency records logged yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentEmergencies.map((em) => (
+                    <tr
+                      key={em.id}
+                      className="hover:bg-primary-light/30 transition-colors"
+                    >
+                      <td className="py-3 pr-4 font-mono font-bold text-text-primary">
+                        {em.incidentNumber}
+                      </td>
+                      <td className="py-3 px-4 capitalize text-text-secondary font-medium">
+                        {em.emergencyType.toLowerCase()}
+                      </td>
+                      <td className="py-3 px-4">
+                        <TablePriorityBadge priority={em.priority} />
+                      </td>
+                      <td className="py-3 px-4">
+                        <TableStatusBadge status={em.status} />
+                      </td>
+                      <td className="py-3 px-4 text-text-secondary font-mono">
+                        {formatDate(em.createdAt, "dd MMM yyyy")}
+                      </td>
+                      <td className="py-3 pl-4 text-right">
+                        <Link
+                          href={`/dashboard/patient/history?search=${em.incidentNumber}`}
+                          className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-8 cursor-pointer"
+                        >
+                          <span>View</span>
+                          <ArrowRight
+                            className="w-3.5 h-3.5"
+                            aria-hidden="true"
+                          />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -1040,16 +993,18 @@ export function PatientView() {
           <DialogFooter className="gap-2 pt-2 border-t border-slate-200">
             <Button
               variant="outline"
+              disabled={isCancelling}
               onClick={() => setCancelDialogOpen(false)}
               className="text-xs rounded-none min-h-10 cursor-pointer"
             >
               Keep Active Request
             </Button>
             <Button
+              disabled={isCancelling}
               onClick={handleConfirmCancel}
               className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-none min-h-10 cursor-pointer"
             >
-              Confirm Cancellation
+              {isCancelling ? "Cancelling..." : "Confirm Cancellation"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
@@ -28,10 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  useCreateDispatch,
+  useGetEmergencies,
+  useRecommendAmbulances,
+  useUpdateEmergencyPriority,
+} from "@/hooks";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { seedHospitals } from "@/lib/dummy/hospitals";
 import type { Ambulance } from "@/lib/types/ambulance.types";
+import type { ScoredAmbulanceCandidate } from "@/lib/types/dispatch.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
   AmbulanceStatus,
@@ -39,19 +45,19 @@ import {
   EmergencyStatus,
 } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
-import { calculateHaversineDistance } from "@/lib/utils";
-
-interface DispatchCandidate {
-  ambulance: Ambulance;
-  distanceKm: number;
-  score: number;
-  serviceOverdue: boolean;
-}
 
 export function DispatcherView() {
-  const [emergencies, setEmergencies] =
-    useState<EmergencyRequest[]>(seedEmergencies);
-  const [ambulances, setAmbulances] = useState<Ambulance[]>(seedAmbulances);
+  // Live polling for emergency queue every 10 seconds
+  const { data: emergenciesResponse } = useGetEmergencies(
+    { limit: 100 },
+    { refetchInterval: 10_000 },
+  );
+
+  const emergencies = useMemo(() => {
+    return emergenciesResponse?.data ?? [];
+  }, [emergenciesResponse]);
+
+  const [ambulances] = useState<Ambulance[]>(seedAmbulances);
   const [hospitals] = useState<Hospital[]>(seedHospitals);
 
   // Set Priority Dialog State
@@ -67,20 +73,16 @@ export function DispatcherView() {
   const [dispatchDialogOpen, setDispatchDialogOpen] = useState(false);
   const [selectedEmergencyForDispatch, setSelectedEmergencyForDispatch] =
     useState<EmergencyRequest | null>(null);
-  const [candidates, setCandidates] = useState<DispatchCandidate[]>([]);
-  const [isAssigning, setIsAssigning] = useState(false);
+  const [candidates, setCandidates] = useState<ScoredAmbulanceCandidate[]>([]);
   const [dispatchError, setDispatchError] = useState<string | null>(null);
 
-  // Polling every ~10 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // In production, this invokes the emergencies and ambulances endpoints
-      // Here we simulate the 10-second refresh cycle
-      setEmergencies((prev) => [...prev]);
-      setAmbulances((prev) => [...prev]);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  // Mutations
+  const { mutate: updatePriorityMutation, isPending: isUpdatingPriority } =
+    useUpdateEmergencyPriority();
+  const { mutate: getRecommendations, isPending: isLoadingRecommendations } =
+    useRecommendAmbulances();
+  const { mutate: createDispatchMutation, isPending: isAssigning } =
+    useCreateDispatch();
 
   // Compute live queue counts
   const needsPriorityCount = useMemo(() => {
@@ -106,18 +108,19 @@ export function DispatcherView() {
       .length;
   }, [ambulances]);
 
-  // Emergency Queue list: PENDING, PRIORITIZED, DISPATCHING (ACTIVE_TRIP excluded)
+  // Emergency Queue list: PENDING, PRIORITIZED, DISPATCHING, REASSIGNMENT_REQUIRED
   // Sort: priority P1 first, unset priority next to top of its group, then oldest first
   const queueEmergencies = useMemo(() => {
     const validStatuses: EmergencyStatus[] = [
       EmergencyStatus.PENDING,
       EmergencyStatus.PRIORITIZED,
       EmergencyStatus.DISPATCHING,
+      EmergencyStatus.REASSIGNMENT_REQUIRED,
     ];
 
     const getRank = (priority: EmergencyPriority | null | undefined) => {
       if (priority === EmergencyPriority.P1_CRITICAL) return 1;
-      if (!priority) return 2; // unset priority next to top of group
+      if (!priority) return 2;
       if (priority === EmergencyPriority.P2_EMERGENCY) return 3;
       if (priority === EmergencyPriority.P3_URGENT) return 4;
       if (priority === EmergencyPriority.P4_NON_URGENT) return 5;
@@ -160,112 +163,84 @@ export function DispatcherView() {
   const handleSavePriority = () => {
     if (!selectedEmergencyForPriority) return;
 
-    try {
-      setEmergencies((prev) =>
-        prev.map((e) => {
-          if (e.id !== selectedEmergencyForPriority.id) return e;
-          return {
-            ...e,
-            priority: pendingPriority,
-            status:
-              e.status === EmergencyStatus.PENDING
-                ? EmergencyStatus.PRIORITIZED
-                : e.status,
-          };
-        }),
-      );
-
-      toast.success(
-        `Priority set to ${pendingPriority.split("_")[0]} for ${selectedEmergencyForPriority.incidentNumber}`,
-      );
-      setPriorityDialogOpen(false);
-      setSelectedEmergencyForPriority(null);
-    } catch {
-      setPriorityError("Failed to update priority. Please try again.");
-    }
-  };
-
-  // Compute recommendations for emergency
-  const loadRecommendations = (em: EmergencyRequest) => {
-    const available = ambulances.filter(
-      (a) => a.status === AmbulanceStatus.AVAILABLE,
+    updatePriorityMutation(
+      { id: selectedEmergencyForPriority.id, priority: pendingPriority },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Priority set to ${pendingPriority.split("_")[0]} for ${selectedEmergencyForPriority.incidentNumber}`,
+          );
+          setPriorityDialogOpen(false);
+          setSelectedEmergencyForPriority(null);
+        },
+        onError: (err) => {
+          setPriorityError(
+            err instanceof Error
+              ? err.message
+              : "Failed to update priority. Please try again.",
+          );
+        },
+      },
     );
-    const scored: DispatchCandidate[] = available.map((amb, index) => {
-      const dist = calculateHaversineDistance(
-        em.locationLat,
-        em.locationLng,
-        amb.baseLocationLat,
-        amb.baseLocationLng,
-      );
-      const score = Math.max(70, Math.round((1 - dist / 30) * 100));
-      // Flag overdue service (index 2 as test case or past nextServiceDue)
-      const isOverdue =
-        index === 2 ||
-        !!(
-          amb.nextServiceDue &&
-          new Date(amb.nextServiceDue).getTime() < Date.now()
-        );
-      return {
-        ambulance: amb,
-        distanceKm: dist,
-        score,
-        serviceOverdue: isOverdue,
-      };
-    });
-
-    scored.sort((a, b) => b.score - a.score);
-    setCandidates(scored);
   };
 
-  // Handler: Open Dispatch Dialog
+  // Handler: Open Dispatch Dialog & Load Candidates from Backend
   const handleOpenDispatch = (emergency: EmergencyRequest) => {
     setSelectedEmergencyForDispatch(emergency);
     setDispatchError(null);
-    loadRecommendations(emergency);
+    setCandidates([]);
     setDispatchDialogOpen(true);
+
+    getRecommendations(emergency.id, {
+      onSuccess: (res) => {
+        setCandidates(res.data ?? []);
+      },
+      onError: (err) => {
+        setDispatchError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load ambulance recommendations.",
+        );
+      },
+    });
   };
 
-  // Handler: Assign Dispatch
-  const handleAssignDispatch = (candidate: DispatchCandidate) => {
+  // Handler: Assign Dispatch via Backend
+  const handleAssignDispatch = (candidate: ScoredAmbulanceCandidate) => {
     if (!selectedEmergencyForDispatch) return;
 
-    setIsAssigning(true);
     setDispatchError(null);
 
-    // Simulate dispatch assignment
-    setTimeout(() => {
-      // Show service overdue warning if flagged
-      if (candidate.serviceOverdue) {
-        toast.warning("Service Overdue Notice", {
-          description: `Vehicle ${candidate.ambulance.registrationNumber} is overdue for scheduled maintenance.`,
-        });
-      }
+    createDispatchMutation(
+      {
+        emergencyId: selectedEmergencyForDispatch.id,
+        ambulanceId: candidate.ambulanceId,
+        dispatchScore: candidate.score,
+      },
+      {
+        onSuccess: (res) => {
+          if (res.data?.serviceOverdueWarning || candidate.serviceOverdue) {
+            toast.warning("Service Overdue Notice", {
+              description: `Vehicle ${candidate.registrationNumber} is overdue for scheduled maintenance.`,
+            });
+          }
 
-      // Mark ambulance busy and emergency dispatching
-      setAmbulances((prev) =>
-        prev.map((a) =>
-          a.id === candidate.ambulance.id
-            ? { ...a, status: AmbulanceStatus.BUSY }
-            : a,
-        ),
-      );
+          toast.success(
+            `Unit ${candidate.registrationNumber} dispatched to ${selectedEmergencyForDispatch.incidentNumber}`,
+          );
 
-      setEmergencies((prev) =>
-        prev.map((e) =>
-          e.id === selectedEmergencyForDispatch.id
-            ? { ...e, status: EmergencyStatus.DISPATCHING }
-            : e,
-        ),
-      );
-
-      toast.success(
-        `Unit ${candidate.ambulance.registrationNumber} dispatched to ${selectedEmergencyForDispatch.incidentNumber}`,
-      );
-
-      setIsAssigning(false);
-      setDispatchDialogOpen(false);
-      setSelectedEmergencyForDispatch(null);
-    }, 400);
+          setDispatchDialogOpen(false);
+          setSelectedEmergencyForDispatch(null);
+        },
+        onError: (err) => {
+          setDispatchError(
+            err instanceof Error
+              ? err.message
+              : "Failed to assign ambulance to this emergency.",
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -374,7 +349,8 @@ export function DispatcherView() {
                       queueEmergencies.map((em) => {
                         const canDispatch =
                           em.status === EmergencyStatus.PRIORITIZED ||
-                          em.status === EmergencyStatus.DISPATCHING;
+                          em.status === EmergencyStatus.DISPATCHING ||
+                          em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
 
                         return (
                           <tr
@@ -455,9 +431,9 @@ export function DispatcherView() {
                 availableAmbulancesList.map((amb, index) => {
                   const isOverdue =
                     index === 1 ||
-                    !!(
+                    Boolean(
                       amb.nextServiceDue &&
-                      new Date(amb.nextServiceDue).getTime() < Date.now()
+                        new Date(amb.nextServiceDue).getTime() < Date.now(),
                     );
 
                   return (
@@ -507,7 +483,6 @@ export function DispatcherView() {
                     className="py-3 flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      {/* Purple hospital icon */}
                       <svg
                         className="w-4 h-4 text-secondary shrink-0"
                         viewBox="0 0 24 24"
@@ -570,7 +545,10 @@ export function DispatcherView() {
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-text-primary">
+              <label
+                htmlFor="priority-level-select"
+                className="text-xs font-bold text-text-primary block"
+              >
                 Triage Priority Level
               </label>
               <Select
@@ -579,7 +557,10 @@ export function DispatcherView() {
                   setPendingPriority(val as EmergencyPriority)
                 }
               >
-                <SelectTrigger className="rounded-none border-2 border-border text-xs min-h-10 focus:ring-0">
+                <SelectTrigger
+                  id="priority-level-select"
+                  className="rounded-none border-2 border-border text-xs min-h-10 focus:ring-0"
+                >
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent className="rounded-none border-2 border-primary bg-white">
@@ -607,6 +588,7 @@ export function DispatcherView() {
             <Button
               type="button"
               variant="outline"
+              disabled={isUpdatingPriority}
               onClick={() => setPriorityDialogOpen(false)}
               className="rounded-none border-border text-xs min-h-9.5"
             >
@@ -614,10 +596,11 @@ export function DispatcherView() {
             </Button>
             <Button
               type="button"
+              disabled={isUpdatingPriority}
               onClick={handleSavePriority}
               className="rounded-none bg-primary hover:bg-primary-dark text-white text-xs font-bold min-h-9.5"
             >
-              Save Priority
+              {isUpdatingPriority ? "Saving..." : "Save Priority"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -649,32 +632,45 @@ export function DispatcherView() {
             </div>
           )}
 
-          <div className="space-y-3 py-2">
-            {candidates.length === 0 ? (
+          <div className="space-y-3 py-2 max-h-96 overflow-y-auto">
+            {isLoadingRecommendations ? (
+              <div className="py-8 text-center text-text-muted text-xs flex flex-col items-center gap-2">
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent animate-spin rounded-full" />
+                <span>Computing optimal ambulance candidates & routes...</span>
+              </div>
+            ) : candidates.length === 0 ? (
               <div className="py-6 text-center text-text-muted text-xs">
-                No available ambulances found for dispatch.
+                No eligible ambulances available for this emergency capability.
               </div>
             ) : (
               candidates.map((cand) => (
                 <div
-                  key={cand.ambulance.id}
+                  key={cand.ambulanceId}
                   className="p-3 border border-border bg-slate-50 flex items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-text-primary text-sm">
-                        {cand.ambulance.registrationNumber}
+                        {cand.registrationNumber}
                       </span>
                       <span className="text-xs font-semibold text-text-secondary">
-                        {cand.ambulance.type}
+                        {cand.type}
                       </span>
                       <span className="text-xs text-primary-dark font-bold">
-                        Score: {cand.score}%
+                        Score:{" "}
+                        {cand.score <= 1
+                          ? `${Math.round(cand.score * 100)}%`
+                          : `${cand.score}%`}
                       </span>
                     </div>
 
                     <div className="text-xs text-text-secondary">
                       Distance: {cand.distanceKm} km
+                      {cand.driverName && (
+                        <span className="ml-2 font-medium text-text-primary">
+                          · Driver: {cand.driverName}
+                        </span>
+                      )}
                     </div>
 
                     {cand.serviceOverdue && (
@@ -690,7 +686,7 @@ export function DispatcherView() {
                     onClick={() => handleAssignDispatch(cand)}
                     className="bg-primary hover:bg-primary-dark disabled:opacity-50 text-white px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9 cursor-pointer"
                   >
-                    Assign
+                    {isAssigning ? "Assigning..." : "Assign"}
                   </button>
                 </div>
               ))
@@ -701,6 +697,7 @@ export function DispatcherView() {
             <Button
               type="button"
               variant="outline"
+              disabled={isAssigning}
               onClick={() => setDispatchDialogOpen(false)}
               className="rounded-none border-border text-xs min-h-9.5"
             >

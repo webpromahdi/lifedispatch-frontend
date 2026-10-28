@@ -8,7 +8,7 @@ import {
   Send,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCreateEmergency, useGetMe } from "@/hooks";
 import { EmergencyType, RequiredCapability } from "@/lib/types/enums";
 
 export interface CreateEmergencyFormProps {
@@ -31,6 +32,9 @@ export function CreateEmergencyForm({
   onSuccess,
   onCancel,
 }: CreateEmergencyFormProps) {
+  const { data: meData } = useGetMe();
+  const currentUser = meData?.data?.user;
+
   const [emergencyType, setEmergencyType] = useState<string>(
     EmergencyType.CARDIAC,
   );
@@ -41,30 +45,85 @@ export function CreateEmergencyForm({
   const [locationAddress, setLocationAddress] = useState(
     "House 14, Road 7, Sector 3, Uttara, Dhaka",
   );
-  const [callerName, setCallerName] = useState("Nafisa Anjum");
-  const [callerPhone, setCallerPhone] = useState("+880 1711-555555");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationLat, setLocationLat] = useState(23.8759);
+  const [locationLng, setLocationLng] = useState(90.3795);
+  const [callerName, setCallerName] = useState(currentUser?.name || "");
+  const [callerPhone, setCallerPhone] = useState(currentUser?.phone || "");
+
+  // Update caller defaults once user session is resolved if field is empty
+  useEffect(() => {
+    if (currentUser?.name && !callerName) {
+      setCallerName(currentUser.name);
+    }
+    if (currentUser?.phone && !callerPhone) {
+      setCallerPhone(currentUser.phone);
+    }
+  }, [currentUser, callerName, callerPhone]);
+
+  const { mutate: createEmergency, isPending } = useCreateEmergency();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    const generatedIncident = `INC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Emergency Response Dispatched!", {
-        description: `Incident ${generatedIncident} logged. Nearest ALS unit alert sent.`,
-      });
-      if (onSuccess) onSuccess(generatedIncident);
-    }, 600);
+    createEmergency(
+      {
+        emergencyType: emergencyType as EmergencyType,
+        requiredCapability: capability as RequiredCapability,
+        description,
+        locationAddress,
+        locationLat,
+        locationLng,
+        callerName: callerName || "Unknown Caller",
+        callerPhone: callerPhone || "+8801700000000",
+      },
+      {
+        onSuccess: (res) => {
+          const incidentNumber = res.data?.incidentNumber;
+          toast.success("Emergency Response Dispatched!", {
+            description: `Incident ${incidentNumber} logged. Nearest ${capability} unit alert sent.`,
+          });
+          if (onSuccess && incidentNumber) {
+            onSuccess(incidentNumber);
+          }
+        },
+        onError: (err) => {
+          toast.error("Failed to Create Emergency", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "Unable to submit emergency request. Please try again or call emergency services directly.",
+          });
+        },
+      },
+    );
   };
 
   const handleDetectLocation = () => {
-    toast.info("GPS Coordinates Resolved", {
-      description: "23.8759° N, 90.3795° E (Sector 3, Uttara)",
-    });
-    setLocationAddress("House 14, Road 7, Sector 3, Uttara, Dhaka");
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLocationLat(pos.coords.latitude);
+          setLocationLng(pos.coords.longitude);
+          toast.info("GPS Location Detected", {
+            description: `${pos.coords.latitude.toFixed(4)}° N, ${pos.coords.longitude.toFixed(4)}° E`,
+          });
+        },
+        () => {
+          setLocationLat(23.8759);
+          setLocationLng(90.3795);
+          toast.info("Default Coordinates Set", {
+            description: "23.8759° N, 90.3795° E (Sector 3, Uttara)",
+          });
+          setLocationAddress("House 14, Road 7, Sector 3, Uttara, Dhaka");
+        },
+      );
+    } else {
+      setLocationLat(23.8759);
+      setLocationLng(90.3795);
+      toast.info("Default Coordinates Set", {
+        description: "23.8759° N, 90.3795° E (Sector 3, Uttara)",
+      });
+    }
   };
 
   return (
@@ -94,23 +153,30 @@ export function CreateEmergencyForm({
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="CARDIAC">
+              <SelectItem value={EmergencyType.CARDIAC}>
                 Cardiac / Chest Pain / Heart
               </SelectItem>
-              <SelectItem value="TRAUMA">
+              <SelectItem value={EmergencyType.TRAUMA}>
                 Severe Trauma / Accident / Bleeding
               </SelectItem>
-              <SelectItem value="RESPIRATORY">
+              <SelectItem value={EmergencyType.RESPIRATORY}>
                 Respiratory / Severe Asthma
               </SelectItem>
-              <SelectItem value="NEUROLOGICAL">
+              <SelectItem value={EmergencyType.NEUROLOGICAL}>
                 Neurological / Stroke / Seizure
               </SelectItem>
-              <SelectItem value="OBSTETRIC">
+              <SelectItem value={EmergencyType.OBSTETRIC}>
                 Obstetric / Labor Complication
               </SelectItem>
-              <SelectItem value="PEDIATRIC">Pediatric Emergency</SelectItem>
-              <SelectItem value="OTHER">Other Clinical Emergency</SelectItem>
+              <SelectItem value={EmergencyType.PEDIATRIC}>
+                Pediatric Emergency
+              </SelectItem>
+              <SelectItem value={EmergencyType.PSYCHIATRIC}>
+                Psychiatric Crisis
+              </SelectItem>
+              <SelectItem value={EmergencyType.OTHER}>
+                Other Clinical Emergency
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -131,14 +197,17 @@ export function CreateEmergencyForm({
               <SelectValue placeholder="Select capability" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALS">
+              <SelectItem value={RequiredCapability.ALS}>
                 ALS — Advanced Life Support (Paramedic + Defibrillator)
               </SelectItem>
-              <SelectItem value="BLS">
+              <SelectItem value={RequiredCapability.BLS}>
                 BLS — Basic Life Support (EMT + Oxygen)
               </SelectItem>
-              <SelectItem value="NEONATAL">
+              <SelectItem value={RequiredCapability.NEONATAL}>
                 Neonatal Critical Care Transport
+              </SelectItem>
+              <SelectItem value={RequiredCapability.BARIATRIC}>
+                Bariatric Transport Support
               </SelectItem>
             </SelectContent>
           </Select>
@@ -243,6 +312,7 @@ export function CreateEmergencyForm({
             type="button"
             variant="outline"
             onClick={onCancel}
+            disabled={isPending}
             className="text-xs min-h-11 cursor-pointer order-2 sm:order-1"
           >
             Cancel
@@ -250,11 +320,11 @@ export function CreateEmergencyForm({
         )}
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isPending}
           className="bg-primary hover:bg-primary-dark text-white text-xs min-h-11 px-5 font-semibold cursor-pointer gap-1.5 order-1 sm:order-2"
         >
           <Send className="h-3.5 w-3.5" aria-hidden="true" />
-          {isSubmitting ? "Broadcasting..." : "Dispatch Emergency Request"}
+          {isPending ? "Broadcasting..." : "Dispatch Emergency Request"}
         </Button>
       </div>
     </form>

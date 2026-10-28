@@ -58,4 +58,3 @@ export function rejectDispatch(id: string, reason: string) {
     body: { reason },
   });
 }
-

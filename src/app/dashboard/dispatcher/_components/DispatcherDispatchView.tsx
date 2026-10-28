@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useCancelDispatch } from "@/hooks";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedDispatches } from "@/lib/dummy/dispatches";
 import { seedDrivers } from "@/lib/dummy/drivers";
@@ -50,6 +51,9 @@ export function DispatcherDispatchView() {
     null,
   );
 
+  const { mutate: cancelDispatchMutation, isPending: isCancelling } =
+    useCancelDispatch();
+
   const handleOpenCancelDialog = (dispatch: Dispatch) => {
     setSelectedDispatch(dispatch);
     setCancelDialogOpen(true);
@@ -58,31 +62,50 @@ export function DispatcherDispatchView() {
   const handleConfirmCancel = () => {
     if (!selectedDispatch) return;
 
-    const targetId = selectedDispatch.id;
-    setDispatches((prev) =>
-      prev.map((d) => {
-        if (d.id !== targetId) return d;
-        return {
-          ...d,
-          status: DispatchStatus.CANCELLED,
-          cancelledAt: new Date().toISOString(),
-          cancellationReason:
-            "Cancelled manually by dispatcher console operator.",
-        };
-      }),
+    cancelDispatchMutation(
+      {
+        id: selectedDispatch.id,
+        reason: "Cancelled manually by dispatcher console operator.",
+      },
+      {
+        onSuccess: () => {
+          const targetId = selectedDispatch.id;
+          setDispatches((prev) =>
+            prev.map((d) => {
+              if (d.id !== targetId) return d;
+              return {
+                ...d,
+                status: DispatchStatus.CANCELLED,
+                cancelledAt: new Date().toISOString(),
+                cancellationReason:
+                  "Cancelled manually by dispatcher console operator.",
+              };
+            }),
+          );
+
+          const relatedEmergency = seedEmergencies.find(
+            (e) => e.id === selectedDispatch.emergencyId,
+          );
+          const incNumber =
+            relatedEmergency?.incidentNumber || selectedDispatch.id;
+
+          toast.success("Dispatch Assignment Cancelled", {
+            description: `Assignment ${selectedDispatch.id} (Incident ${incNumber}) cancelled and unit released.`,
+          });
+
+          setCancelDialogOpen(false);
+          setSelectedDispatch(null);
+        },
+        onError: (err) => {
+          toast.error("Failed to Cancel Dispatch", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "Unable to cancel dispatch assignment.",
+          });
+        },
+      },
     );
-
-    const relatedEmergency = seedEmergencies.find(
-      (e) => e.id === selectedDispatch.emergencyId,
-    );
-    const incNumber = relatedEmergency?.incidentNumber || selectedDispatch.id;
-
-    toast.success("Dispatch Assignment Cancelled", {
-      description: `Assignment ${selectedDispatch.id} (Incident ${incNumber}) cancelled and unit released.`,
-    });
-
-    setCancelDialogOpen(false);
-    setSelectedDispatch(null);
   };
 
   // Helper maps for lookup
@@ -164,14 +187,20 @@ export function DispatcherDispatchView() {
               <SelectItem value="ALL">
                 All Statuses ({dispatches.length})
               </SelectItem>
-              <SelectItem value="ACCEPTED">ACCEPTED</SelectItem>
-              <SelectItem value="PENDING_ACCEPTANCE">
+              <SelectItem value={DispatchStatus.ACCEPTED}>ACCEPTED</SelectItem>
+              <SelectItem value={DispatchStatus.PENDING_ACCEPTANCE}>
                 PENDING ACCEPTANCE
               </SelectItem>
-              <SelectItem value="COMPLETED">COMPLETED</SelectItem>
-              <SelectItem value="REJECTED">REJECTED</SelectItem>
-              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
-              <SelectItem value="TIMED_OUT">TIMED OUT</SelectItem>
+              <SelectItem value={DispatchStatus.COMPLETED}>
+                COMPLETED
+              </SelectItem>
+              <SelectItem value={DispatchStatus.REJECTED}>REJECTED</SelectItem>
+              <SelectItem value={DispatchStatus.CANCELLED}>
+                CANCELLED
+              </SelectItem>
+              <SelectItem value={DispatchStatus.TIMED_OUT}>
+                TIMED OUT
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -290,7 +319,7 @@ export function DispatcherDispatchView() {
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={isTerminal}
+                        disabled={isTerminal || isCancelling}
                         onClick={() => handleOpenCancelDialog(disp)}
                         aria-label={`Cancel dispatch assignment ${disp.id}`}
                         className={`h-7 px-2.5 text-xs font-medium cursor-pointer ${
@@ -343,16 +372,18 @@ export function DispatcherDispatchView() {
           <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-border">
             <Button
               variant="outline"
+              disabled={isCancelling}
               onClick={() => setCancelDialogOpen(false)}
               className="text-xs min-h-10 cursor-pointer"
             >
               Abort
             </Button>
             <Button
+              disabled={isCancelling}
               onClick={handleConfirmCancel}
               className="bg-destructive hover:bg-destructive/90 text-white text-xs min-h-10 cursor-pointer font-medium"
             >
-              Confirm Cancel
+              {isCancelling ? "Cancelling..." : "Confirm Cancel"}
             </Button>
           </DialogFooter>
         </DialogContent>
