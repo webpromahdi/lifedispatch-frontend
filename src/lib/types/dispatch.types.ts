@@ -1,5 +1,3 @@
-import type { Ambulance } from "./ambulance.types";
-import type { Driver } from "./driver.types";
 import type { DispatchStatus } from "./enums";
 
 export interface Dispatch {
@@ -20,8 +18,13 @@ export interface Dispatch {
 }
 
 export interface ScoredAmbulanceCandidate {
-  ambulance: Ambulance;
-  driver: Driver | null;
+  ambulanceId: string;
+  registrationNumber: string;
+  type: string;
+  capabilities: string[];
+  driverId: string;
+  driverName: string;
+  driverCertificationLevel: string;
   distanceKm: number;
   score: number;
   scoreBreakdown: {
@@ -29,5 +32,19 @@ export interface ScoredAmbulanceCandidate {
     priorityScore: number;
     typeScore: number;
   };
-  serviceOverdue: boolean;
+  serviceOverdue?: boolean;
+}
+
+export interface RecommendAmbulancesPayload {
+  emergencyId: string;
+}
+
+export interface CreateDispatchPayload {
+  emergencyId: string;
+  ambulanceId: string;
+  dispatchScore?: number;
+}
+
+export interface CancelDispatchPayload {
+  reason: string;
 }
