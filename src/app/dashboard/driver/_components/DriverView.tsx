@@ -19,27 +19,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDispatches } from "@/lib/dummy/dispatches";
-import { seedDrivers } from "@/lib/dummy/drivers";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
-import { seedHospitals } from "@/lib/dummy/hospitals";
-import type { Ambulance } from "@/lib/types/ambulance.types";
-import type { Dispatch } from "@/lib/types/dispatch.types";
-import type { EmergencyRequest } from "@/lib/types/emergency.types";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  DispatchStatus,
+  useAcceptDispatch,
+  useCompleteTrip,
+  useGetHospitals,
+  useGetMyDriverProfile,
+  useGetMyPendingDispatches,
+  useGetMyTrips,
+  useRejectDispatch,
+  useSelectTripHospital,
+  useToggleDriverShift,
+  useUpdateTripStatus,
+} from "@/hooks";
+import type { PendingDispatchItem } from "@/lib/types/dispatch.types";
+import {
   EmergencyPriority,
   HospitalDiversionStatus,
 } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
 import { cn } from "@/lib/utils";
-
-interface PendingDispatchItem {
-  dispatch: Dispatch;
-  emergency: EmergencyRequest;
-  ambulance: Ambulance;
-}
 
 const TRIP_STEPS = [
   { id: 1, label: "01 Departed" },
@@ -49,47 +48,80 @@ const TRIP_STEPS = [
 ];
 
 export function DriverView() {
-  const currentDriver = seedDrivers[0];
-  const [isOnShift, setIsOnShift] = useState<boolean>(currentDriver.isOnShift);
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
 
-  // Pending dispatches list
-  const [pendingDispatches, setPendingDispatches] = useState<
-    PendingDispatchItem[]
-  >(() => {
-    // Find dispatches with PENDING_ACCEPTANCE
-    const pending = seedDispatches.find(
-      (d) => d.status === DispatchStatus.PENDING_ACCEPTANCE,
-    );
-    if (!pending) return [];
+  // Driver Profile & Shift status query & mutation
+  const { data: driverData, isLoading: isDriverLoading } =
+    useGetMyDriverProfile();
+  const toggleShiftMutation = useToggleDriverShift();
 
-    const em =
-      seedEmergencies.find((e) => e.id === pending.emergencyId) ||
-      seedEmergencies[0];
-    const amb =
-      seedAmbulances.find((a) => a.id === pending.ambulanceId) ||
-      seedAmbulances[0];
+  const isOnShift = driverData?.data?.isOnShift ?? false;
 
-    return [{ dispatch: pending, emergency: em, ambulance: amb }];
-  });
+  // Pending dispatches query — refetches every 5 seconds only when on shift
+  const { data: pendingData, isLoading: isPendingLoading } =
+    useGetMyPendingDispatches({
+      refetchInterval: isOnShift ? 5000 : false,
+    });
+
+  const pendingDispatches: PendingDispatchItem[] = isOnShift
+    ? (pendingData?.data ?? [])
+    : [];
 
   // Active Trip State
   const [activeTrip, setActiveTrip] = useState<{
-    id: string;
+    tripId: string;
     incidentNumber: string;
     emergencyType: string;
     locationAddress: string;
-    stepIndex: number; // 1: Departed, 2: At Scene, 3: Patient Picked Up, 4: At Hospital
-    destinationHospital: Hospital | null;
+    stepIndex: number;
+    destinationHospital: { id: string; name: string } | null;
   } | null>(null);
+
+  // Restore ongoing active trip from server if available on page load
+  const { data: activeTripsData } = useGetMyTrips(
+    { status: "ACTIVE", limit: 1 },
+    { enabled: isOnShift },
+  );
+
+  useEffect(() => {
+    if (activeTripsData?.data?.[0] && !activeTrip) {
+      const ongoing = activeTripsData.data[0];
+      let stepIndex = 1;
+      if (ongoing.arrivedAtHospitalAt) stepIndex = 4;
+      else if (ongoing.patientPickedUpAt) stepIndex = 3;
+      else if (ongoing.arrivedAtSceneAt) stepIndex = 2;
+      else if (ongoing.departedAt) stepIndex = 1;
+
+      setActiveTrip({
+        tripId: ongoing.id,
+        incidentNumber: ongoing.emergency.incidentNumber,
+        emergencyType: ongoing.emergency.emergencyType,
+        locationAddress: ongoing.emergency.locationAddress,
+        stepIndex,
+        destinationHospital: ongoing.hospital
+          ? { id: ongoing.hospital.id, name: ongoing.hospital.name }
+          : null,
+      });
+    }
+  }, [activeTripsData, activeTrip]);
+
+  // Mutations
+  const acceptDispatchMutation = useAcceptDispatch();
+  const rejectDispatchMutation = useRejectDispatch();
+  const updateTripStatusMutation = useUpdateTripStatus();
+  const selectHospitalMutation = useSelectTripHospital();
+  const completeTripMutation = useCompleteTrip();
 
   // Reject Dialog State
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [dispatchToReject, setDispatchToReject] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
-  // Select Hospital Dialog State
+  // Select Hospital Dialog State & Query
   const [hospitalDialogOpen, setHospitalDialogOpen] = useState(false);
+  const { data: hospitalsData, isLoading: isHospitalsLoading } = useGetHospitals(
+    { limit: 50 },
+  );
 
   // Complete Trip Dialog State
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
@@ -103,45 +135,51 @@ export function DriverView() {
     return () => clearInterval(timer);
   }, []);
 
-  // Polling driver's pending dispatches every ~5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // In production, fetch pending dispatches for driver
-      // Dispatches will not arrive when off shift
-      if (!isOnShift) {
-        setPendingDispatches([]);
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isOnShift]);
-
   // Handle Shift Toggle
   const handleToggleShift = () => {
-    const nextState = !isOnShift;
-    setIsOnShift(nextState);
-    if (nextState) {
-      toast.success("Shift status updated: ON SHIFT");
-    } else {
-      toast.info("Shift status updated: OFF SHIFT");
-    }
+    const nextAction = isOnShift ? "end" : "start";
+    toggleShiftMutation.mutate(nextAction, {
+      onSuccess: (res) => {
+        toast.success(
+          res.message ||
+            (nextAction === "start"
+              ? "Shift status updated: ON SHIFT"
+              : "Shift status updated: OFF SHIFT"),
+        );
+      },
+      onError: (err: unknown) => {
+        const error = err as { data?: { message?: string }; message?: string };
+        toast.error(
+          error.data?.message ||
+            error.message ||
+            "Failed to update shift status.",
+        );
+      },
+    });
   };
 
   // Handle Accept Dispatch
   const handleAcceptDispatch = (item: PendingDispatchItem) => {
-    setPendingDispatches((prev) =>
-      prev.filter((d) => d.dispatch.id !== item.dispatch.id),
-    );
-
-    setActiveTrip({
-      id: item.dispatch.id,
-      incidentNumber: item.emergency.incidentNumber,
-      emergencyType: item.emergency.emergencyType,
-      locationAddress: item.emergency.locationAddress,
-      stepIndex: 1, // Start at 01 Departed
-      destinationHospital: seedHospitals[0],
+    acceptDispatchMutation.mutate(item.id, {
+      onSuccess: (res) => {
+        const result = res.data;
+        setActiveTrip({
+          tripId: result.trip.id,
+          incidentNumber: result.emergency.incidentNumber,
+          emergencyType: result.emergency.emergencyType,
+          locationAddress: result.emergency.locationAddress,
+          stepIndex: 1,
+          destinationHospital: null,
+        });
+        toast.success(`Dispatch accepted for ${result.emergency.incidentNumber}`);
+      },
+      onError: (err: unknown) => {
+        const error = err as { data?: { message?: string }; message?: string };
+        toast.error(
+          error.data?.message || error.message || "Failed to accept dispatch.",
+        );
+      },
     });
-
-    toast.success(`Dispatch accepted for ${item.emergency.incidentNumber}`);
   };
 
   // Handle Open Reject Dialog
@@ -154,14 +192,29 @@ export function DriverView() {
   // Handle Confirm Reject
   const handleConfirmReject = () => {
     if (!dispatchToReject) return;
+    const trimmedReason = rejectReason.trim();
+    if (!trimmedReason) {
+      toast.error("Please provide a reason for declining the dispatch.");
+      return;
+    }
 
-    setPendingDispatches((prev) =>
-      prev.filter((d) => d.dispatch.id !== dispatchToReject),
+    rejectDispatchMutation.mutate(
+      { id: dispatchToReject, reason: trimmedReason },
+      {
+        onSuccess: () => {
+          toast.info("Dispatch rejected");
+          setRejectDialogOpen(false);
+          setDispatchToReject(null);
+          setRejectReason("");
+        },
+        onError: (err: unknown) => {
+          const error = err as { data?: { message?: string }; message?: string };
+          toast.error(
+            error.data?.message || error.message || "Failed to reject dispatch.",
+          );
+        },
+      },
     );
-
-    toast.info("Dispatch rejected");
-    setRejectDialogOpen(false);
-    setDispatchToReject(null);
   };
 
   // Advance Trip Milestone
@@ -170,31 +223,117 @@ export function DriverView() {
 
     if (activeTrip.stepIndex < 4) {
       const nextStep = activeTrip.stepIndex + 1;
-      setActiveTrip({
-        ...activeTrip,
-        stepIndex: nextStep,
-      });
-      const stepName = TRIP_STEPS.find((s) => s.id === nextStep)?.label || "";
-      toast.success(`Milestone updated: ${stepName}`);
+      updateTripStatusMutation.mutate(
+        { id: activeTrip.tripId, payload: { status: "ACTIVE" } },
+        {
+          onSuccess: () => {
+            setActiveTrip((prev) =>
+              prev ? { ...prev, stepIndex: nextStep } : null,
+            );
+            const stepName =
+              TRIP_STEPS.find((s) => s.id === nextStep)?.label || "";
+            toast.success(`Milestone updated: ${stepName}`);
+          },
+          onError: (err: unknown) => {
+            const error = err as {
+              data?: { message?: string };
+              message?: string;
+            };
+            toast.error(
+              error.data?.message ||
+                error.message ||
+                "Failed to update milestone.",
+            );
+          },
+        },
+      );
     } else {
       // Already at step 4: prompt completion
       setCompleteDialogOpen(true);
     }
   };
 
+  // Select Hospital
+  const handleConfirmSelectHospital = (hosp: Hospital) => {
+    if (!activeTrip) return;
+
+    selectHospitalMutation.mutate(
+      { id: activeTrip.tripId, payload: { hospitalId: hosp.id } },
+      {
+        onSuccess: (res) => {
+          setActiveTrip((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  destinationHospital: { id: hosp.id, name: hosp.name },
+                }
+              : null,
+          );
+          toast.success(res.message || `Destination set to ${hosp.name}`);
+          setHospitalDialogOpen(false);
+        },
+        onError: (err: unknown) => {
+          const error = err as {
+            data?: { message?: string };
+            message?: string;
+          };
+          toast.error(
+            error.data?.message ||
+              error.message ||
+              "Failed to set destination hospital.",
+          );
+        },
+      },
+    );
+  };
+
   // Complete Trip
   const handleConfirmCompleteTrip = () => {
     if (!activeTrip) return;
 
-    toast.success(`Trip ${activeTrip.incidentNumber} completed successfully`);
-    setActiveTrip(null);
-    setCompleteDialogOpen(false);
+    const km = Number.parseFloat(tripDistanceKm);
+    if (Number.isNaN(km) || km <= 0) {
+      toast.error("Please enter a valid positive distance in km.");
+      return;
+    }
+
+    completeTripMutation.mutate(
+      {
+        id: activeTrip.tripId,
+        payload: {
+          distanceKm: km,
+          arrivedAtHospitalAt: new Date().toISOString(),
+        },
+      },
+      {
+        onSuccess: (res) => {
+          const invoiceNo = res.data?.payment?.invoiceNumber;
+          toast.success(
+            `Trip ${activeTrip.incidentNumber} completed successfully.${
+              invoiceNo ? ` Invoice: ${invoiceNo}` : ""
+            }`,
+          );
+          setActiveTrip(null);
+          setCompleteDialogOpen(false);
+          setTripDistanceKm("8.5");
+        },
+        onError: (err: unknown) => {
+          const error = err as {
+            data?: { message?: string };
+            message?: string;
+          };
+          toast.error(
+            error.data?.message || error.message || "Failed to complete trip.",
+          );
+        },
+      },
+    );
   };
 
   // Compact hospitals list for right column
   const compactHospitals = useMemo(() => {
-    return seedHospitals.slice(0, 5);
-  }, []);
+    return (hospitalsData?.data ?? []).slice(0, 5);
+  }, [hospitalsData]);
 
   return (
     <div className="space-y-6 flex flex-col">
@@ -203,7 +342,21 @@ export function DriverView() {
         {/* Left Column (Desktop 8 cols / Mobile 1st): INCOMING DISPATCH & ACTIVE TRIP */}
         <div className="lg:col-span-8 w-full flex flex-col gap-6 order-1">
           {/* Card: INCOMING DISPATCH */}
-          {pendingDispatches.length > 0 && (
+          {isPendingLoading && (
+            <section
+              aria-label="Loading Dispatches"
+              className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6 space-y-4"
+            >
+              <CornerNotch />
+              <LabelTab label="INCOMING DISPATCH" />
+              <div className="space-y-3 pt-3">
+                <Skeleton className="h-24 w-full rounded-none" />
+                <Skeleton className="h-24 w-full rounded-none" />
+              </div>
+            </section>
+          )}
+
+          {!isPendingLoading && pendingDispatches.length > 0 && (
             <section
               aria-label="Incoming Dispatch"
               className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
@@ -213,9 +366,7 @@ export function DriverView() {
 
               <div className="mt-4 space-y-6">
                 {pendingDispatches.map((item) => {
-                  const targetTime = new Date(
-                    item.dispatch.timeoutAt,
-                  ).getTime();
+                  const targetTime = new Date(item.timeoutAt).getTime();
                   const diffMs = Math.max(0, targetTime - currentTime);
                   const isExpired = diffMs <= 0;
                   const minutes = Math.floor(diffMs / 60000);
@@ -224,7 +375,7 @@ export function DriverView() {
 
                   return (
                     <div
-                      key={item.dispatch.id}
+                      key={item.id}
                       className="border-2 border-slate-200 p-4 sm:p-5 bg-slate-50 space-y-4"
                     >
                       {/* Top row: Incident No + Badges + Countdown */}
@@ -235,7 +386,7 @@ export function DriverView() {
                           </span>
                           <PriorityBadge
                             priority={
-                              item.emergency.priority ||
+                              (item.emergency.priority as EmergencyPriority) ||
                               EmergencyPriority.P1_CRITICAL
                             }
                             variant="square"
@@ -292,14 +443,19 @@ export function DriverView() {
                             Caller Contact:
                           </span>
                           <span className="font-medium text-text-primary">
-                            {item.emergency.callerName} (
-                            <a
-                              href={`tel:${item.emergency.callerPhone}`}
-                              className="text-primary-dark font-bold hover:underline"
-                            >
-                              {item.emergency.callerPhone}
-                            </a>
-                            )
+                            {item.emergency.callerName || "Unknown caller"}{" "}
+                            {item.emergency.callerPhone ? (
+                              <>
+                                (
+                                <a
+                                  href={`tel:${item.emergency.callerPhone}`}
+                                  className="text-primary-dark font-bold hover:underline"
+                                >
+                                  {item.emergency.callerPhone}
+                                </a>
+                                )
+                              </>
+                            ) : null}
                           </span>
                         </div>
 
@@ -318,24 +474,27 @@ export function DriverView() {
                       <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                         <button
                           type="button"
-                          disabled={isExpired}
+                          disabled={
+                            isExpired || acceptDispatchMutation.isPending
+                          }
                           onClick={() => handleAcceptDispatch(item)}
                           className={cn(
                             "w-full sm:flex-1 min-h-12 px-6 text-sm font-bold text-white rounded-none cursor-pointer transition-colors",
-                            isExpired
+                            isExpired || acceptDispatchMutation.isPending
                               ? "bg-slate-300 cursor-not-allowed text-slate-500"
                               : "bg-primary hover:bg-primary-dark",
                           )}
                         >
-                          Accept Dispatch
+                          {acceptDispatchMutation.isPending
+                            ? "Accepting..."
+                            : "Accept Dispatch"}
                         </button>
 
                         <button
                           type="button"
-                          onClick={() =>
-                            handleOpenRejectDialog(item.dispatch.id)
-                          }
-                          className="w-full sm:w-auto min-h-12 px-6 text-sm font-bold border-2 border-red-500 text-red-600 hover:bg-red-50 rounded-none cursor-pointer"
+                          disabled={rejectDispatchMutation.isPending}
+                          onClick={() => handleOpenRejectDialog(item.id)}
+                          className="w-full sm:w-auto min-h-12 px-6 text-sm font-bold border-2 border-red-500 text-red-600 hover:bg-red-50 rounded-none cursor-pointer disabled:opacity-50"
                         >
                           Reject
                         </button>
@@ -348,24 +507,30 @@ export function DriverView() {
           )}
 
           {/* Empty State for Incoming Dispatch when no pending */}
-          {pendingDispatches.length === 0 && !activeTrip && (
-            <section
-              aria-label="Incoming Dispatch Standby"
-              className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
-            >
-              <CornerNotch />
-              <LabelTab label="INCOMING DISPATCH" />
+          {!isPendingLoading &&
+            pendingDispatches.length === 0 &&
+            !activeTrip && (
+              <section
+                aria-label="Incoming Dispatch Standby"
+                className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+              >
+                <CornerNotch />
+                <LabelTab label="INCOMING DISPATCH" />
 
-              <div className="py-12 text-center space-y-2">
-                <div className="text-base font-semibold text-text-primary">
-                  No pending dispatches.
+                <div className="py-12 text-center space-y-2">
+                  <div className="text-base font-semibold text-text-primary">
+                    {isOnShift
+                      ? "No pending dispatches."
+                      : "Currently Off Duty"}
+                  </div>
+                  <div className="text-xs text-text-secondary">
+                    {isOnShift
+                      ? "New emergency assignments will arrive here automatically."
+                      : "Start your shift on the right panel to receive incoming emergency dispatches."}
+                  </div>
                 </div>
-                <div className="text-xs text-text-secondary">
-                  New dispatches appear here automatically.
-                </div>
-              </div>
-            </section>
-          )}
+              </section>
+            )}
 
           {/* Card: ACTIVE TRIP */}
           {activeTrip && (
@@ -472,12 +637,15 @@ export function DriverView() {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                   <button
                     type="button"
+                    disabled={updateTripStatusMutation.isPending}
                     onClick={handleAdvanceMilestone}
-                    className="flex-1 min-h-12 px-6 text-sm font-bold bg-primary hover:bg-primary-dark text-white rounded-none cursor-pointer"
+                    className="flex-1 min-h-12 px-6 text-sm font-bold bg-primary hover:bg-primary-dark text-white rounded-none cursor-pointer disabled:opacity-50"
                   >
-                    {activeTrip.stepIndex < 4
-                      ? `Advance to ${TRIP_STEPS[activeTrip.stepIndex]?.label || "Next Milestone"}`
-                      : "Handover Complete — Ready to Complete"}
+                    {updateTripStatusMutation.isPending
+                      ? "Updating..."
+                      : activeTrip.stepIndex < 4
+                        ? `Advance to ${TRIP_STEPS[activeTrip.stepIndex]?.label || "Next Milestone"}`
+                        : "Handover Complete — Ready to Complete"}
                   </button>
 
                   <button
@@ -516,10 +684,14 @@ export function DriverView() {
                 <span className="text-sm font-semibold text-text-secondary">
                   Shift Duty Status:
                 </span>
-                <StatusBadge
-                  status={isOnShift ? "ON_SHIFT" : "OFF_SHIFT"}
-                  variant="square"
-                />
+                {isDriverLoading ? (
+                  <Skeleton className="h-6 w-20 rounded-none" />
+                ) : (
+                  <StatusBadge
+                    status={isOnShift ? "ON_SHIFT" : "OFF_SHIFT"}
+                    variant="square"
+                  />
+                )}
               </div>
 
               {!isOnShift && (
@@ -530,22 +702,25 @@ export function DriverView() {
 
               <button
                 type="button"
+                disabled={toggleShiftMutation.isPending || isDriverLoading}
                 onClick={handleToggleShift}
                 className={cn(
-                  "w-full min-h-12 text-sm font-bold rounded-none cursor-pointer transition-colors",
+                  "w-full min-h-12 text-sm font-bold rounded-none cursor-pointer transition-colors disabled:opacity-50",
                   isOnShift
                     ? "border-2 border-border text-text-primary hover:bg-slate-100"
                     : "bg-primary hover:bg-primary-dark text-white",
                 )}
               >
-                {isOnShift
-                  ? "End Shift (Go Off Duty)"
-                  : "Start Shift (Go On Duty)"}
+                {toggleShiftMutation.isPending
+                  ? "Updating Shift..."
+                  : isOnShift
+                    ? "End Shift (Go Off Duty)"
+                    : "Start Shift (Go On Duty)"}
               </button>
             </div>
           </section>
 
-          {/* Card: HOSPITALS (Same compact list as Dispatcher) */}
+          {/* Card: HOSPITALS (Compact list) */}
           <section
             aria-label="Hospitals"
             className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5"
@@ -553,47 +728,61 @@ export function DriverView() {
             <CornerNotch />
             <LabelTab label="HOSPITALS" />
 
-            <div className="mt-4 divide-y divide-slate-100 text-xs">
-              {compactHospitals.map((hosp) => (
-                <div
-                  key={hosp.id}
-                  className="py-3 flex items-center justify-between gap-3"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <svg
-                      className="w-4 h-4 text-secondary shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
+            {isHospitalsLoading ? (
+              <div className="mt-4 space-y-3">
+                <Skeleton className="h-10 w-full rounded-none" />
+                <Skeleton className="h-10 w-full rounded-none" />
+                <Skeleton className="h-10 w-full rounded-none" />
+              </div>
+            ) : (
+              <div className="mt-4 divide-y divide-slate-100 text-xs">
+                {compactHospitals.length === 0 ? (
+                  <p className="py-4 text-center text-text-muted text-xs">
+                    No hospitals found.
+                  </p>
+                ) : (
+                  compactHospitals.map((hosp) => (
+                    <div
+                      key={hosp.id}
+                      className="py-3 flex items-center justify-between gap-3"
                     >
-                      <path d="M12 6v4" />
-                      <path d="M10 8h4" />
-                      <path d="M18 20V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16" />
-                      <path d="M2 20h20" />
-                      <path d="M10 14h4v6h-4z" />
-                    </svg>
-                    <div className="min-w-0">
-                      <span className="font-semibold text-text-primary truncate block text-xs">
-                        {hosp.name}
-                      </span>
-                      <span className="text-[11px] text-text-secondary">
-                        {hosp.availableErBeds} beds available
-                      </span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <svg
+                          className="w-4 h-4 text-secondary shrink-0"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 6v4" />
+                          <path d="M10 8h4" />
+                          <path d="M18 20V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16" />
+                          <path d="M2 20h20" />
+                          <path d="M10 14h4v6h-4z" />
+                        </svg>
+                        <div className="min-w-0">
+                          <span className="font-semibold text-text-primary truncate block text-xs">
+                            {hosp.name}
+                          </span>
+                          <span className="text-[11px] text-text-secondary">
+                            {hosp.availableErBeds} beds available
+                          </span>
+                        </div>
+                      </div>
+                      <div className="shrink-0">
+                        <StatusBadge
+                          status={hosp.diversionStatus}
+                          variant="square"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="shrink-0">
-                    <StatusBadge
-                      status={hosp.diversionStatus}
-                      variant="square"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                  ))
+                )}
+              </div>
+            )}
           </section>
         </div>
       </div>
@@ -626,6 +815,7 @@ export function DriverView() {
             <Button
               type="button"
               variant="outline"
+              disabled={rejectDispatchMutation.isPending}
               onClick={() => setRejectDialogOpen(false)}
               className="rounded-none border-border text-xs min-h-11"
             >
@@ -633,10 +823,13 @@ export function DriverView() {
             </Button>
             <Button
               type="button"
+              disabled={rejectDispatchMutation.isPending}
               onClick={handleConfirmReject}
               className="rounded-none bg-red-600 hover:bg-red-700 text-white text-xs font-bold min-h-11"
             >
-              Confirm Reject
+              {rejectDispatchMutation.isPending
+                ? "Rejecting..."
+                : "Confirm Reject"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -655,88 +848,92 @@ export function DriverView() {
           </DialogHeader>
 
           <div className="space-y-3 py-2 max-h-[60vh] overflow-y-auto">
-            {seedHospitals.map((hosp) => {
-              const isClosed =
-                hosp.diversionStatus === HospitalDiversionStatus.CLOSED;
-              const isDiverting =
-                hosp.diversionStatus === HospitalDiversionStatus.DIVERTING;
+            {isHospitalsLoading && (
+              <div className="space-y-2">
+                <Skeleton className="h-16 w-full rounded-none" />
+                <Skeleton className="h-16 w-full rounded-none" />
+              </div>
+            )}
 
-              return (
-                <div
-                  key={hosp.id}
-                  className="p-3 border border-border bg-slate-50 flex items-center justify-between gap-3"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4 text-secondary shrink-0"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M12 6v4" />
-                        <path d="M10 8h4" />
-                        <path d="M18 20V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16" />
-                        <path d="M2 20h20" />
-                        <path d="M10 14h4v6h-4z" />
-                      </svg>
-                      <span className="font-bold text-xs text-text-primary">
-                        {hosp.name}
-                      </span>
-                    </div>
+            {!isHospitalsLoading &&
+              (hospitalsData?.data ?? []).map((hosp) => {
+                const isClosed =
+                  hosp.diversionStatus === HospitalDiversionStatus.CLOSED;
+                const isDiverting =
+                  hosp.diversionStatus === HospitalDiversionStatus.DIVERTING;
 
-                    <div className="text-xs text-text-secondary">
-                      {hosp.availableErBeds} beds available
-                    </div>
-
-                    {isDiverting && (
-                      <div className="text-[11px] text-amber-700 font-medium">
-                        Hospital is diverting non-critical admissions.
-                      </div>
-                    )}
-
-                    {isClosed && (
-                      <div className="text-[11px] text-red-700 font-medium">
-                        Hospital intake is closed.
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={isClosed}
-                    onClick={() => {
-                      if (activeTrip) {
-                        setActiveTrip({
-                          ...activeTrip,
-                          destinationHospital: hosp,
-                        });
-                        toast.success(`Destination set to ${hosp.name}`);
-                        setHospitalDialogOpen(false);
-                      }
-                    }}
-                    className={cn(
-                      "px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9.5 cursor-pointer",
-                      isClosed
-                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                        : "bg-primary hover:bg-primary-dark text-white",
-                    )}
+                return (
+                  <div
+                    key={hosp.id}
+                    className="p-3 border border-border bg-slate-50 flex items-center justify-between gap-3"
                   >
-                    Select
-                  </button>
-                </div>
-              );
-            })}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className="w-4 h-4 text-secondary shrink-0"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 6v4" />
+                          <path d="M10 8h4" />
+                          <path d="M18 20V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16" />
+                          <path d="M2 20h20" />
+                          <path d="M10 14h4v6h-4z" />
+                        </svg>
+                        <span className="font-bold text-xs text-text-primary">
+                          {hosp.name}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-text-secondary">
+                        {hosp.availableErBeds} beds available
+                      </div>
+
+                      {isDiverting && (
+                        <div className="text-[11px] text-amber-700 font-medium">
+                          Hospital is diverting non-critical admissions.
+                        </div>
+                      )}
+
+                      {isClosed && (
+                        <div className="text-[11px] text-red-700 font-medium">
+                          Hospital intake is closed.
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={
+                        isClosed || selectHospitalMutation.isPending
+                      }
+                      onClick={() => handleConfirmSelectHospital(hosp)}
+                      className={cn(
+                        "px-3.5 py-1.5 text-xs font-bold rounded-none min-h-9.5 cursor-pointer",
+                        isClosed || selectHospitalMutation.isPending
+                          ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                          : "bg-primary hover:bg-primary-dark text-white",
+                      )}
+                    >
+                      {selectHospitalMutation.isPending
+                        ? "Saving..."
+                        : "Select"}
+                    </button>
+                  </div>
+                );
+              })}
           </div>
 
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
+              disabled={selectHospitalMutation.isPending}
               onClick={() => setHospitalDialogOpen(false)}
               className="rounded-none border-border text-xs min-h-9.5"
             >
@@ -776,6 +973,7 @@ export function DriverView() {
             <Button
               type="button"
               variant="outline"
+              disabled={completeTripMutation.isPending}
               onClick={() => setCompleteDialogOpen(false)}
               className="rounded-none border-border text-xs min-h-11"
             >
@@ -783,10 +981,13 @@ export function DriverView() {
             </Button>
             <Button
               type="button"
+              disabled={completeTripMutation.isPending}
               onClick={handleConfirmCompleteTrip}
               className="rounded-none bg-primary hover:bg-primary-dark text-white text-xs font-bold min-h-11"
             >
-              Confirm Complete Trip
+              {completeTripMutation.isPending
+                ? "Completing..."
+                : "Confirm Complete Trip"}
             </Button>
           </DialogFooter>
         </DialogContent>

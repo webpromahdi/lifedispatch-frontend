@@ -16,12 +16,24 @@ import {
 } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Badge } from "@/components/ui/badge";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDrivers } from "@/lib/dummy/drivers";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetMyDriverProfile } from "@/hooks";
 
 export function DriverProfileView() {
-  const driver = seedDrivers[0];
-  const ambulance = seedAmbulances[0];
+  const { data: driverResponse, isLoading } = useGetMyDriverProfile();
+  const driver = driverResponse?.data;
+  const user = driver?.user;
+  const ambulance = driver?.ambulance;
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .filter(Boolean)
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "DR";
 
   return (
     <div className="space-y-6">
@@ -36,69 +48,81 @@ export function DriverProfileView() {
 
       {/* Driver Identity Card */}
       <div className="bg-surface border border-border rounded-none p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-border">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-none bg-primary-light text-primary flex items-center justify-center font-bold text-2xl border-2 border-primary/20 shrink-0">
-              RI
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-text-primary">
-                  Rafiqul Islam
-                </h2>
-                <Badge
-                  variant="outline"
-                  className="bg-status-bg text-status-text border-status/40 text-xs font-semibold"
-                >
-                  <CheckCircle2
-                    className="h-3 w-3 mr-1 text-status"
-                    aria-hidden="true"
-                  />
-                  {driver.isOnShift ? "Active Duty" : "Off Duty"}
-                </Badge>
-              </div>
-              <p className="text-xs text-text-secondary mt-0.5">
-                Senior Paramedic Fleet Driver • Dhaka Metropolitan Region
-              </p>
-              <div className="flex items-center gap-2 mt-1.5 text-xs text-text-muted">
-                <span className="flex items-center text-amber-500">
-                  <Star
-                    className="h-3.5 w-3.5 fill-amber-400 text-amber-400 mr-1"
-                    aria-hidden="true"
-                  />
-                  <strong className="text-text-primary">4.95</strong> / 5.0
-                </span>
-                <span>•</span>
-                <span>
-                  License ID:{" "}
-                  <strong className="font-mono text-text-primary">
-                    {driver.licenseNumber}
-                  </strong>
-                </span>
+        {isLoading ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-16 w-16 rounded-none" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48 rounded-none" />
+                <Skeleton className="h-4 w-32 rounded-none" />
               </div>
             </div>
           </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-border">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-none bg-primary-light text-primary flex items-center justify-center font-bold text-2xl border-2 border-primary/20 shrink-0">
+                {initials}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-text-primary">
+                    {user?.name || "Driver Profile"}
+                  </h2>
+                  <Badge
+                    variant="outline"
+                    className="bg-status-bg text-status-text border-status/40 text-xs font-semibold"
+                  >
+                    <CheckCircle2
+                      className="h-3 w-3 mr-1 text-status"
+                      aria-hidden="true"
+                    />
+                    {driver?.isOnShift ? "Active Duty" : "Off Duty"}
+                  </Badge>
+                </div>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  Paramedic Fleet Driver • EMS Response Division
+                </p>
+                <div className="flex items-center gap-2 mt-1.5 text-xs text-text-muted">
+                  <span className="flex items-center text-amber-500">
+                    <Star
+                      className="h-3.5 w-3.5 fill-amber-400 text-amber-400 mr-1"
+                      aria-hidden="true"
+                    />
+                    <strong className="text-text-primary">4.95</strong> / 5.0
+                  </span>
+                  <span>•</span>
+                  <span>
+                    License ID:{" "}
+                    <strong className="font-mono text-text-primary">
+                      {driver?.licenseNumber || "N/A"}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2 bg-background p-3 rounded-none border border-border text-xs">
-            <div className="text-right">
-              <span className="text-[11px] text-text-muted block">
-                Total Missions
-              </span>
-              <span className="text-base font-bold text-primary font-mono">
-                {driver.totalTripsCompleted}
-              </span>
-            </div>
-            <div className="h-8 w-px bg-border mx-2" />
-            <div className="text-right">
-              <span className="text-[11px] text-text-muted block">
-                SLA Compliance
-              </span>
-              <span className="text-base font-bold text-status font-mono">
-                100%
-              </span>
+            <div className="flex items-center gap-2 bg-background p-3 rounded-none border border-border text-xs">
+              <div className="text-right">
+                <span className="text-[11px] text-text-muted block">
+                  Total Missions
+                </span>
+                <span className="text-base font-bold text-primary font-mono">
+                  {driver?.totalTripsCompleted ?? 0}
+                </span>
+              </div>
+              <div className="h-8 w-px bg-border mx-2" />
+              <div className="text-right">
+                <span className="text-[11px] text-text-muted block">
+                  SLA Compliance
+                </span>
+                <span className="text-base font-bold text-status font-mono">
+                  100%
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Profile Attributes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
@@ -114,7 +138,7 @@ export function DriverProfileView() {
                   <Mail className="h-3.5 w-3.5" aria-hidden="true" /> Email:
                 </span>
                 <span className="text-text-primary font-medium">
-                  rafiqul.islam@lifedispatch.org
+                  {user?.email || "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -122,7 +146,7 @@ export function DriverProfileView() {
                   <Phone className="h-3.5 w-3.5" aria-hidden="true" /> Phone:
                 </span>
                 <span className="text-text-primary font-medium">
-                  +880 1711-234567
+                  {user?.phone || "Not registered"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -131,10 +155,10 @@ export function DriverProfileView() {
                     className="h-3.5 w-3.5 text-status"
                     aria-hidden="true"
                   />{" "}
-                  Emergency Contact:
+                  Account Role:
                 </span>
                 <span className="text-text-primary font-medium">
-                  +880 1819-998877 (Spouse)
+                  {user?.role || "DRIVER"}
                 </span>
               </div>
             </div>
@@ -150,13 +174,15 @@ export function DriverProfileView() {
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">Unit Plate:</span>
                 <span className="font-mono font-semibold text-text-primary">
-                  {ambulance.registrationNumber}
+                  {ambulance?.registrationNumber || "Unassigned"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">Vehicle Type:</span>
                 <span className="capitalize font-medium text-text-primary">
-                  {ambulance.type.replace(/_/g, " ").toLowerCase()}
+                  {ambulance
+                    ? ambulance.type.replace(/_/g, " ").toLowerCase()
+                    : "No vehicle assigned"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -165,7 +191,7 @@ export function DriverProfileView() {
                   Station:
                 </span>
                 <span className="font-medium text-text-primary">
-                  Banani Dispatch Hub (Zone 4)
+                  Central Dispatch Hub
                 </span>
               </div>
             </div>
@@ -187,14 +213,14 @@ export function DriverProfileView() {
                   variant="outline"
                   className="font-mono text-[10px] font-bold text-primary border-primary/30 bg-primary-light"
                 >
-                  {driver.certificationLevel}
+                  {driver?.certificationLevel || "EMT_BASIC"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-text-muted">ACLS / BLS Certified:</span>
                 <span className="text-status font-medium flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                  Valid through 2028
+                  Verified
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -250,8 +276,8 @@ export function DriverProfileView() {
               Excellence in Emergency Care
             </h4>
             <p className="text-[11px] text-text-secondary mt-0.5">
-              Over 300 successful patient handovers with zero safety incidents
-              over 5 years.
+              Over {driver?.totalTripsCompleted ?? 0} successful missions completed
+              under EMS protocol.
             </p>
           </div>
         </div>

@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -32,53 +33,50 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedHospitals } from "@/lib/dummy/hospitals";
-import { seedTrips } from "@/lib/dummy/trips";
-import type { Trip } from "@/lib/types/trip.types";
+import { useGetMyTrips } from "@/hooks";
+import type { TripStatus } from "@/lib/types/enums";
 import { formatDate } from "@/lib/utils";
 
 export function DriverTripsView() {
-  const [trips] = useState<Trip[]>(seedTrips);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
-  const ambulanceMap = useMemo(
-    () => new Map(seedAmbulances.map((a) => [a.id, a])),
-    [],
-  );
-  const hospitalMap = useMemo(
-    () => new Map(seedHospitals.map((h) => [h.id, h])),
-    [],
+  const { data: tripsResponse, isLoading } = useGetMyTrips({
+    limit: 100,
+    status: statusFilter === "ALL" ? undefined : (statusFilter as TripStatus),
+  });
+
+  const trips = useMemo(() => tripsResponse?.data ?? [], [tripsResponse]);
+
+  const completedTrips = useMemo(
+    () => trips.filter((t) => t.status === "COMPLETED"),
+    [trips],
   );
 
-  const completedTrips = trips.filter((t) => t.status === "COMPLETED");
-  const totalKm = completedTrips.reduce(
-    (sum, t) => sum + (t.distanceKm || 0),
-    0,
+  const totalKm = useMemo(
+    () =>
+      completedTrips.reduce(
+        (sum, t) => sum + (Number(t.distanceKm) || 0),
+        0,
+      ),
+    [completedTrips],
   );
 
   const filteredTrips = useMemo(() => {
     return trips.filter((trip) => {
-      const amb = ambulanceMap.get(trip.ambulanceId);
-      const hosp = trip.hospitalId ? hospitalMap.get(trip.hospitalId) : null;
-
       const searchTerms = [
         trip.id,
-        amb?.registrationNumber || "",
-        hosp?.name || "",
+        trip.emergency?.incidentNumber || "",
+        trip.ambulance?.registrationNumber || "",
+        trip.hospital?.name || "",
         trip.status,
       ]
         .join(" ")
         .toLowerCase();
 
-      const matchesSearch = searchTerms.includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "ALL" || trip.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
+      return searchTerms.includes(search.toLowerCase());
     });
-  }, [trips, search, statusFilter, ambulanceMap, hospitalMap]);
+  }, [trips, search]);
 
   return (
     <div className="space-y-6">
@@ -95,15 +93,15 @@ export function DriverTripsView() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Missions Completed"
-          value={completedTrips.length}
+          value={isLoading ? "..." : completedTrips.length}
           icon={CheckCircle2}
           subtitle="All-time verified handovers"
         />
         <StatCard
           label="Total Distance Covered"
-          value={`${totalKm.toFixed(1)} km`}
+          value={isLoading ? "..." : `${totalKm.toFixed(1)} km`}
           icon={Route}
-          subtitle="Zone 4 response radius"
+          subtitle="Zone response telemetry"
         />
         <StatCard
           label="Avg Mission Duration"
@@ -202,7 +200,25 @@ export function DriverTripsView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTrips.length === 0 ? (
+            {isLoading ? (
+              <>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Skeleton className="h-9 w-full rounded-none" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Skeleton className="h-9 w-full rounded-none" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Skeleton className="h-9 w-full rounded-none" />
+                  </TableCell>
+                </TableRow>
+              </>
+            ) : filteredTrips.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={7}
@@ -212,67 +228,64 @@ export function DriverTripsView() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredTrips.map((trip) => {
-                const amb = ambulanceMap.get(trip.ambulanceId);
-                const hosp = trip.hospitalId
-                  ? hospitalMap.get(trip.hospitalId)
-                  : null;
-
-                return (
-                  <TableRow
-                    key={trip.id}
-                    className="hover:bg-primary-light/20 transition-colors"
-                  >
-                    <TableCell className="font-mono text-xs font-semibold text-text-primary">
-                      {trip.id}
-                    </TableCell>
-                    <TableCell className="text-xs text-text-secondary">
-                      <div className="flex items-center gap-1.5 font-mono">
-                        <Calendar
-                          className="h-3.5 w-3.5 text-text-muted"
-                          aria-hidden="true"
-                        />
-                        <span>
-                          {formatDate(trip.departedAt, "MMM dd, yyyy hh:mm a")}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-text-secondary">
-                      <div className="flex items-center gap-1.5 font-mono">
-                        <Truck
-                          className="h-3.5 w-3.5 text-primary"
-                          aria-hidden="true"
-                        />
-                        <span>
-                          {amb ? amb.registrationNumber : trip.ambulanceId}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-text-secondary">
-                      <div className="flex items-center gap-1.5">
-                        <Building2
-                          className="h-3.5 w-3.5 text-secondary"
-                          aria-hidden="true"
-                        />
-                        <span>
-                          {hosp ? hosp.name : "Local Emergency Center"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs font-mono font-medium text-text-primary">
-                      {trip.distanceKm ? `${trip.distanceKm} km` : "—"}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={trip.status} />
-                    </TableCell>
-                    <TableCell className="text-right text-xs font-mono text-text-muted">
-                      {trip.completedAt
-                        ? formatDate(trip.completedAt, "hh:mm a")
-                        : "—"}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              filteredTrips.map((trip) => (
+                <TableRow
+                  key={trip.id}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="font-mono text-xs font-semibold text-text-primary">
+                    {trip.id.slice(0, 8)}...
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary">
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <Calendar
+                        className="h-3.5 w-3.5 text-text-muted"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {formatDate(
+                          trip.departedAt || trip.createdAt,
+                          "MMM dd, yyyy hh:mm a",
+                        )}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary">
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <Truck
+                        className="h-3.5 w-3.5 text-primary"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {trip.ambulance?.registrationNumber ||
+                          trip.ambulanceId.slice(0, 8)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary">
+                    <div className="flex items-center gap-1.5">
+                      <Building2
+                        className="h-3.5 w-3.5 text-secondary"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {trip.hospital?.name || "Local Emergency Center"}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs font-mono font-medium text-text-primary">
+                    {trip.distanceKm ? `${trip.distanceKm} km` : "—"}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={trip.status} />
+                  </TableCell>
+                  <TableCell className="text-right text-xs font-mono text-text-muted">
+                    {trip.completedAt
+                      ? formatDate(trip.completedAt, "hh:mm a")
+                      : "—"}
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
