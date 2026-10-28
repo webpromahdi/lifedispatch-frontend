@@ -402,10 +402,9 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
       </div>
 
       {/* Continue with Google */}
-      <Button
-        type="button"
-        variant="ghost"
-        className="relative w-full h-12 min-h-12 group flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
+      <a
+        href={`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/google`}
+        className="relative w-full h-12 min-h-12 group flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0 cursor-pointer"
       >
         {/* Outer border container */}
         <div
@@ -437,7 +436,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
           <GoogleIcon className="h-4 w-4 shrink-0" />
           <span>Continue with Google</span>
         </span>
-      </Button>
+      </a>
 
       {/* Sign in link */}
       <p className="mt-5 text-center text-xs sm:text-sm text-slate-500 font-medium">

@@ -17,24 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useLogin } from "@/hooks";
 import { DEMO_ROLES } from "@/lib/demo-roles";
+import { getRoleDashboardPath } from "@/lib/utils";
 import { loginSchema } from "@/validations";
 
-function getRoleDashboardPath(role?: string): string {
-  switch (role) {
-    case "SUPER_ADMIN":
-      return "/dashboard/super-admin";
-    case "ADMIN":
-      return "/dashboard/admin";
-    case "DISPATCHER":
-      return "/dashboard/dispatcher";
-    case "DRIVER":
-      return "/dashboard/driver";
-    case "HOSPITAL_STAFF":
-      return "/dashboard/hospital-staff";
-    default:
-      return "/dashboard/patient";
-  }
-}
+export { getRoleDashboardPath };
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -86,6 +72,18 @@ export function LoginForm() {
   });
 
   useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error("Google Authentication Failed", {
+        description:
+          error === "google_auth_failed"
+            ? "Could not sign in with Google. Please try again."
+            : error,
+      });
+      router.replace("/login", { scroll: false });
+      return;
+    }
+
     const demo = searchParams.get("demo");
     if (demo) {
       const role = DEMO_ROLES.find((r) => r.name === demo);

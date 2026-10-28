@@ -83,3 +83,23 @@ export function calculateDispatchScore(params: {
     typeScore,
   };
 }
+
+/**
+ * Returns the corresponding dashboard path for a given user role.
+ */
+export function getRoleDashboardPath(role?: string): string {
+  switch (role) {
+    case "SUPER_ADMIN":
+      return "/dashboard/super-admin";
+    case "ADMIN":
+      return "/dashboard/admin";
+    case "DISPATCHER":
+      return "/dashboard/dispatcher";
+    case "DRIVER":
+      return "/dashboard/driver";
+    case "HOSPITAL_STAFF":
+      return "/dashboard/hospital-staff";
+    default:
+      return "/dashboard/patient";
+  }
+}

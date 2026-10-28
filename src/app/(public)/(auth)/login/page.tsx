@@ -8,7 +8,6 @@ import {
   CircuitTraceRight,
   GoogleIcon,
 } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Sign In | LifeDispatch",
@@ -19,6 +18,8 @@ export const metadata: Metadata = {
 import { DEMO_ROLES } from "@/lib/demo-roles";
 
 export default function LoginPage() {
+  const googleAuthUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/google`;
+
   return (
     <div className="w-full flex flex-col">
       {/* SECTION 1: Centered Main Login Card */}
@@ -93,10 +94,9 @@ export default function LoginPage() {
                 </div>
 
                 {/* Continue with Google button — with continuous chamfered border and top-right dark notch */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="relative w-full h-12 min-h-12 group flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
+                <a
+                  href={googleAuthUrl}
+                  className="relative w-full h-12 min-h-12 group flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0 cursor-pointer"
                 >
                   {/* Outer border container */}
                   <div
@@ -128,7 +128,7 @@ export default function LoginPage() {
                     <GoogleIcon className="h-4 w-4 shrink-0" />
                     <span>Continue with Google</span>
                   </span>
-                </Button>
+                </a>
 
                 {/* Registration link */}
                 <p className="mt-5 text-center text-xs sm:text-sm text-slate-500 font-medium">
