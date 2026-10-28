@@ -67,3 +67,10 @@ export function toggleDriverShift(action: "start" | "end") {
   });
 }
 
+export function getMyDriverProfile() {
+  return apiClient<ApiResponse<DriverWithUser>>("/drivers/me", {
+    method: "GET",
+  });
+}
+
+

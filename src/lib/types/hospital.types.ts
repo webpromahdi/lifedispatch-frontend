@@ -28,3 +28,8 @@ export interface HospitalStaff {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface GetHospitalsParams {
+  page?: number;
+  limit?: number;
+}

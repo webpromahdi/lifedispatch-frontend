@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createDriver,
   getDrivers,
+  getMyDriverProfile,
   toggleDriverShift,
   updateDriver,
 } from "@/api";
@@ -18,6 +19,17 @@ export function useGetDrivers(
   return useQuery({
     queryKey: ["drivers", params],
     queryFn: () => getDrivers(params),
+    ...options,
+  });
+}
+
+export function useGetMyDriverProfile(options?: {
+  enabled?: boolean;
+  refetchInterval?: number | false;
+}) {
+  return useQuery({
+    queryKey: ["driver", "me"],
+    queryFn: getMyDriverProfile,
     ...options,
   });
 }
@@ -58,6 +70,8 @@ export function useToggleDriverShift() {
     mutationFn: (action: "start" | "end") => toggleDriverShift(action),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
+      queryClient.invalidateQueries({ queryKey: ["driver", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["user", "me"] });
     },
   });
 }

@@ -70,7 +70,10 @@ export function useAcceptDispatch() {
     mutationFn: (id: string) => acceptDispatch(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dispatch"] });
+      queryClient.invalidateQueries({ queryKey: ["dispatch", "me"] });
       queryClient.invalidateQueries({ queryKey: ["emergencies"] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trips", "me"] });
     },
   });
 }
@@ -83,6 +86,7 @@ export function useRejectDispatch() {
       rejectDispatch(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dispatch"] });
+      queryClient.invalidateQueries({ queryKey: ["dispatch", "me"] });
       queryClient.invalidateQueries({ queryKey: ["emergencies"] });
     },
   });
