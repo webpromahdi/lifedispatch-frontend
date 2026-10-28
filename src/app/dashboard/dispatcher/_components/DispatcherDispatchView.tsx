@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useCancelDispatch } from "@/hooks";
+import { useCancelDispatch, useGetAmbulances, useGetDrivers } from "@/hooks";
 import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedDispatches } from "@/lib/dummy/dispatches";
 import { seedDrivers } from "@/lib/dummy/drivers";
@@ -108,18 +108,29 @@ export function DispatcherDispatchView() {
     );
   };
 
+  const { data: ambulancesResponse } = useGetAmbulances();
+  const { data: driversResponse } = useGetDrivers();
+
   // Helper maps for lookup
   const emergencyMap = useMemo(() => {
     return new Map(seedEmergencies.map((e) => [e.id, e]));
   }, []);
 
   const ambulanceMap = useMemo(() => {
-    return new Map(seedAmbulances.map((a) => [a.id, a]));
-  }, []);
+    const map = new Map<string, any>(seedAmbulances.map((a) => [a.id, a]));
+    for (const a of ambulancesResponse?.data || []) {
+      map.set(a.id, a);
+    }
+    return map;
+  }, [ambulancesResponse]);
 
   const driverMap = useMemo(() => {
-    return new Map(seedDrivers.map((d) => [d.id, d]));
-  }, []);
+    const map = new Map<string, any>(seedDrivers.map((d) => [d.id, d]));
+    for (const d of driversResponse?.data || []) {
+      map.set(d.id, d);
+    }
+    return map;
+  }, [driversResponse]);
 
   const filteredDispatches = useMemo(() => {
     return dispatches.filter((disp) => {

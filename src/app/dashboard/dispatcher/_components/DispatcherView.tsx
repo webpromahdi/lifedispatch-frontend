@@ -30,13 +30,12 @@ import {
 } from "@/components/ui/select";
 import {
   useCreateDispatch,
+  useGetAmbulances,
   useGetEmergencies,
   useRecommendAmbulances,
   useUpdateEmergencyPriority,
 } from "@/hooks";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedHospitals } from "@/lib/dummy/hospitals";
-import type { Ambulance } from "@/lib/types/ambulance.types";
 import type { ScoredAmbulanceCandidate } from "@/lib/types/dispatch.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
@@ -57,7 +56,14 @@ export function DispatcherView() {
     return emergenciesResponse?.data ?? [];
   }, [emergenciesResponse]);
 
-  const [ambulances] = useState<Ambulance[]>(seedAmbulances);
+  // Live polling for ambulance fleet every 10 seconds
+  const { data: ambulancesResponse } = useGetAmbulances(undefined, {
+    refetchInterval: 10_000,
+  });
+
+  const ambulances = useMemo(() => {
+    return ambulancesResponse?.data ?? [];
+  }, [ambulancesResponse]);
   const [hospitals] = useState<Hospital[]>(seedHospitals);
 
   // Set Priority Dialog State
@@ -428,13 +434,11 @@ export function DispatcherView() {
                   No ambulances currently available.
                 </div>
               ) : (
-                availableAmbulancesList.map((amb, index) => {
-                  const isOverdue =
-                    index === 1 ||
-                    Boolean(
-                      amb.nextServiceDue &&
-                        new Date(amb.nextServiceDue).getTime() < Date.now(),
-                    );
+                availableAmbulancesList.map((amb) => {
+                  const isOverdue = Boolean(
+                    amb.nextServiceDue &&
+                      new Date(amb.nextServiceDue).getTime() < Date.now(),
+                  );
 
                   return (
                     <div

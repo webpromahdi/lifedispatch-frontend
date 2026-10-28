@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, UserCheck } from "lucide-react";
+import { Loader2, Plus, Upload, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,30 +21,79 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedUsers } from "@/lib/dummy/users";
-import { CertificationLevel } from "@/lib/types/enums";
+import { useCreateDriver, useGetAmbulances } from "@/hooks";
+import { AmbulanceStatus, CertificationLevel } from "@/lib/types/enums";
 
 export function CreateDriverDialog() {
   const [open, setOpen] = useState(false);
-  const [userId, setUserId] = useState(
-    seedUsers.find((u) => u.role === "DRIVER")?.id || "usr_003",
-  );
-  const [certLevel, setCertLevel] = useState<string>(
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [licenseExpiry, setLicenseExpiry] = useState("2028-12-31");
+  const [certLevel, setCertLevel] = useState<CertificationLevel>(
     CertificationLevel.PARAMEDIC,
   );
-  const [licenseExpiry, setLicenseExpiry] = useState("2028-12-31");
-  const [assignedAmbulanceId, setAssignedAmbulanceId] = useState(
-    seedAmbulances[0]?.id || "amb_001",
-  );
+  const [assignedAmbulanceId, setAssignedAmbulanceId] = useState<string>("NONE");
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
+
+  const createDriverMutation = useCreateDriver();
+  const { data: ambulancesResponse, isLoading: isLoadingAmbulances } =
+    useGetAmbulances({ status: AmbulanceStatus.AVAILABLE });
+
+  const availableAmbulances = ambulancesResponse?.data || [];
+
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPhone("");
+    setLicenseNumber("");
+    setLicenseExpiry("2028-12-31");
+    setCertLevel(CertificationLevel.PARAMEDIC);
+    setAssignedAmbulanceId("NONE");
+    setLicenseFile(null);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const user = seedUsers.find((u) => u.id === userId);
-    toast.success("Driver Profile Created", {
-      description: `Paramedic credential registered for ${user?.name || "Driver"}.`,
-    });
-    setOpen(false);
+
+    if (!licenseFile) {
+      toast.error("License Document Required", {
+        description: "Please upload a copy of the commercial driving license (PDF or image).",
+      });
+      return;
+    }
+
+    createDriverMutation.mutate(
+      {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim() || undefined,
+        licenseNumber: licenseNumber.trim(),
+        licenseExpiry,
+        certificationLevel: certLevel,
+        assignedAmbulanceId:
+          assignedAmbulanceId === "NONE" ? undefined : assignedAmbulanceId,
+        licenseDocument: licenseFile,
+      },
+      {
+        onSuccess: (res) => {
+          toast.success("Driver Profile Created", {
+            description: `Paramedic profile registered for ${res.data?.user?.name || name}.`,
+          });
+          resetForm();
+          setOpen(false);
+        },
+        onError: (err) => {
+          toast.error("Registration Failed", {
+            description:
+              (err as { data?: { message?: string } })?.data?.message ||
+              err.message ||
+              "Failed to register paramedic driver.",
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -58,7 +107,7 @@ export function CreateDriverDialog() {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg bg-primary-light text-primary">
@@ -67,35 +116,46 @@ export function CreateDriverDialog() {
               <DialogTitle>Register Paramedic Driver</DialogTitle>
             </div>
             <DialogDescription>
-              Attach certified EMS driver credentials and emergency vehicle
-              assignment to a user account.
+              Create a new EMS driver profile, attach professional paramedic certification,
+              and optionally assign to an active ambulance.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-            {/* User Account Select */}
+            {/* Driver Full Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="driver-user">Assign to User Account *</Label>
-              <Select
-                value={userId}
-                onValueChange={(val) => val && setUserId(val)}
-              >
-                <SelectTrigger
-                  id="driver-user"
-                  aria-label="Select user account"
-                >
-                  <SelectValue placeholder="Select user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {seedUsers
-                    .filter((u) => u.role === "DRIVER" || u.role === "PATIENT")
-                    .map((u) => (
-                      <SelectItem key={u.id} value={u.id}>
-                        {u.name} ({u.email})
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="driver-name">Full Name *</Label>
+              <Input
+                id="driver-name"
+                placeholder="e.g. Tariqul Islam"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Email & Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="driver-email">Email Address *</Label>
+                <Input
+                  id="driver-email"
+                  type="email"
+                  placeholder="driver@lifedispatch.bd"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="driver-phone">Phone Number</Label>
+                <Input
+                  id="driver-phone"
+                  placeholder="+8801700000000"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* Certification Level */}
@@ -103,7 +163,7 @@ export function CreateDriverDialog() {
               <Label htmlFor="driver-cert">Certification Level *</Label>
               <Select
                 value={certLevel}
-                onValueChange={(val) => val && setCertLevel(val)}
+                onValueChange={(val) => val && setCertLevel(val as CertificationLevel)}
               >
                 <SelectTrigger
                   id="driver-cert"
@@ -125,21 +185,31 @@ export function CreateDriverDialog() {
               </Select>
             </div>
 
-            {/* License Expiry Date */}
-            <div className="space-y-1.5">
-              <Label htmlFor="license-expiry">
-                Commercial Driver License Expiry *
-              </Label>
-              <Input
-                id="license-expiry"
-                type="date"
-                value={licenseExpiry}
-                onChange={(e) => setLicenseExpiry(e.target.value)}
-                required
-              />
+            {/* Commercial License Number & Expiry */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="driver-license-num">License Number *</Label>
+                <Input
+                  id="driver-license-num"
+                  placeholder="e.g. DL-DH-99201"
+                  value={licenseNumber}
+                  onChange={(e) => setLicenseNumber(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="license-expiry">License Expiry Date *</Label>
+                <Input
+                  id="license-expiry"
+                  type="date"
+                  value={licenseExpiry}
+                  onChange={(e) => setLicenseExpiry(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
-            {/* Assigned Ambulance */}
+            {/* Assigned Ambulance Select */}
             <div className="space-y-1.5">
               <Label htmlFor="assigned-ambulance">
                 Assigned Ambulance Unit (Optional)
@@ -152,16 +222,54 @@ export function CreateDriverDialog() {
                   id="assigned-ambulance"
                   aria-label="Select assigned ambulance"
                 >
-                  <SelectValue placeholder="Select unit" />
+                  <SelectValue placeholder="Select unit or leave unassigned" />
                 </SelectTrigger>
                 <SelectContent>
-                  {seedAmbulances.map((amb) => (
-                    <SelectItem key={amb.id} value={amb.id}>
-                      {amb.registrationNumber} ({amb.type})
+                  <SelectItem value="NONE">
+                    None (Standby / Unassigned)
+                  </SelectItem>
+                  {isLoadingAmbulances ? (
+                    <SelectItem value="loading" disabled>
+                      Loading available units...
                     </SelectItem>
-                  ))}
+                  ) : (
+                    availableAmbulances.map((amb) => (
+                      <SelectItem key={amb.id} value={amb.id}>
+                        {amb.registrationNumber} ({amb.type.replace(/_/g, " ")})
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* License Document File Upload (Required) */}
+            <div className="space-y-1.5">
+              <Label htmlFor="license-doc">
+                Commercial Driver License Document *
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="license-doc"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setLicenseFile(file);
+                  }}
+                  className="cursor-pointer file:cursor-pointer text-xs"
+                  required
+                />
+                {licenseFile && (
+                  <span className="text-[11px] text-text-muted font-mono flex items-center gap-1 shrink-0">
+                    <Upload className="h-3 w-3 text-status" />
+                    Attached
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-text-muted">
+                Official document proof required for backend verification (PDF, PNG, JPG).
+              </p>
             </div>
 
             <DialogFooter className="pt-3 gap-2">
@@ -169,14 +277,23 @@ export function CreateDriverDialog() {
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={createDriverMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
+                disabled={createDriverMutation.isPending}
                 className="bg-primary text-white hover:bg-primary-hover font-semibold"
               >
-                Authorize Driver
+                {createDriverMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                    Registering...
+                  </>
+                ) : (
+                  "Authorize Driver"
+                )}
               </Button>
             </DialogFooter>
           </form>

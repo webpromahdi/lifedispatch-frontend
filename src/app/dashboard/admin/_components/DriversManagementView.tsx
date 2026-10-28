@@ -1,8 +1,7 @@
 "use client";
 
-import { Power, Search, UserCheck } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { AlertCircle, Power, RefreshCw, Search, ShieldCheck, UserCheck } from "lucide-react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Badge } from "@/components/ui/badge";
@@ -16,45 +15,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDrivers } from "@/lib/dummy/drivers";
-import { seedUsers } from "@/lib/dummy/users";
-import type { Driver } from "@/lib/types/driver.types";
+import { useGetDrivers } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 import { CreateDriverDialog } from "./dialogs/CreateDriverDialog";
 
+const SKELETON_ROWS = [
+  "skel-driver-1",
+  "skel-driver-2",
+  "skel-driver-3",
+  "skel-driver-4",
+];
+
 export function DriversManagementView() {
-  const [drivers, setDrivers] = useState<Driver[]>(seedDrivers);
   const [search, setSearch] = useState("");
 
-  // Toggle isOnShift state locally + show toast
-  const handleToggleShift = (driverId: string) => {
-    setDrivers((prev) =>
-      prev.map((d) => {
-        if (d.id !== driverId) return d;
-        const nextShift = !d.isOnShift;
-        const driverUser = seedUsers.find((u) => u.id === d.userId);
-        toast.success("Driver Shift Updated", {
-          description: `${driverUser?.name || "Paramedic"} is now ${
-            nextShift ? "ON DUTY (Active)" : "OFF DUTY (Standby)"
-          }.`,
-        });
-        return {
-          ...d,
-          isOnShift: nextShift,
-        };
-      }),
-    );
-  };
+  const {
+    data: driversResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetDrivers();
 
-  const filteredDrivers = drivers.filter((d) => {
-    const user = seedUsers.find((u) => u.id === d.userId);
-    const nameMatch = user?.name.toLowerCase().includes(search.toLowerCase());
-    const certMatch = d.certificationLevel
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return nameMatch || certMatch;
-  });
+  const drivers = driversResponse?.data || [];
+
+  const filteredDrivers = useMemo(() => {
+    return drivers.filter((d) => {
+      const term = search.toLowerCase();
+      const nameMatch = d.user?.name?.toLowerCase().includes(term);
+      const emailMatch = d.user?.email?.toLowerCase().includes(term);
+      const certMatch = d.certificationLevel?.toLowerCase().includes(term);
+      const licenseMatch = d.licenseNumber?.toLowerCase().includes(term);
+      return nameMatch || emailMatch || certMatch || licenseMatch;
+    });
+  }, [drivers, search]);
+
+  const onDutyCount = drivers.filter((d) => d.isOnShift).length;
 
   return (
     <div className="space-y-6">
@@ -68,7 +64,7 @@ export function DriversManagementView() {
         action={<CreateDriverDialog />}
       />
 
-      {/* Search Bar */}
+      {/* Search and Summary Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="relative flex-1 max-w-sm">
           <Search
@@ -76,7 +72,7 @@ export function DriversManagementView() {
             aria-hidden="true"
           />
           <Input
-            placeholder="Search by driver name or certification..."
+            placeholder="Search by driver name, license, or certification..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-base md:text-xs h-10 md:h-9"
@@ -84,14 +80,47 @@ export function DriversManagementView() {
           />
         </div>
 
-        <div className="text-xs text-text-muted">
-          Active On-Duty:{" "}
-          <span className="font-bold text-status">
-            {drivers.filter((d) => d.isOnShift).length}
-          </span>{" "}
-          / {drivers.length} drivers
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-text-muted">
+            Active On-Duty:{" "}
+            <span className="font-bold text-status">
+              {onDutyCount}
+            </span>{" "}
+            / {drivers.length} drivers
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-9 px-2.5 text-xs text-text-muted hover:text-text-primary"
+            title="Refresh driver roster"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
+
+      {/* Error State */}
+      {isError && (
+        <div className="p-4 bg-destructive-bg border border-destructive/20 rounded-none flex items-center justify-between">
+          <div className="flex items-center gap-2 text-destructive text-xs">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>
+              Failed to load driver roster:{" "}
+              {error?.message || "Unknown error occurred."}
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* Driver Table */}
       <DataTable
@@ -101,7 +130,7 @@ export function DriversManagementView() {
               Paramedic Personnel ({filteredDrivers.length})
             </span>
             <span className="text-xs text-text-muted">
-              Toggle shift switch to clock drivers in/out of live CAD routing
+              Live driver profiles synced with authentication & CAD dispatch
             </span>
           </div>
         }
@@ -110,36 +139,66 @@ export function DriversManagementView() {
           <TableHeader className="bg-background">
             <TableRow>
               <TableHead scope="col" className="text-xs font-semibold">
-                Paramedic Name
+                Paramedic Officer
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
                 Certification Level
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
-                Commercial License Expiry
+                Commercial License & Expiry
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
                 Assigned Unit
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
-                Shift Status
+                Duty Shift
               </TableHead>
               <TableHead
                 scope="col"
                 className="text-xs font-semibold text-right"
               >
-                Duty Toggle
+                Trips Completed
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDrivers.map((driver) => {
-              const user = seedUsers.find((u) => u.id === driver.userId);
-              const ambulance = seedAmbulances.find(
-                (a) => a.id === driver.assignedAmbulanceId,
-              );
-
-              return (
+            {isLoading ? (
+              SKELETON_ROWS.map((rowId) => (
+                <TableRow key={rowId}>
+                  <TableCell className="py-4">
+                    <div className="h-3.5 bg-muted animate-pulse rounded w-32 mb-1.5" />
+                    <div className="h-2.5 bg-muted animate-pulse rounded w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-muted animate-pulse rounded w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-3.5 bg-muted animate-pulse rounded w-28 mb-1" />
+                    <div className="h-2.5 bg-muted animate-pulse rounded w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 bg-muted animate-pulse rounded w-20" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="h-3.5 bg-muted animate-pulse rounded w-12 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : filteredDrivers.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="py-12 text-center text-xs text-text-muted"
+                >
+                  <UserCheck className="h-8 w-8 mx-auto mb-2 text-text-muted/40" />
+                  No paramedic drivers found matching the selected criteria.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredDrivers.map((driver) => (
                 <TableRow
                   key={driver.id}
                   className="hover:bg-primary-light/20 transition-colors"
@@ -150,10 +209,10 @@ export function DriversManagementView() {
                         className="h-3.5 w-3.5 text-primary shrink-0"
                         aria-hidden="true"
                       />
-                      {user?.name || "Paramedic Officer"}
+                      {driver.user?.name || "Paramedic Officer"}
                     </div>
-                    <div className="text-[11px] text-text-muted font-mono">
-                      {user?.email || "driver@lifedispatch.bd"}
+                    <div className="text-[11px] text-text-muted font-mono mt-0.5">
+                      {driver.user?.email || "driver@lifedispatch.bd"}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -161,19 +220,29 @@ export function DriversManagementView() {
                       variant="outline"
                       className="font-mono text-[10px] font-semibold bg-primary-light text-primary border-primary/20"
                     >
-                      {driver.certificationLevel}
+                      {driver.certificationLevel?.replace(/_/g, " ")}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-text-secondary">
-                    {formatDate(driver.licenseExpiry, "dd MMM yyyy")}
+                  <TableCell>
+                    <div className="font-mono text-xs font-semibold text-text-primary">
+                      {driver.licenseNumber}
+                    </div>
+                    <div className="text-[10px] text-text-muted font-mono">
+                      Exp: {formatDate(driver.licenseExpiry, "dd MMM yyyy")}
+                    </div>
                   </TableCell>
                   <TableCell className="text-xs font-medium text-text-secondary">
-                    {ambulance ? (
-                      <span className="font-mono text-text-primary">
-                        {ambulance.registrationNumber}
-                      </span>
+                    {driver.ambulance ? (
+                      <div>
+                        <span className="font-mono font-semibold text-text-primary">
+                          {driver.ambulance.registrationNumber}
+                        </span>
+                        <div className="text-[10px] text-text-muted">
+                          {driver.ambulance.type.replace(/_/g, " ")}
+                        </div>
+                      </div>
                     ) : (
-                      <span className="text-text-muted italic">Unassigned</span>
+                      <span className="text-text-muted italic">Unassigned (Standby)</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -189,24 +258,12 @@ export function DriversManagementView() {
                       </span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleToggleShift(driver.id)}
-                      className={`h-8 px-3 text-xs font-medium gap-1.5 cursor-pointer ${
-                        driver.isOnShift
-                          ? "hover:bg-destructive-bg hover:text-destructive hover:border-destructive/30"
-                          : "hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
-                      }`}
-                    >
-                      <Power className="h-3.5 w-3.5" aria-hidden="true" />
-                      {driver.isOnShift ? "Clock Out" : "Clock In"}
-                    </Button>
+                  <TableCell className="text-right font-mono text-xs font-semibold text-text-primary">
+                    {driver.totalTripsCompleted ?? 0}
                   </TableCell>
                 </TableRow>
-              );
-            })}
+              ))
+            )}
           </TableBody>
         </Table>
       </DataTable>

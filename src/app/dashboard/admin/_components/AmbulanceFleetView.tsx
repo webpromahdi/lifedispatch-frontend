@@ -1,7 +1,7 @@
 "use client";
 
-import { Ambulance, Search } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, Ambulance, Loader2, RefreshCw, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -24,40 +24,70 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import type { Ambulance as AmbulanceTypeModel } from "@/lib/types/ambulance.types";
-import type { AmbulanceStatus } from "@/lib/types/enums";
+import { useGetAmbulances, useUpdateAmbulanceStatus } from "@/hooks";
+import { AmbulanceStatus } from "@/lib/types/enums";
 import { CreateAmbulanceDialog } from "./dialogs/CreateAmbulanceDialog";
 
+const SKELETON_ROWS = [
+  "skel-row-1",
+  "skel-row-2",
+  "skel-row-3",
+  "skel-row-4",
+];
+
 export function AmbulanceFleetView() {
-  const [ambulances, setAmbulances] =
-    useState<AmbulanceTypeModel[]>(seedAmbulances);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // Local state update for ambulance status
-  const handleUpdateStatus = (id: string, newStatus: AmbulanceStatus) => {
-    setAmbulances((prev) =>
-      prev.map((amb) => {
-        if (amb.id !== id) return amb;
-        toast.success("Ambulance Telematics Updated", {
-          description: `${amb.registrationNumber} is now ${newStatus}.`,
-        });
-        return {
-          ...amb,
-          status: newStatus,
-        };
-      }),
+  const {
+    data: ambulancesResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetAmbulances({
+    status: statusFilter === "ALL" ? undefined : (statusFilter as AmbulanceStatus),
+  });
+
+  const updateStatusMutation = useUpdateAmbulanceStatus();
+
+  const ambulances = ambulancesResponse?.data || [];
+
+  const handleUpdateStatus = (
+    id: string,
+    newStatus: AmbulanceStatus,
+    regNum: string,
+  ) => {
+    updateStatusMutation.mutate(
+      { id, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success("Ambulance Telematics Updated", {
+            description: `${regNum} transitioned to ${newStatus.replace(/_/g, " ")}.`,
+          });
+        },
+        onError: (err) => {
+          toast.error("Status Update Failed", {
+            description:
+              (err as { data?: { message?: string } })?.data?.message ||
+              err.message ||
+              "Could not update ambulance telemetry status.",
+          });
+        },
+      },
     );
   };
 
-  const filteredAmbulances = ambulances.filter((amb) => {
-    const matchesSearch =
-      amb.registrationNumber.toLowerCase().includes(search.toLowerCase()) ||
-      amb.type.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "ALL" || amb.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredAmbulances = useMemo(() => {
+    return ambulances.filter((amb) => {
+      const term = search.toLowerCase();
+      const matchesSearch =
+        amb.registrationNumber.toLowerCase().includes(term) ||
+        amb.type.toLowerCase().includes(term) ||
+        amb.capabilities?.some((c) => c.toLowerCase().includes(term));
+      return matchesSearch;
+    });
+  }, [ambulances, search]);
 
   return (
     <div className="space-y-6">
@@ -79,7 +109,7 @@ export function AmbulanceFleetView() {
             aria-hidden="true"
           />
           <Input
-            placeholder="Search by license plate or type..."
+            placeholder="Search by license plate, type, or capability..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-base md:text-xs h-10 md:h-9"
@@ -102,14 +132,44 @@ export function AmbulanceFleetView() {
               <SelectItem value="ALL">
                 All Statuses ({ambulances.length})
               </SelectItem>
-              <SelectItem value="AVAILABLE">AVAILABLE</SelectItem>
-              <SelectItem value="BUSY">BUSY</SelectItem>
-              <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
-              <SelectItem value="OUT_OF_SERVICE">OUT_OF_SERVICE</SelectItem>
+              <SelectItem value={AmbulanceStatus.AVAILABLE}>AVAILABLE</SelectItem>
+              <SelectItem value={AmbulanceStatus.BUSY}>BUSY</SelectItem>
+              <SelectItem value={AmbulanceStatus.OUT_OF_SERVICE}>OUT_OF_SERVICE</SelectItem>
             </SelectContent>
           </Select>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-9 px-2.5 text-xs text-text-muted hover:text-text-primary"
+            title="Refresh fleet telemetry"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {isError && (
+        <div className="p-4 bg-destructive-bg border border-destructive/20 rounded-none flex items-center justify-between">
+          <div className="flex items-center gap-2 text-destructive text-xs">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>
+              Failed to load ambulance fleet:{" "}
+              {error?.message || "Unknown error occurred."}
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* Fleet Table */}
       <DataTable
@@ -119,7 +179,7 @@ export function AmbulanceFleetView() {
               Active Fleet Units ({filteredAmbulances.length})
             </span>
             <span className="text-xs text-text-muted">
-              Click status pill to dynamically simulate unit telemetry update
+              Click status controls to dynamically update live unit telemetry via API
             </span>
           </div>
         }
@@ -134,13 +194,13 @@ export function AmbulanceFleetView() {
                 Type & Capability
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
-                GPS Base Location
+                Assigned Paramedic
+              </TableHead>
+              <TableHead scope="col" className="text-xs font-semibold">
+                GPS Station
               </TableHead>
               <TableHead scope="col" className="text-xs font-semibold">
                 Current Status
-              </TableHead>
-              <TableHead scope="col" className="text-xs font-semibold">
-                Equipment Specs
               </TableHead>
               <TableHead
                 scope="col"
@@ -151,89 +211,166 @@ export function AmbulanceFleetView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAmbulances.map((amb) => (
-              <TableRow
-                key={amb.id}
-                className="hover:bg-primary-light/20 transition-colors"
-              >
-                <TableCell className="py-3">
-                  <div className="font-semibold text-xs text-text-primary flex items-center gap-1.5">
-                    <Ambulance
-                      className="h-3.5 w-3.5 text-primary shrink-0"
-                      aria-hidden="true"
-                    />
-                    {amb.registrationNumber}
-                  </div>
-                  <div className="text-[11px] text-text-muted font-mono mt-0.5">
-                    ID: {amb.id}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className="font-mono text-[10px] font-semibold bg-muted text-text-secondary"
-                  >
-                    {amb.type}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs font-mono text-text-secondary">
-                  {amb.baseLocationLat.toFixed(4)},{" "}
-                  {amb.baseLocationLng.toFixed(4)}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={amb.status} />
-                </TableCell>
-                <TableCell className="text-xs text-text-muted max-w-50 truncate">
-                  {amb.capabilities.join(", ") || "Standard First Aid Kit"}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="inline-flex items-center gap-1">
-                    <Button
-                      size="sm"
-                      variant={
-                        amb.status === "AVAILABLE" ? "default" : "outline"
-                      }
-                      onClick={() => handleUpdateStatus(amb.id, "AVAILABLE")}
-                      className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
-                        amb.status === "AVAILABLE"
-                          ? "bg-status text-white hover:bg-status/90"
-                          : "text-status hover:bg-emerald-50"
-                      }`}
-                    >
-                      Available
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={amb.status === "BUSY" ? "default" : "outline"}
-                      onClick={() => handleUpdateStatus(amb.id, "BUSY")}
-                      className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
-                        amb.status === "BUSY"
-                          ? "bg-amber-500 text-white hover:bg-amber-600"
-                          : "text-amber-600 hover:bg-amber-50"
-                      }`}
-                    >
-                      Busy
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={
-                        amb.status === "OUT_OF_SERVICE" ? "default" : "outline"
-                      }
-                      onClick={() =>
-                        handleUpdateStatus(amb.id, "OUT_OF_SERVICE")
-                      }
-                      className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
-                        amb.status === "OUT_OF_SERVICE"
-                          ? "bg-destructive text-white hover:bg-destructive/90"
-                          : "text-destructive hover:bg-destructive-bg"
-                      }`}
-                    >
-                      Off
-                    </Button>
-                  </div>
+            {isLoading ? (
+              SKELETON_ROWS.map((rowId) => (
+                <TableRow key={rowId}>
+                  <TableCell className="py-4">
+                    <div className="h-3.5 bg-muted animate-pulse rounded w-32 mb-1.5" />
+                    <div className="h-2.5 bg-muted animate-pulse rounded w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-muted animate-pulse rounded w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-3 bg-muted animate-pulse rounded w-28" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-3 bg-muted animate-pulse rounded w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 bg-muted animate-pulse rounded w-20" />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="h-7 bg-muted animate-pulse rounded w-36 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : filteredAmbulances.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="py-12 text-center text-xs text-text-muted"
+                >
+                  <Ambulance className="h-8 w-8 mx-auto mb-2 text-text-muted/40" />
+                  No ambulance units found matching the selected criteria.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredAmbulances.map((amb) => (
+                <TableRow
+                  key={amb.id}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="py-3">
+                    <div className="font-semibold text-xs text-text-primary flex items-center gap-1.5">
+                      <Ambulance
+                        className="h-3.5 w-3.5 text-primary shrink-0"
+                        aria-hidden="true"
+                      />
+                      {amb.registrationNumber}
+                    </div>
+                    <div className="text-[11px] text-text-muted font-mono mt-0.5 truncate max-w-40">
+                      ID: {amb.id}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[10px] font-semibold bg-muted text-text-secondary"
+                    >
+                      {amb.type.replace(/_/g, " ")}
+                    </Badge>
+                    <div className="text-[11px] text-text-muted max-w-40 truncate mt-1">
+                      {amb.capabilities?.join(", ") || "Standard Clinical Kit"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {amb.driver?.user?.name ? (
+                      <div>
+                        <div className="font-semibold text-text-primary">
+                          {amb.driver.user.name}
+                        </div>
+                        <div className="text-[10px] text-text-muted">
+                          {amb.driver.certificationLevel}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-text-muted italic">Unassigned</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs font-mono text-text-secondary">
+                    {amb.baseLocationLat.toFixed(4)},{" "}
+                    {amb.baseLocationLng.toFixed(4)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={amb.status} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="inline-flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant={
+                          amb.status === AmbulanceStatus.AVAILABLE
+                            ? "default"
+                            : "outline"
+                        }
+                        disabled={updateStatusMutation.isPending}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            amb.id,
+                            AmbulanceStatus.AVAILABLE,
+                            amb.registrationNumber,
+                          )
+                        }
+                        className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
+                          amb.status === AmbulanceStatus.AVAILABLE
+                            ? "bg-status text-white hover:bg-status/90"
+                            : "text-status hover:bg-emerald-50"
+                        }`}
+                      >
+                        Available
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          amb.status === AmbulanceStatus.BUSY
+                            ? "default"
+                            : "outline"
+                        }
+                        disabled={updateStatusMutation.isPending}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            amb.id,
+                            AmbulanceStatus.BUSY,
+                            amb.registrationNumber,
+                          )
+                        }
+                        className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
+                          amb.status === AmbulanceStatus.BUSY
+                            ? "bg-amber-500 text-white hover:bg-amber-600"
+                            : "text-amber-600 hover:bg-amber-50"
+                        }`}
+                      >
+                        Busy
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={
+                          amb.status === AmbulanceStatus.OUT_OF_SERVICE
+                            ? "default"
+                            : "outline"
+                        }
+                        disabled={updateStatusMutation.isPending}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            amb.id,
+                            AmbulanceStatus.OUT_OF_SERVICE,
+                            amb.registrationNumber,
+                          )
+                        }
+                        className={`h-7 px-2 text-[11px] font-medium cursor-pointer ${
+                          amb.status === AmbulanceStatus.OUT_OF_SERVICE
+                            ? "bg-destructive text-white hover:bg-destructive/90"
+                            : "text-destructive hover:bg-destructive-bg"
+                        }`}
+                      >
+                        Out
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DataTable>

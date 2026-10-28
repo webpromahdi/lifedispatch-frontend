@@ -1,36 +1,59 @@
 "use client";
 
-import { Ambulance, MapPin, Search } from "lucide-react";
+import {
+  AlertCircle,
+  Ambulance,
+  MapPin,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import type { Ambulance as AmbulanceModel } from "@/lib/types/ambulance.types";
-import type { AmbulanceStatus } from "@/lib/types/enums";
+import { useGetAmbulances, useUpdateAmbulanceStatus } from "@/hooks";
+import type { AmbulanceWithDriver } from "@/lib/types/ambulance.types";
+import { AmbulanceStatus } from "@/lib/types/enums";
 
 export function DispatcherAmbulancesView() {
-  const [ambulances, setAmbulances] =
-    useState<AmbulanceModel[]>(seedAmbulances);
   const [search, setSearch] = useState("");
+
+  const {
+    data: ambulancesResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetAmbulances(undefined, { refetchInterval: 15_000 });
+
+  const updateStatusMutation = useUpdateAmbulanceStatus();
+
+  const ambulances = ambulancesResponse?.data || [];
 
   const handleStatusChange = (
     ambulanceId: string,
     newStatus: AmbulanceStatus,
+    regNum: string,
   ) => {
-    setAmbulances((prev) =>
-      prev.map((amb) => {
-        if (amb.id !== ambulanceId) return amb;
-        toast.success("Ambulance Readiness Updated", {
-          description: `Unit ${amb.registrationNumber} transitioned to ${newStatus.replace(/_/g, " ")}.`,
-        });
-        return {
-          ...amb,
-          status: newStatus,
-        };
-      }),
+    updateStatusMutation.mutate(
+      { id: ambulanceId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success("Ambulance Readiness Updated", {
+            description: `Unit ${regNum} transitioned to ${newStatus.replace(/_/g, " ")}.`,
+          });
+        },
+        onError: (err) => {
+          toast.error("Status Update Failed", {
+            description:
+              (err as { data?: { message?: string } })?.data?.message ||
+              err.message ||
+              "Could not update ambulance status.",
+          });
+        },
+      },
     );
   };
 
@@ -39,18 +62,20 @@ export function DispatcherAmbulancesView() {
       (a) =>
         a.registrationNumber.toLowerCase().includes(search.toLowerCase()) ||
         a.type.toLowerCase().includes(search.toLowerCase()) ||
-        a.capabilities.some((c) =>
+        a.capabilities?.some((c) =>
           c.toLowerCase().includes(search.toLowerCase()),
         ),
     );
   }, [ambulances, search]);
 
   const availableUnits = filteredAmbulances.filter(
-    (a) => a.status === "AVAILABLE",
+    (a) => a.status === AmbulanceStatus.AVAILABLE,
   );
-  const busyUnits = filteredAmbulances.filter((a) => a.status === "BUSY");
+  const busyUnits = filteredAmbulances.filter(
+    (a) => a.status === AmbulanceStatus.BUSY,
+  );
   const outOfServiceUnits = filteredAmbulances.filter(
-    (a) => a.status === "OUT_OF_SERVICE",
+    (a) => a.status === AmbulanceStatus.OUT_OF_SERVICE,
   );
 
   return (
@@ -93,8 +118,39 @@ export function DispatcherAmbulancesView() {
             <span className="h-2 w-2 rounded-none bg-destructive" />
             Out of Service: <strong>{outOfServiceUnits.length}</strong>
           </span>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-8 px-2 text-xs text-text-muted hover:text-text-primary ml-1"
+            title="Refresh fleet monitor"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {isError && (
+        <div className="p-4 bg-destructive-bg border border-destructive/20 rounded-none flex items-center justify-between">
+          <div className="flex items-center gap-2 text-destructive text-xs">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>
+              Failed to load fleet telematics:{" "}
+              {error?.message || "Unknown error occurred."}
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* 3-Column Status Board: AVAILABLE / BUSY / OUT_OF_SERVICE */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -116,7 +172,9 @@ export function DispatcherAmbulancesView() {
           </div>
 
           <div className="space-y-3 min-h-75">
-            {availableUnits.length === 0 ? (
+            {isLoading ? (
+              <ColumnLoadingSkeleton />
+            ) : availableUnits.length === 0 ? (
               <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units currently available in this filter.
               </div>
@@ -125,6 +183,7 @@ export function DispatcherAmbulancesView() {
                 <AmbulanceStatusCard
                   key={amb.id}
                   ambulance={amb}
+                  isUpdating={updateStatusMutation.isPending}
                   onStatusChange={handleStatusChange}
                 />
               ))
@@ -150,7 +209,9 @@ export function DispatcherAmbulancesView() {
           </div>
 
           <div className="space-y-3 min-h-75">
-            {busyUnits.length === 0 ? (
+            {isLoading ? (
+              <ColumnLoadingSkeleton />
+            ) : busyUnits.length === 0 ? (
               <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units currently busy.
               </div>
@@ -159,6 +220,7 @@ export function DispatcherAmbulancesView() {
                 <AmbulanceStatusCard
                   key={amb.id}
                   ambulance={amb}
+                  isUpdating={updateStatusMutation.isPending}
                   onStatusChange={handleStatusChange}
                 />
               ))
@@ -184,7 +246,9 @@ export function DispatcherAmbulancesView() {
           </div>
 
           <div className="space-y-3 min-h-75">
-            {outOfServiceUnits.length === 0 ? (
+            {isLoading ? (
+              <ColumnLoadingSkeleton />
+            ) : outOfServiceUnits.length === 0 ? (
               <div className="p-8 text-center text-xs text-text-muted border border-dashed border-border rounded-none bg-surface/50">
                 No units out of service.
               </div>
@@ -193,6 +257,7 @@ export function DispatcherAmbulancesView() {
                 <AmbulanceStatusCard
                   key={amb.id}
                   ambulance={amb}
+                  isUpdating={updateStatusMutation.isPending}
                   onStatusChange={handleStatusChange}
                 />
               ))
@@ -204,12 +269,36 @@ export function DispatcherAmbulancesView() {
   );
 }
 
+const SKELETON_KEYS = ["skeleton-card-1", "skeleton-card-2"];
+
+function ColumnLoadingSkeleton() {
+  return (
+    <div className="space-y-3">
+      {SKELETON_KEYS.map((keyId) => (
+        <div
+          key={keyId}
+          className="p-4 rounded-none bg-surface border border-border shadow-xs space-y-3 animate-pulse"
+        >
+          <div className="flex justify-between items-center">
+            <div className="h-4 bg-muted rounded w-28" />
+            <div className="h-4 bg-muted rounded w-16" />
+          </div>
+          <div className="h-3 bg-muted rounded w-36" />
+          <div className="h-5 bg-muted rounded w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function AmbulanceStatusCard({
   ambulance,
+  isUpdating,
   onStatusChange,
 }: {
-  ambulance: AmbulanceModel;
-  onStatusChange: (id: string, status: AmbulanceStatus) => void;
+  ambulance: AmbulanceWithDriver;
+  isUpdating: boolean;
+  onStatusChange: (id: string, status: AmbulanceStatus, regNum: string) => void;
 }) {
   return (
     <div className="p-4 rounded-none bg-surface border border-border shadow-xs space-y-3">
@@ -240,7 +329,14 @@ function AmbulanceStatusCard({
           </span>
         </div>
 
-        {ambulance.capabilities && ambulance.capabilities.length > 0 && (
+        {ambulance.driver?.user?.name && (
+          <div className="text-[11px] text-text-primary font-medium">
+            Crew: {ambulance.driver.user.name} (
+            {ambulance.driver.certificationLevel})
+          </div>
+        )}
+
+        {(ambulance.capabilities?.length ?? 0) > 0 && (
           <div className="flex flex-wrap gap-1 pt-1">
             {ambulance.capabilities.map((cap) => (
               <span
@@ -258,33 +354,54 @@ function AmbulanceStatusCard({
       <div className="flex items-center justify-between pt-2 border-t border-border">
         <span className="text-[11px] text-text-muted">Set Status:</span>
         <div className="flex items-center gap-1">
-          {ambulance.status !== "AVAILABLE" && (
+          {ambulance.status !== AmbulanceStatus.AVAILABLE && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onStatusChange(ambulance.id, "AVAILABLE")}
+              disabled={isUpdating}
+              onClick={() =>
+                onStatusChange(
+                  ambulance.id,
+                  AmbulanceStatus.AVAILABLE,
+                  ambulance.registrationNumber,
+                )
+              }
               className="h-6 px-2 text-[10px] font-medium text-status border-status/40 hover:bg-status-bg cursor-pointer"
             >
               Available
             </Button>
           )}
 
-          {ambulance.status !== "BUSY" && (
+          {ambulance.status !== AmbulanceStatus.BUSY && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onStatusChange(ambulance.id, "BUSY")}
+              disabled={isUpdating}
+              onClick={() =>
+                onStatusChange(
+                  ambulance.id,
+                  AmbulanceStatus.BUSY,
+                  ambulance.registrationNumber,
+                )
+              }
               className="h-6 px-2 text-[10px] font-medium text-amber-600 border-amber-500/40 hover:bg-amber-50 cursor-pointer"
             >
               Busy
             </Button>
           )}
 
-          {ambulance.status !== "OUT_OF_SERVICE" && (
+          {ambulance.status !== AmbulanceStatus.OUT_OF_SERVICE && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onStatusChange(ambulance.id, "OUT_OF_SERVICE")}
+              disabled={isUpdating}
+              onClick={() =>
+                onStatusChange(
+                  ambulance.id,
+                  AmbulanceStatus.OUT_OF_SERVICE,
+                  ambulance.registrationNumber,
+                )
+              }
               className="h-6 px-2 text-[10px] font-medium text-destructive border-destructive/40 hover:bg-destructive-bg cursor-pointer"
             >
               Out of Svc
