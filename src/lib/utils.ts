@@ -103,3 +103,15 @@ export function getRoleDashboardPath(role?: string): string {
       return "/dashboard/patient";
   }
 }
+
+/**
+ * Converts raw bytes into a human-readable file size string.
+ * < 1MB → "44 KB" | ≥ 1MB → "1.4 MB"
+ */
+export function formatFileSize(bytes: number): string {
+  if (!bytes || bytes <= 0) return "0 KB";
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}

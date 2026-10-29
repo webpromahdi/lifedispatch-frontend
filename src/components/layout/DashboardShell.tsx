@@ -2,14 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useGetMe } from "@/hooks/auth.hook";
+import {
+  useIsMobileDrawerOpen,
+  useSetMobileDrawerOpen,
+} from "@/store/useAppStore";
 import { MobileDrawer } from "./MobileDrawer";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const mobileDrawerOpen = useIsMobileDrawerOpen();
+  const setMobileDrawerOpen = useSetMobileDrawerOpen();
   const router = useRouter();
 
   const { data: meRes, isLoading, isError } = useGetMe();

@@ -51,7 +51,7 @@ It coordinates the full lifecycle of a medical emergency — from patient distre
 - **API functions**: `src/api/auth.api.ts` (only auth so far) — more files will be added per feature
 - **Hooks**: TanStack Query/Mutation hooks in `src/hooks/auth.hook.ts`
 - **Session**: `useGetMe()` → calls `GET /auth/me` → returns `{ data: { user: { id, name, role, ... } } }`
-- **No Zustand**: user state lives in TanStack Query cache (`["user", "me"]`) — do NOT add Zustand
+- **State Management Boundary**: TanStack Query owns all server/API state (user, drivers, ambulances, etc.). Zustand (v5, at `src/store/`) owns client-only UI state (sidebar, mobile drawer, filter state, etc.). Never duplicate server data in Zustand. Never put File objects or binary blobs in Zustand.
 
 ### Auth Endpoints (Backend — 100% complete)
 | Method | Path | Purpose |
@@ -92,6 +92,7 @@ src/
     types/         # Shared TypeScript enums and types
     utils.ts       # cn() and utility helpers
   providers/   # React Query provider
+  store/       # Zustand client-only UI state slices (sidebar, mobile drawer, active tab)
   validations/ # Zod schemas
 ```
 

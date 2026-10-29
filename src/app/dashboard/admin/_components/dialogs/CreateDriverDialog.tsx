@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Plus, Upload, UserCheck } from "lucide-react";
+import { Loader2, Plus, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -248,34 +249,16 @@ export function CreateDriverDialog() {
             </div>
 
             {/* License Document File Upload (Required) */}
-            <div className="space-y-1.5">
-              <Label htmlFor="license-doc">
-                Commercial Driver License Document *
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="license-doc"
-                  type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setLicenseFile(file);
-                  }}
-                  className="cursor-pointer file:cursor-pointer text-xs"
-                  required
-                />
-                {licenseFile && (
-                  <span className="text-[11px] text-text-muted font-mono flex items-center gap-1 shrink-0">
-                    <Upload className="h-3 w-3 text-status" />
-                    Attached
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-text-muted">
-                Official document proof required for backend verification (PDF,
-                PNG, JPG).
-              </p>
-            </div>
+            <FileUpload
+              id="driver-license-doc"
+              label="Commercial Driver License Document"
+              description="Official document proof required for backend verification (PDF, PNG, JPG up to 5MB)."
+              value={licenseFile}
+              onChange={setLicenseFile}
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
+              maxSizeMB={5}
+              required
+            />
 
             <DialogFooter className="pt-3 gap-2">
               <Button

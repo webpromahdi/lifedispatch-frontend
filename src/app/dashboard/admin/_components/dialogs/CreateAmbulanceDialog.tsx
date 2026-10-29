@@ -1,6 +1,7 @@
 "use client";
 
-import { Ambulance, Loader2, Plus, Upload } from "lucide-react";
+import { Ambulance, Loader2, Plus } from "lucide-react";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -242,32 +244,15 @@ export function CreateAmbulanceDialog() {
             </div>
 
             {/* Registration Document File */}
-            <div className="space-y-1.5">
-              <Label htmlFor="reg-doc">
-                Registration Certificate / Telematics PDF
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="reg-doc"
-                  type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setDocumentFile(file);
-                  }}
-                  className="cursor-pointer file:cursor-pointer text-xs"
-                />
-                {documentFile && (
-                  <span className="text-[11px] text-text-muted font-mono flex items-center gap-1 shrink-0">
-                    <Upload className="h-3 w-3 text-status" />
-                    Selected
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-text-muted">
-                Optional document upload (PDF, PNG, JPG up to 5MB).
-              </p>
-            </div>
+            <FileUpload
+              id="ambulance-reg-doc"
+              label="Registration Certificate / Telematics PDF"
+              description="Optional document upload (PDF, PNG, JPG up to 5MB)."
+              value={documentFile}
+              onChange={setDocumentFile}
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
+              maxSizeMB={5}
+            />
 
             <DialogFooter className="pt-3 gap-2">
               <Button
