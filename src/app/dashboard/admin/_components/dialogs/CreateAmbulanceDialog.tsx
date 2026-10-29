@@ -4,6 +4,7 @@ import { Ambulance, Loader2, Plus } from "lucide-react";
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { FileUpload } from "@/components/common/FileUpload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {

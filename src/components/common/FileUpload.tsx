@@ -133,7 +133,7 @@ export function FileUpload({
                 <FileText className="size-4 text-primary shrink-0" />
               )}
               <span
-                className="truncate max-w-[180px] sm:max-w-[240px] font-medium text-text-primary"
+                className="truncate max-w-45 sm:max-w-60 font-medium text-text-primary"
                 title={value.name}
               >
                 {value.name}
