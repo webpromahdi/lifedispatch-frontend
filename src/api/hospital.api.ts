@@ -1,6 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import type { ApiResponse } from "@/lib/types/emergency.types";
 import type {
+  CreateHospitalPayload,
   CreateHospitalStaffPayload,
   GetHospitalStaffParams,
   GetHospitalsParams,
@@ -45,6 +46,13 @@ export function getHospitals(params?: GetHospitalsParams) {
 export function getHospitalById(id: string) {
   return apiClient<ApiResponse<Hospital>>(`/hospitals/${id}`, {
     method: "GET",
+  });
+}
+
+export function createHospital(payload: CreateHospitalPayload) {
+  return apiClient<ApiResponse<Hospital>>("/hospitals/create", {
+    method: "POST",
+    body: payload,
   });
 }
 

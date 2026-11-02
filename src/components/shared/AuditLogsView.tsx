@@ -1,7 +1,7 @@
 "use client";
 
-import { Search } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Pagination } from "@/components/common/Pagination";
@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedAuditLogs } from "@/lib/dummy/audit-logs";
+import { useGetAuditLogs } from "@/hooks";
+import type { AuditLog } from "@/lib/types/audit.types";
 import { formatDate } from "@/lib/utils";
 
 interface AuditLogsViewProps {
@@ -35,24 +36,33 @@ export function AuditLogsView({
   const [search, setSearch] = useState("");
   const [actionFilter, setActionFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
-  // Filter logs
-  const filteredLogs = seedAuditLogs.filter((log) => {
-    const matchesSearch =
-      log.action.toLowerCase().includes(search.toLowerCase()) ||
-      log.entity.toLowerCase().includes(search.toLowerCase()) ||
-      log.performedByName.toLowerCase().includes(search.toLowerCase()) ||
-      log.ipAddress.includes(search);
-    const matchesAction = actionFilter === "ALL" || log.action === actionFilter;
-    return matchesSearch && matchesAction;
+  const { data: auditResponse, isLoading } = useGetAuditLogs({
+    page: currentPage,
+    limit: itemsPerPage,
+    action: actionFilter !== "ALL" ? actionFilter : undefined,
   });
 
-  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage) || 1;
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const rawLogs: AuditLog[] = useMemo(() => {
+    return auditResponse?.data ?? [];
+  }, [auditResponse]);
+
+  const totalPages = auditResponse?.meta?.totalPages || 1;
+  const totalEvents = auditResponse?.meta?.total ?? rawLogs.length;
+
+  // Filter logs locally by search term if search is provided
+  const filteredLogs = useMemo(() => {
+    if (!search.trim()) return rawLogs;
+    const q = search.toLowerCase();
+    return rawLogs.filter((log) => {
+      const matchesAction = log.action?.toLowerCase().includes(q);
+      const matchesEntity = log.entity?.toLowerCase().includes(q);
+      const matchesActor = log.performedByName?.toLowerCase().includes(q);
+      const matchesIP = log.ipAddress?.includes(q);
+      return matchesAction || matchesEntity || matchesActor || matchesIP;
+    });
+  }, [rawLogs, search]);
 
   const basePath =
     userRole === "SUPER_ADMIN" ? "/dashboard/super-admin" : "/dashboard/admin";
@@ -80,7 +90,6 @@ export function AuditLogsView({
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setCurrentPage(1);
             }}
             className="pl-9 text-base md:text-xs h-10 md:h-9"
             aria-label="Search audit records"
@@ -104,8 +113,9 @@ export function AuditLogsView({
               <SelectValue placeholder="All Actions" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">
-                All Actions ({seedAuditLogs.length})
+              <SelectItem value="ALL">All Actions</SelectItem>
+              <SelectItem value="UPDATE_USER_STATUS">
+                UPDATE_USER_STATUS
               </SelectItem>
               <SelectItem value="USER_CREATED">USER_CREATED</SelectItem>
               <SelectItem value="STATUS_CHANGE">STATUS_CHANGE</SelectItem>
@@ -124,7 +134,7 @@ export function AuditLogsView({
         headerSlot={
           <div className="flex items-center justify-between w-full">
             <span className="font-semibold text-sm text-text-primary">
-              Immutable Records ({filteredLogs.length} events)
+              Immutable Records ({totalEvents} events)
             </span>
             <span className="text-xs text-text-muted">
               Page {currentPage} of {totalPages}
@@ -159,45 +169,65 @@ export function AuditLogsView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedLogs.map((log) => (
-              <TableRow
-                key={log.id}
-                className="hover:bg-primary-light/20 transition-colors"
-              >
-                <TableCell className="font-mono text-xs text-text-muted">
-                  {formatDate(log.createdAt, "dd MMM yyyy, hh:mm:ss a")}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className="font-mono text-[10px] font-semibold bg-primary-light text-primary border-primary/20"
-                  >
-                    {log.action}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs text-text-secondary font-medium">
-                  {log.entity}
-                </TableCell>
-                <TableCell className="font-mono text-xs text-text-muted">
-                  {log.entityId
-                    ? log.entityId.length > 12
-                      ? `${log.entityId.slice(0, 12)}...`
-                      : log.entityId
-                    : "N/A"}
-                </TableCell>
-                <TableCell className="text-xs font-medium text-text-primary">
-                  {log.performedByName}
-                </TableCell>
-                <TableCell>
-                  <span className="text-[11px] text-text-muted font-mono">
-                    {log.performedByRole}
-                  </span>
-                </TableCell>
-                <TableCell className="font-mono text-xs text-text-muted">
-                  {log.ipAddress}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8">
+                  <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    Loading audit trail from secure ledger...
+                  </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredLogs.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-8 text-xs text-text-muted"
+                >
+                  No audit logs recorded matching this criteria.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredLogs.map((log) => (
+                <TableRow
+                  key={log.id}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="font-mono text-xs text-text-muted">
+                    {formatDate(log.createdAt, "dd MMM yyyy, hh:mm:ss a")}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[10px] font-semibold bg-primary-light text-primary border-primary/20"
+                    >
+                      {log.action}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary font-medium">
+                    {log.entity}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-text-muted">
+                    {log.entityId
+                      ? log.entityId.length > 12
+                        ? `${log.entityId.slice(0, 12)}...`
+                        : log.entityId
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell className="text-xs font-medium text-text-primary">
+                    {log.performedByName}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-[11px] text-text-muted font-mono">
+                      {log.performedByRole}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-text-muted">
+                    {log.ipAddress}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
 

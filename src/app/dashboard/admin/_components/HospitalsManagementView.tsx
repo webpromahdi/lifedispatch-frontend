@@ -1,7 +1,13 @@
 "use client";
 
-import { AlertTriangle, Building2, CheckCircle2, Search } from "lucide-react";
-import { useState } from "react";
+import {
+  AlertTriangle,
+  Building2,
+  CheckCircle2,
+  Loader2,
+  Search,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -16,45 +22,67 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedHospitals } from "@/lib/dummy/hospitals";
+import { useGetHospitals, useUpdateHospitalDiversion } from "@/hooks";
 import type { HospitalDiversionStatus } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
 import { CreateHospitalDialog } from "./dialogs/CreateHospitalDialog";
 
 export function HospitalsManagementView() {
-  const [hospitals, setHospitals] = useState<Hospital[]>(seedHospitals);
   const [search, setSearch] = useState("");
+  const { data: hospitalsResponse, isLoading } = useGetHospitals({
+    limit: 100,
+  });
+  const { mutate: updateDiversion, isPending: isUpdating } =
+    useUpdateHospitalDiversion();
 
-  // Toggle diversion status locally with toast
-  const handleToggleDiversion = (hospitalId: string) => {
-    setHospitals((prev) =>
-      prev.map((hosp) => {
-        if (hosp.id !== hospitalId) return hosp;
-        const nextStatus: HospitalDiversionStatus =
-          hosp.diversionStatus === "ACCEPTING" ? "DIVERTING" : "ACCEPTING";
-        const reason =
-          nextStatus === "DIVERTING"
-            ? "ER at critical surge capacity. Trauma diverted."
-            : null;
+  const hospitals: Hospital[] = useMemo(() => {
+    return hospitalsResponse?.data ?? [];
+  }, [hospitalsResponse]);
 
-        toast.success("Hospital Diversion Status Updated", {
-          description: `${hosp.name} is now ${nextStatus}. CAD routing notified.`,
-        });
+  // Toggle diversion status via API mutation
+  const handleToggleDiversion = (hosp: Hospital) => {
+    const nextStatus: HospitalDiversionStatus =
+      hosp.diversionStatus === "ACCEPTING" ? "DIVERTING" : "ACCEPTING";
+    const reason =
+      nextStatus === "DIVERTING"
+        ? "ER at critical surge capacity. Trauma diverted."
+        : undefined;
 
-        return {
-          ...hosp,
+    updateDiversion(
+      {
+        id: hosp.id,
+        payload: {
           diversionStatus: nextStatus,
           diversionReason: reason,
-        };
-      }),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Hospital Diversion Status Updated", {
+            description: `${hosp.name} is now ${nextStatus}. CAD routing notified.`,
+          });
+        },
+        onError: (err) => {
+          toast.error("Failed to update diversion status", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "Unable to update hospital status.",
+          });
+        },
+      },
     );
   };
 
-  const filteredHospitals = hospitals.filter((h) => {
-    const nameMatch = h.name.toLowerCase().includes(search.toLowerCase());
-    const addressMatch = h.address.toLowerCase().includes(search.toLowerCase());
-    return nameMatch || addressMatch;
-  });
+  const filteredHospitals = useMemo(() => {
+    return hospitals.filter((h) => {
+      const nameMatch = h.name.toLowerCase().includes(search.toLowerCase());
+      const addressMatch = h.address
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      return nameMatch || addressMatch;
+    });
+  }, [hospitals, search]);
 
   return (
     <div className="space-y-6">
@@ -134,73 +162,94 @@ export function HospitalsManagementView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredHospitals.map((hosp) => (
-              <TableRow
-                key={hosp.id}
-                className="hover:bg-primary-light/20 transition-colors"
-              >
-                <TableCell className="py-3">
-                  <div className="font-semibold text-xs text-text-primary flex items-center gap-1.5">
-                    <Building2
-                      className="h-3.5 w-3.5 text-primary shrink-0"
-                      aria-hidden="true"
-                    />
-                    {hosp.name}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    Loading hospital network...
                   </div>
-                  <div className="text-[11px] text-text-muted truncate max-w-70">
-                    {hosp.address}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={hosp.diversionStatus} />
-                </TableCell>
-                <TableCell className="text-xs text-text-secondary">
-                  <span className="font-bold text-text-primary">
-                    {hosp.availableErBeds}
-                  </span>{" "}
-                  / {hosp.totalErBeds} beds
-                </TableCell>
-                <TableCell className="text-xs font-mono text-text-secondary">
-                  <div>{hosp.phone}</div>
-                  <div className="text-[11px] text-text-muted">
-                    {hosp.email}
-                  </div>
-                </TableCell>
-                <TableCell className="text-xs text-text-muted max-w-60 truncate">
-                  {hosp.diversionReason || "Accepting patient dispatches"}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleToggleDiversion(hosp.id)}
-                    className={`h-8 px-3 text-xs font-medium gap-1.5 cursor-pointer ${
-                      hosp.diversionStatus === "ACCEPTING"
-                        ? "hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300"
-                        : "hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
-                    }`}
-                  >
-                    {hosp.diversionStatus === "ACCEPTING" ? (
-                      <>
-                        <AlertTriangle
-                          className="h-3.5 w-3.5 text-amber-500"
-                          aria-hidden="true"
-                        />
-                        Divert
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2
-                          className="h-3.5 w-3.5 text-status"
-                          aria-hidden="true"
-                        />
-                        Accept
-                      </>
-                    )}
-                  </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredHospitals.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-xs text-text-muted"
+                >
+                  No hospital facilities found matching your criteria.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredHospitals.map((hosp) => (
+                <TableRow
+                  key={hosp.id}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="py-3">
+                    <div className="font-semibold text-xs text-text-primary flex items-center gap-1.5">
+                      <Building2
+                        className="h-3.5 w-3.5 text-primary shrink-0"
+                        aria-hidden="true"
+                      />
+                      {hosp.name}
+                    </div>
+                    <div className="text-[11px] text-text-muted truncate max-w-70">
+                      {hosp.address}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={hosp.diversionStatus} />
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary">
+                    <span className="font-bold text-text-primary">
+                      {hosp.availableErBeds}
+                    </span>{" "}
+                    / {hosp.totalErBeds} beds
+                  </TableCell>
+                  <TableCell className="text-xs font-mono text-text-secondary">
+                    <div>{hosp.phone}</div>
+                    <div className="text-[11px] text-text-muted">
+                      {hosp.email}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-muted max-w-60 truncate">
+                    {hosp.diversionReason || "Accepting patient dispatches"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isUpdating}
+                      onClick={() => handleToggleDiversion(hosp)}
+                      className={`h-8 px-3 text-xs font-medium gap-1.5 cursor-pointer ${
+                        hosp.diversionStatus === "ACCEPTING"
+                          ? "hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300"
+                          : "hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
+                      }`}
+                    >
+                      {hosp.diversionStatus === "ACCEPTING" ? (
+                        <>
+                          <AlertTriangle
+                            className="h-3.5 w-3.5 text-amber-500"
+                            aria-hidden="true"
+                          />
+                          Divert
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2
+                            className="h-3.5 w-3.5 text-status"
+                            aria-hidden="true"
+                          />
+                          Accept
+                        </>
+                      )}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DataTable>

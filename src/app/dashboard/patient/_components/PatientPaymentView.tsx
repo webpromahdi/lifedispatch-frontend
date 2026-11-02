@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { seedPayments } from "@/lib/dummy/payments";
+import { useGetPaymentById, useInitiatePayment } from "@/hooks";
 import { PaymentStatus } from "@/lib/types/enums";
 import { formatBDT, formatDate } from "@/lib/utils";
 
@@ -23,45 +23,166 @@ export interface PatientPaymentViewProps {
   paymentId?: string;
 }
 
-export function PatientPaymentView({
-  paymentId = "pay_001",
-}: PatientPaymentViewProps) {
-  const initialPayment =
-    seedPayments.find((p) => p.id === paymentId) ||
-    seedPayments[1] ||
-    seedPayments[0];
-
-  const [payment, setPayment] = useState(initialPayment);
+export function PatientPaymentView({ paymentId }: PatientPaymentViewProps) {
   const [selectedMethod, setSelectedMethod] = useState<string>("BKASH");
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  const {
+    data: paymentResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetPaymentById(paymentId, {
+    enabled: Boolean(paymentId),
+  });
+
+  const { mutate: initiatePaymentMutate, isPending: isInitiating } =
+    useInitiatePayment();
+
+  const payment = paymentResponse?.data;
 
   const handlePayNow = () => {
-    setIsProcessing(true);
-    toast.info("Redirecting to payment gateway...", {
-      description: `Securing transaction for ${payment.invoiceNumber} via SSLCommerz.`,
+    if (!paymentId) {
+      toast.error("Invalid payment ID.");
+      return;
+    }
+
+    toast.info("Connecting to payment gateway...", {
+      description: `Securing transaction for ${payment?.invoiceNumber ?? "invoice"} via SSLCommerz.`,
     });
 
-    setTimeout(() => {
-      setIsProcessing(false);
-      setPayment((prev) => ({
-        ...prev,
-        status: PaymentStatus.PAID,
-        transactionId: `SSL_TXN_${Math.floor(100000000 + Math.random() * 900000000)}`,
-        paymentConfirmedAt: new Date().toISOString(),
-      }));
-      toast.success("Payment Received!", {
-        description: `Invoice ${payment.invoiceNumber} settled in full. Receipt generated.`,
-      });
-    }, 1200);
+    initiatePaymentMutate(paymentId, {
+      onSuccess: (res) => {
+        if (res.data?.gatewayUrl) {
+          window.location.href = res.data.gatewayUrl;
+        } else {
+          toast.error("Payment Gateway Error", {
+            description: "No gateway URL received from server.",
+          });
+        }
+      },
+      onError: (err) => {
+        toast.error("Payment Gateway Error", {
+          description:
+            err instanceof Error
+              ? err.message
+              : "Unable to connect to payment gateway. Please try again.",
+        });
+      },
+    });
   };
 
   const handleDownloadReceipt = () => {
+    if (!payment) return;
     toast.success("Receipt Downloaded", {
       description: `${payment.invoiceNumber}-receipt.pdf saved to downloads.`,
     });
   };
 
-  const isPaid = payment.status === "PAID";
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto animate-pulse">
+        <div className="space-y-2">
+          <div className="h-8 w-64 bg-muted rounded-none" />
+          <div className="h-4 w-96 bg-muted rounded-none" />
+        </div>
+        <div className="bg-surface border border-border rounded-none p-6 sm:p-8 space-y-6">
+          <div className="flex justify-between items-center pb-6 border-b border-border">
+            <div className="space-y-2">
+              <div className="h-6 w-48 bg-muted rounded-none" />
+              <div className="h-3 w-64 bg-muted rounded-none" />
+            </div>
+            <div className="h-6 w-24 bg-muted rounded-none" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-background border border-border">
+            {[
+              "sk-meta-date",
+              "sk-meta-trip",
+              "sk-meta-method",
+              "sk-meta-txn",
+            ].map((id) => (
+              <div key={id} className="space-y-1">
+                <div className="h-3 w-16 bg-muted rounded-none" />
+                <div className="h-4 w-24 bg-muted rounded-none" />
+              </div>
+            ))}
+          </div>
+          <div className="space-y-3">
+            <div className="h-4 w-40 bg-muted rounded-none" />
+            <div className="border border-border divide-y divide-border">
+              {[
+                "sk-charge-head",
+                "sk-charge-base",
+                "sk-charge-dist",
+                "sk-charge-total",
+              ].map((id) => (
+                <div key={id} className="h-10 bg-muted/40" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !payment) {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto">
+        <PageHeader
+          title="Medical Transport Invoice & Billing"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/dashboard/patient" },
+            { label: "Billing", href: "/dashboard/patient/history" },
+            { label: "Error" },
+          ]}
+          action={
+            <Link href="/dashboard/patient">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs min-h-9.5 cursor-pointer"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                Return to Portal
+              </Button>
+            </Link>
+          }
+        />
+        <div className="bg-surface border border-destructive/30 rounded-none p-6 sm:p-8 text-center space-y-4">
+          <div className="w-12 h-12 mx-auto bg-destructive-bg text-destructive flex items-center justify-center rounded-none">
+            <Receipt className="w-6 h-6" aria-hidden="true" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-text-primary">
+              Invoice Not Found
+            </h2>
+            <p className="text-xs text-text-secondary max-w-md mx-auto">
+              {error instanceof Error
+                ? error.message
+                : "Unable to retrieve invoice details. The invoice record may have expired or you may not be authorized to view it."}
+            </p>
+          </div>
+          <div className="pt-2 flex justify-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="text-xs cursor-pointer"
+            >
+              Retry Loading
+            </Button>
+            <Link href="/dashboard/patient">
+              <Button size="sm" className="text-xs cursor-pointer">
+                Return to Dashboard
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isPaid = payment.paymentStatus === PaymentStatus.PAID;
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -104,7 +225,7 @@ export function PatientPaymentView({
           </div>
 
           <div className="flex items-center gap-3">
-            <StatusBadge status={payment.status} />
+            <StatusBadge status={payment.paymentStatus} />
             {isPaid && (
               <Button
                 variant="outline"
@@ -136,7 +257,7 @@ export function PatientPaymentView({
               Trip Reference
             </span>
             <span className="font-mono font-medium text-text-primary">
-              {payment.tripId}
+              {payment.trip?.id ?? payment.tripId}
             </span>
           </div>
 
@@ -159,7 +280,7 @@ export function PatientPaymentView({
           </div>
         </div>
 
-        {/* Itemized Charges Table (Accessibility: aria-label on amounts) */}
+        {/* Itemized Charges Table */}
         <div className="space-y-3">
           <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">
             Itemized Clinical Services & Mileage
@@ -168,7 +289,7 @@ export function PatientPaymentView({
           <div className="border border-border rounded-none overflow-hidden divide-y divide-border text-xs">
             <div className="flex justify-between items-center p-3 bg-muted/40 font-medium text-text-secondary">
               <span>Service Description</span>
-              <span>Amount (BDT)</span>
+              <span>Amount ({payment.currency || "BDT"})</span>
             </div>
 
             <div className="flex justify-between items-center p-3">
@@ -191,13 +312,45 @@ export function PatientPaymentView({
                   Mileage Transport Surcharge
                 </span>
                 <span className="text-[11px] text-text-muted">
-                  Traveled distance surcharge at standard tariff (12.6 km)
+                  Traveled distance surcharge at standard tariff
                 </span>
               </div>
               <div className="font-mono font-semibold text-text-primary">
                 {formatBDT(payment.distanceCharge)}
               </div>
             </div>
+
+            {Number(payment.waitingCharge) > 0 && (
+              <div className="flex justify-between items-center p-3">
+                <div>
+                  <span className="font-medium text-text-primary block">
+                    On-Scene Waiting Charge
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    Standby duration during on-scene medical stabilization
+                  </span>
+                </div>
+                <div className="font-mono font-semibold text-text-primary">
+                  {formatBDT(payment.waitingCharge)}
+                </div>
+              </div>
+            )}
+
+            {Number(payment.additionalCharges) > 0 && (
+              <div className="flex justify-between items-center p-3">
+                <div>
+                  <span className="font-medium text-text-primary block">
+                    Additional Clinical Charges
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    Supplemental emergency interventions applied during transit
+                  </span>
+                </div>
+                <div className="font-mono font-semibold text-text-primary">
+                  {formatBDT(payment.additionalCharges)}
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-between items-center p-3">
               <div>
@@ -234,7 +387,8 @@ export function PatientPaymentView({
                   Total Settlement Amount
                 </span>
                 <span className="text-[11px] text-text-secondary">
-                  Final payable in Bangladeshi Taka (BDT)
+                  Final payable in Bangladeshi Taka ({payment.currency || "BDT"}
+                  )
                 </span>
               </div>
               <div className="text-lg font-bold text-primary font-mono">
@@ -296,11 +450,11 @@ export function PatientPaymentView({
 
               <Button
                 onClick={handlePayNow}
-                disabled={isProcessing}
+                disabled={isInitiating}
                 aria-label={`Pay now ${payment.totalAmount} Bangladeshi Taka via ${selectedMethod}`}
                 className="w-full sm:w-auto min-h-11 px-8 bg-primary hover:bg-primary-dark text-white font-semibold text-xs cursor-pointer shadow-xs"
               >
-                {isProcessing
+                {isInitiating
                   ? "Connecting to Gateway..."
                   : `Pay Now ${formatBDT(payment.totalAmount)}`}
               </Button>
@@ -319,7 +473,9 @@ export function PatientPaymentView({
               </span>
             </div>
             <span className="font-mono text-[11px] text-text-muted">
-              {formatDate(payment.paymentConfirmedAt, "hh:mm a")}
+              {payment.paymentConfirmedAt
+                ? formatDate(payment.paymentConfirmedAt, "hh:mm a")
+                : "Confirmed"}
             </span>
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  createHospital,
   createHospitalStaff,
   deleteHospitalStaff,
   getHospitalById,
@@ -13,6 +14,7 @@ import {
   updateHospitalStaff,
 } from "@/api";
 import type {
+  CreateHospitalPayload,
   CreateHospitalStaffPayload,
   GetHospitalStaffParams,
   GetHospitalsParams,
@@ -53,6 +55,17 @@ export function useGetMyHospitalStaffProfile(options?: {
     queryKey: ["hospitals", "staff", "me"],
     queryFn: () => getMyHospitalStaffProfile(),
     ...options,
+  });
+}
+
+export function useCreateHospital() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateHospitalPayload) => createHospital(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["hospitals"] });
+    },
   });
 }
 

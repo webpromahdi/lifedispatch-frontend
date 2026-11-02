@@ -15,4 +15,3 @@ export const createUISlice: StateCreator<BoundState, [], [], UISlice> = (
   toggleMobileDrawer: () =>
     set((state) => ({ isMobileDrawerOpen: !state.isMobileDrawerOpen })),
 });
-

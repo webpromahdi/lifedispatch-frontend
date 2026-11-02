@@ -38,12 +38,7 @@ import {
   useGetEmergencyById,
   useGetMe,
 } from "@/hooks";
-import { seedPayments } from "@/lib/dummy/payments";
-import {
-  EmergencyPriority,
-  EmergencyStatus,
-  PaymentStatus,
-} from "@/lib/types/enums";
+import { EmergencyPriority, EmergencyStatus } from "@/lib/types/enums";
 import { cn, formatDate } from "@/lib/utils";
 
 // ── Priority Badge Helper Matching Reference (■ P1, ■ P2, etc.) ──
@@ -203,11 +198,6 @@ export function PatientView() {
     return detailResponse?.data?.timeline ?? [];
   }, [detailResponse]);
 
-  // Pending payment for this patient
-  const pendingPayment = useMemo(() => {
-    return seedPayments.find((p) => p.status === PaymentStatus.PENDING) ?? null;
-  }, []);
-
   // Compute stat card metrics dynamically from real patient emergencies
   const totalRequestsCount = patientEmergencies.length;
 
@@ -292,20 +282,6 @@ export function PatientView() {
   // Handle Create Emergency Success
   const handleCreateSuccess = (_incidentNumber: string) => {
     setRequestModalOpen(false);
-  };
-
-  // Handle Pay Now redirect
-  const handlePayNow = () => {
-    if (pendingPayment?.gatewayUrl) {
-      toast.info("Connecting to Payment Gateway", {
-        description: `Redirecting to SSLCommerz sandbox for invoice ${pendingPayment.invoiceNumber}...`,
-      });
-      window.location.href = pendingPayment.gatewayUrl;
-    } else {
-      toast.info("Invoice Processed", {
-        description: "Payment gateway initialized.",
-      });
-    }
   };
 
   return (
@@ -690,57 +666,33 @@ export function PatientView() {
           On Mobile: uses contents so items reorder: Payment Due (order-2), Medical Info (order-3).
         */}
         <div className="contents lg:flex lg:flex-col lg:gap-6 lg:col-span-4 w-full">
-          {/* ── 2. PAYMENT DUE CARD (Rendered ONLY when pending payment exists) ── */}
-          {pendingPayment && (
-            <section
-              aria-label="Payment Due"
-              className="order-2 lg:order-2 w-full relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
-            >
-              <CornerNotch />
-              <LabelTab label="PAYMENT DUE" />
+          {/* ── 2. BILLING & INVOICES CARD ── */}
+          <section
+            aria-label="Billing and Invoices"
+            className="order-2 lg:order-2 w-full relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
+          >
+            <CornerNotch />
+            <LabelTab label="BILLING & INVOICES" />
 
-              <div className="mt-4 space-y-3">
-                <h3 className="text-base font-bold text-text-primary tracking-tight">
-                  Trip Invoice
-                </h3>
+            <div className="mt-4 space-y-3">
+              <h3 className="text-base font-bold text-text-primary tracking-tight">
+                Emergency Transport Billing
+              </h3>
 
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center text-text-secondary">
-                    <span>Base fare</span>
-                    <span className="font-semibold text-text-primary font-mono">
-                      {pendingPayment.baseFare} BDT
-                    </span>
-                  </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Review itemized mileage, medical equipment fees, and digital
+                payment receipts for your emergency dispatches.
+              </p>
 
-                  <div className="flex justify-between items-center text-text-secondary">
-                    <span>Distance (4 km × 35 BDT)</span>
-                    <span className="font-semibold text-text-primary font-mono">
-                      {pendingPayment.distanceCharge} BDT
-                    </span>
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-200 pt-2 flex justify-between items-baseline">
-                  <span className="text-sm font-bold text-text-primary">
-                    Total
-                  </span>
-                  <span className="text-xl sm:text-2xl font-black text-text-primary font-mono">
-                    {pendingPayment.totalAmount} BDT
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handlePayNow}
-                  aria-label="Pay trip invoice now"
-                  className="w-full h-10 mt-2 bg-primary hover:bg-primary-dark active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none cursor-pointer shadow-xs"
-                >
-                  <span>Pay Now</span>
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </button>
-              </div>
-            </section>
-          )}
+              <Link
+                href="/dashboard/patient/history"
+                className="w-full h-10 mt-2 bg-primary hover:bg-primary-dark active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none cursor-pointer shadow-xs"
+              >
+                <span>View Invoices & History</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
 
           {/* ── 3. MEDICAL INFO CARD ── */}
           <section

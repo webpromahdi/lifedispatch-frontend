@@ -1,7 +1,7 @@
 "use client";
 
-import { Search, UserCheck, UserX } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Search, UserCheck, UserX } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -24,41 +24,52 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedUsers } from "@/lib/dummy/users";
-import type { UserStatus } from "@/lib/types/enums";
+import { useGetAdminUsers, useUpdateUserStatus } from "@/hooks";
+import type { UserRole, UserStatus } from "@/lib/types/enums";
 import type { User } from "@/lib/types/user.types";
 import { formatDate } from "@/lib/utils";
 
 export function UserManagementView() {
-  // Local state initialized directly from static seed array
-  const [users, setUsers] = useState<User[]>(seedUsers);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
 
-  // Filter users locally
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+  const { data: usersResponse, isLoading } = useGetAdminUsers({
+    search: searchQuery || undefined,
+    role: roleFilter !== "ALL" ? (roleFilter as UserRole) : undefined,
+    limit: 100,
   });
 
-  // Action: "Change Status" toggle with local state and toast
-  const handleToggleStatus = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((user) => {
-        if (user.id !== userId) return user;
-        const nextStatus: UserStatus =
-          user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
-        toast.success("User Account Updated", {
-          description: `${user.name}'s status was changed to ${nextStatus}.`,
-        });
-        return {
-          ...user,
-          status: nextStatus,
-        };
-      }),
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
+
+  const users: User[] = useMemo(() => {
+    return usersResponse?.data ?? [];
+  }, [usersResponse]);
+
+  // Action: "Change Status" toggle with real API mutation
+  const handleToggleStatus = (user: User) => {
+    const nextStatus: UserStatus =
+      user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+
+    updateStatus(
+      {
+        id: user.id,
+        payload: { status: nextStatus },
+      },
+      {
+        onSuccess: () => {
+          toast.success("User Account Updated", {
+            description: `${user.name}'s status was changed to ${nextStatus}.`,
+          });
+        },
+        onError: (err) => {
+          toast.error("Failed to update user status", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "Unable to update account status.",
+          });
+        },
+      },
     );
   };
 
@@ -135,7 +146,7 @@ export function UserManagementView() {
         headerSlot={
           <div className="flex items-center justify-between w-full">
             <span className="font-semibold text-sm text-text-primary">
-              Registered Accounts ({filteredUsers.length})
+              Registered Accounts ({users.length})
             </span>
             <span className="text-xs text-text-muted">
               Click &quot;Change Status&quot; to toggle ACTIVE &harr; SUSPENDED
@@ -170,65 +181,86 @@ export function UserManagementView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow
-                key={user.id}
-                className="hover:bg-primary-light/20 transition-colors"
-              >
-                <TableCell className="py-3">
-                  <div className="font-semibold text-xs text-text-primary">
-                    {user.name}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    Loading user directory...
                   </div>
-                  <div className="text-[11px] text-text-muted font-mono">
-                    ID: {user.id}
-                  </div>
-                </TableCell>
-                <TableCell className="text-xs text-text-secondary">
-                  {user.email}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] font-semibold py-0.5 px-2 ${getRoleBadgeVariant(user.role)}`}
-                  >
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {/* Status badge: single green dot for ACTIVE, text-only for SUSPENDED */}
-                  <StatusBadge status={user.status} />
-                </TableCell>
-                <TableCell className="font-mono text-xs text-text-muted">
-                  {formatDate(user.createdAt, "dd MMM yyyy")}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleToggleStatus(user.id)}
-                    className="h-8 text-xs font-medium gap-1.5 hover:border-primary cursor-pointer"
-                  >
-                    {user.status === "ACTIVE" ? (
-                      <>
-                        <UserX
-                          className="h-3.5 w-3.5 text-destructive"
-                          aria-hidden="true"
-                        />
-                        Suspend
-                      </>
-                    ) : (
-                      <>
-                        <UserCheck
-                          className="h-3.5 w-3.5 text-status"
-                          aria-hidden="true"
-                        />
-                        Activate
-                      </>
-                    )}
-                  </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-xs text-text-muted"
+                >
+                  No users found matching your criteria.
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
+                <TableRow
+                  key={user.id}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="py-3">
+                    <div className="font-semibold text-xs text-text-primary">
+                      {user.name}
+                    </div>
+                    <div className="text-[11px] text-text-muted font-mono">
+                      ID: {user.id}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-secondary">
+                    {user.email}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] font-semibold py-0.5 px-2 ${getRoleBadgeVariant(user.role)}`}
+                    >
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {/* Status badge: single green dot for ACTIVE, text-only for SUSPENDED */}
+                    <StatusBadge status={user.status} />
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-text-muted">
+                    {formatDate(user.createdAt, "dd MMM yyyy")}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isUpdating}
+                      onClick={() => handleToggleStatus(user)}
+                      className="h-8 text-xs font-medium gap-1.5 hover:border-primary cursor-pointer"
+                    >
+                      {user.status === "ACTIVE" ? (
+                        <>
+                          <UserX
+                            className="h-3.5 w-3.5 text-destructive"
+                            aria-hidden="true"
+                          />
+                          Suspend
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck
+                            className="h-3.5 w-3.5 text-status"
+                            aria-hidden="true"
+                          />
+                          Activate
+                        </>
+                      )}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DataTable>

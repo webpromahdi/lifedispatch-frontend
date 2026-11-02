@@ -8,4 +8,3 @@ import type { UISlice } from "./slices/createUISlice";
 export type BoundState = UISlice;
 
 export type SliceCreator<T> = StateCreator<BoundState, [], [], T>;
-

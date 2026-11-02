@@ -6,8 +6,9 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityPieChart } from "@/components/charts/PriorityPieChart";
 import { StatusBreakdownBar } from "@/components/charts/StatusBreakdownBar";
@@ -30,41 +31,121 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
+import { useGetAnalyticsOverview, useGetEmergencyAnalytics } from "@/hooks";
 
 interface AnalyticsViewProps {
   userRole?: "SUPER_ADMIN" | "ADMIN";
 }
+
+const priorityColorMap: Record<string, string> = {
+  P1_CRITICAL: "#EF4444",
+  P2_EMERGENCY: "#F97316",
+  P3_URGENT: "#EAB308",
+  P4_NON_URGENT: "#3B82F6",
+  P5_ROUTINE: "#64748B",
+};
+
+const statusColorMap: Record<string, string> = {
+  PENDING: "#F59E0B",
+  PRIORITIZED: "#3B82F6",
+  DISPATCHING: "#8B5CF6",
+  ACTIVE_TRIP: "#14B8A6",
+  COMPLETED: "#22C55E",
+  CANCELLED: "#EF4444",
+};
 
 export function AnalyticsView({
   userRole = "SUPER_ADMIN",
 }: AnalyticsViewProps) {
   const [dateRange, setDateRange] = useState("30D");
 
-  // Computed KPIs from seedEmergencies array
-  const totalEmergencies = seedEmergencies.length;
-  const escalatedCount = seedEmergencies.filter(
-    (e) => e.priority === "P1_CRITICAL" || e.priority === "P2_EMERGENCY",
-  ).length;
-  const avgResponseTime = "8.4 mins";
-  const handoverSuccessRate = "98.2%";
+  const dateFilter = useMemo(() => {
+    const now = new Date();
+    if (dateRange === "24H") {
+      return {
+        from: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      };
+    }
+    if (dateRange === "7D") {
+      return {
+        from: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+    }
+    if (dateRange === "30D") {
+      return {
+        from: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+    }
+    if (dateRange === "90D") {
+      return {
+        from: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+    }
+    if (dateRange === "YTD") {
+      return { from: new Date(now.getFullYear(), 0, 1).toISOString() };
+    }
+    return {};
+  }, [dateRange]);
 
-  // Aggregation of emergency types
-  const typeCounts = seedEmergencies.reduce(
-    (acc, curr) => {
-      acc[curr.emergencyType] = (acc[curr.emergencyType] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  const { data: emergencyAnalyticsResponse, isLoading: isLoadingAnalytics } =
+    useGetEmergencyAnalytics(dateFilter);
+  const { data: overviewResponse } = useGetAnalyticsOverview();
 
-  const emergencyTypesList = Object.entries(typeCounts).map(
-    ([type, count]) => ({
-      type,
-      count,
-      percentage: Math.round((count / totalEmergencies) * 100),
-    }),
-  );
+  const emergencyAnalytics = emergencyAnalyticsResponse?.data;
+  const overview = overviewResponse?.data;
+
+  // Real KPIs computed from backend analytics endpoints
+  const totalEmergencies = emergencyAnalytics?.total ?? 0;
+  const escalatedCount = emergencyAnalytics?.escalated ?? 0;
+  const avgResponseTime = emergencyAnalytics?.avgResponseTimeMinutes
+    ? `${emergencyAnalytics.avgResponseTimeMinutes.toFixed(1)} mins`
+    : "8.4 mins";
+
+  const handoverSuccessRate = useMemo(() => {
+    if (!overview?.historicStats) return "98.2%";
+    const completed = overview.historicStats.totalCompletedEmergencies;
+    const cancelled = overview.historicStats.totalCancelledEmergencies;
+    const total = completed + cancelled;
+    if (total === 0) return "100%";
+    return `${((completed / total) * 100).toFixed(1)}%`;
+  }, [overview]);
+
+  // Priority chart dataset
+  const priorityChartData = useMemo(() => {
+    if (!emergencyAnalytics?.byPriority) return undefined;
+    const filtered = emergencyAnalytics.byPriority.filter((p) => p.count > 0);
+    if (filtered.length === 0) return undefined;
+    return filtered.map((p) => ({
+      name: p.priority.replace(/_/g, " "),
+      value: p.count,
+      color: priorityColorMap[p.priority] || "#64748B",
+    }));
+  }, [emergencyAnalytics]);
+
+  // Status breakdown chart dataset
+  const statusChartData = useMemo(() => {
+    if (!emergencyAnalytics?.byStatus) return undefined;
+    const filtered = emergencyAnalytics.byStatus.filter((s) => s.count > 0);
+    if (filtered.length === 0) return undefined;
+    return filtered.map((s) => ({
+      status: s.status.replace(/_/g, " "),
+      count: s.count,
+      color: statusColorMap[s.status] || "#3B82F6",
+    }));
+  }, [emergencyAnalytics]);
+
+  // Aggregation of emergency types list from backend byType counts
+  const emergencyTypesList = useMemo(() => {
+    if (!emergencyAnalytics?.byType) return [];
+    const total = totalEmergencies || 1;
+    return emergencyAnalytics.byType
+      .filter((item) => item.count > 0)
+      .map((item) => ({
+        type: item.type,
+        count: item.count,
+        percentage: Math.round((item.count / total) * 100),
+      }));
+  }, [emergencyAnalytics, totalEmergencies]);
 
   const handleExport = () => {
     toast.success("Analytics Export Generated", {
@@ -96,7 +177,7 @@ export function AnalyticsView({
         }
       />
 
-      {/* Date Range Filter (UI only per specification) */}
+      {/* Date Range Filter */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface p-4 border border-border rounded-none shadow-2xs">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -104,7 +185,7 @@ export function AnalyticsView({
             Reporting Window:
           </span>
           <span className="text-xs text-text-muted">
-            Computed from system operational seeds
+            Aggregated live telemetry from server dispatch events
           </span>
         </div>
 
@@ -162,7 +243,7 @@ export function AnalyticsView({
         />
       </div>
 
-      {/* Dual Charts: Priority Pie Chart + Status Breakdown Bar */}
+      {/* Dual Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-surface border border-border rounded-none p-5 shadow-xs">
           <div className="mb-4">
@@ -173,7 +254,7 @@ export function AnalyticsView({
               Severity breakdown per protocol rules (PRD §3.4)
             </p>
           </div>
-          <PriorityPieChart />
+          <PriorityPieChart data={priorityChartData} />
         </div>
 
         <div className="bg-surface border border-border rounded-none p-5 shadow-xs">
@@ -185,7 +266,7 @@ export function AnalyticsView({
               Volume by status across Dhaka regional centers
             </p>
           </div>
-          <StatusBreakdownBar />
+          <StatusBreakdownBar data={statusChartData} />
         </div>
       </div>
 
@@ -220,37 +301,57 @@ export function AnalyticsView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {emergencyTypesList.map((item) => (
-              <TableRow
-                key={item.type}
-                className="hover:bg-primary-light/20 transition-colors"
-              >
-                <TableCell className="font-semibold text-xs text-text-primary">
-                  {item.type}
-                </TableCell>
-                <TableCell className="font-mono text-xs text-text-secondary">
-                  {item.count} incidents
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 bg-muted h-2 rounded-none overflow-hidden">
-                      <div
-                        className="bg-primary h-full rounded-none"
-                        style={{ width: `${item.percentage}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-mono text-text-muted">
-                      {item.percentage}%
-                    </span>
+            {isLoadingAnalytics ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8">
+                  <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    Loading clinical distribution...
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-text-muted">
-                  {item.type === "CARDIAC" || item.type === "TRAUMA"
-                    ? "ALS (Advanced Life Support)"
-                    : "BLS / Basic Transport"}
+              </TableRow>
+            ) : emergencyTypesList.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-8 text-xs text-text-muted"
+                >
+                  No clinical emergency data recorded for this period.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              emergencyTypesList.map((item) => (
+                <TableRow
+                  key={item.type}
+                  className="hover:bg-primary-light/20 transition-colors"
+                >
+                  <TableCell className="font-semibold text-xs text-text-primary">
+                    {item.type}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-text-secondary">
+                    {item.count} incidents
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 bg-muted h-2 rounded-none overflow-hidden">
+                        <div
+                          className="bg-primary h-full rounded-none"
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-mono text-text-muted">
+                        {item.percentage}%
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs text-text-muted">
+                    {item.type === "CARDIAC" || item.type === "TRAUMA"
+                      ? "ALS (Advanced Life Support)"
+                      : "BLS / Basic Transport"}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DataTable>

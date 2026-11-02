@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AlertCircle,
-  Ambulance,
-  Loader2,
-  RefreshCw,
-  Search,
-} from "lucide-react";
+import { AlertCircle, Ambulance, RefreshCw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";

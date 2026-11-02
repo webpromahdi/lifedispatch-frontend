@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
+  FileText,
   Headphones,
   Receipt,
   RotateCcw,
@@ -13,19 +14,45 @@ import {
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useGetPaymentById } from "@/hooks";
 import { formatBDT } from "@/lib/utils";
 
 export function PaymentResultView() {
   const searchParams = useSearchParams();
-  const statusParam = searchParams.get("status")?.toLowerCase() || "success";
+  const statusParam = searchParams.get("status")?.toLowerCase() || "paid";
+  const paymentId = searchParams.get("paymentId") || "";
 
-  const isSuccess = statusParam === "success" || statusParam === "paid";
-  const isFailed = statusParam === "failed" || statusParam === "fail";
-  const isCancelled = statusParam === "cancelled" || statusParam === "cancel";
+  const { data: paymentResponse } = useGetPaymentById(paymentId, {
+    enabled: Boolean(paymentId),
+  });
 
-  const invoiceNumber = searchParams.get("invoice") || "INV-2026-000101";
-  const amount = searchParams.get("amount") || "941";
-  const transactionId = searchParams.get("txn") || "SSL_TXN_992817412";
+  const livePayment = paymentResponse?.data;
+
+  const isSuccess =
+    statusParam === "success" ||
+    statusParam === "paid" ||
+    livePayment?.paymentStatus === "PAID";
+  const isFailed =
+    statusParam === "failed" ||
+    statusParam === "fail" ||
+    statusParam === "error" ||
+    livePayment?.paymentStatus === "FAILED";
+  const isCancelled =
+    statusParam === "cancelled" ||
+    statusParam === "cancel" ||
+    livePayment?.paymentStatus === "CANCELLED";
+
+  const invoiceNumber =
+    livePayment?.invoiceNumber ||
+    searchParams.get("invoice") ||
+    (paymentId ? `INV-${paymentId.slice(0, 8).toUpperCase()}` : "INVOICE");
+  const amount = livePayment?.totalAmount ?? searchParams.get("amount") ?? "0";
+  const transactionId =
+    livePayment?.transactionId ||
+    searchParams.get("txn") ||
+    "Pending Gateway Record";
+  const paymentMethod =
+    livePayment?.paymentMethod || "Online / SSLCommerz Gateway";
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between p-4 sm:p-8">
@@ -84,7 +111,7 @@ export function PaymentResultView() {
 
                 <div className="flex justify-between py-1">
                   <span className="text-text-secondary">Amount Settled:</span>
-                  <span className="font-bold text-sm text-text-primary">
+                  <span className="font-bold text-sm text-text-primary font-mono">
                     {formatBDT(amount)}
                   </span>
                 </div>
@@ -99,12 +126,24 @@ export function PaymentResultView() {
                 <div className="flex justify-between py-1">
                   <span className="text-text-secondary">Payment Method:</span>
                   <span className="text-text-primary font-medium">
-                    bKash Online / MFS
+                    {paymentMethod}
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 space-y-2.5">
+                {paymentId && (
+                  <Link href={`/dashboard/patient/payment/${paymentId}`}>
+                    <Button
+                      variant="outline"
+                      className="w-full min-h-11 h-11 border-border font-semibold rounded-none cursor-pointer mb-2"
+                    >
+                      <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <span>View Full Itemized Invoice</span>
+                    </Button>
+                  </Link>
+                )}
+
                 <Link href="/dashboard/patient">
                   <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
                     <span>Return to Dashboard</span>
@@ -116,7 +155,7 @@ export function PaymentResultView() {
           )}
 
           {/* FAILED STATE */}
-          {isFailed && (
+          {isFailed && !isSuccess && (
             <div className="space-y-5">
               <div className="h-16 w-16 rounded-none bg-destructive-bg text-destructive flex items-center justify-center mx-auto shadow-xs">
                 <XCircle
@@ -133,37 +172,43 @@ export function PaymentResultView() {
                   Payment Unsuccessful
                 </h1>
                 <p className="text-sm text-text-secondary mt-1">
-                  The banking provider declined the transaction or network
+                  The banking provider declined the transaction or a network
                   timeout occurred. Your account has not been debited.
                 </p>
               </div>
 
               <div className="pt-2 space-y-2.5">
-                <Link href="/payment/result?status=success">
-                  <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
-                    <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
-                    <span>Try Again (Simulate Success)</span>
+                {paymentId ? (
+                  <Link href={`/dashboard/patient/payment/${paymentId}`}>
+                    <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
+                      <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <span>Try Payment Again</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/patient">
+                    <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
+                      <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <span>Return to Dashboard</span>
+                    </Button>
+                  </Link>
+                )}
+
+                <Link href="/dashboard/patient/history">
+                  <Button
+                    variant="outline"
+                    className="w-full min-h-11 h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
+                  >
+                    <Headphones className="h-4 w-4 mr-2" aria-hidden="true" />
+                    <span>View Emergency History</span>
                   </Button>
                 </Link>
-
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    alert(
-                      "LifeDispatch Emergency Billing Hotline: +880 2 999 111",
-                    )
-                  }
-                  className="w-full min-h-11 h-11 border-border text-text-secondary hover:text-text-primary cursor-pointer"
-                >
-                  <Headphones className="h-4 w-4 mr-2" aria-hidden="true" />
-                  <span>Contact Billing Support</span>
-                </Button>
               </div>
             </div>
           )}
 
           {/* CANCELLED STATE */}
-          {isCancelled && (
+          {isCancelled && !isSuccess && !isFailed && (
             <div className="space-y-5">
               <div className="h-16 w-16 rounded-none bg-warning-bg text-warning-foreground flex items-center justify-center mx-auto shadow-xs">
                 <AlertTriangle
@@ -186,12 +231,21 @@ export function PaymentResultView() {
               </div>
 
               <div className="pt-2 space-y-2.5">
-                <Link href="/payment/result?status=success">
-                  <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
-                    <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
-                    <span>Resume Payment</span>
-                  </Button>
-                </Link>
+                {paymentId ? (
+                  <Link href={`/dashboard/patient/payment/${paymentId}`}>
+                    <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
+                      <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <span>Resume Payment</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/patient">
+                    <Button className="w-full min-h-11 h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-none shadow-xs cursor-pointer">
+                      <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <span>Resume Payment</span>
+                    </Button>
+                  </Link>
+                )}
 
                 <Link href="/dashboard/patient">
                   <Button

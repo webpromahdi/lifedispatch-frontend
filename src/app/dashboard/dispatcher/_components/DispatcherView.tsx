@@ -32,10 +32,10 @@ import {
   useCreateDispatch,
   useGetAmbulances,
   useGetEmergencies,
+  useGetHospitals,
   useRecommendAmbulances,
   useUpdateEmergencyPriority,
 } from "@/hooks";
-import { seedHospitals } from "@/lib/dummy/hospitals";
 import type { ScoredAmbulanceCandidate } from "@/lib/types/dispatch.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
@@ -43,7 +43,6 @@ import {
   EmergencyPriority,
   EmergencyStatus,
 } from "@/lib/types/enums";
-import type { Hospital } from "@/lib/types/hospital.types";
 
 export function DispatcherView() {
   // Live polling for emergency queue every 10 seconds
@@ -64,7 +63,14 @@ export function DispatcherView() {
   const ambulances = useMemo(() => {
     return ambulancesResponse?.data ?? [];
   }, [ambulancesResponse]);
-  const [hospitals] = useState<Hospital[]>(seedHospitals);
+
+  const { data: hospitalsResponse } = useGetHospitals(
+    { limit: 50 },
+    { refetchInterval: 30_000 },
+  );
+  const hospitals = useMemo(() => {
+    return hospitalsResponse?.data ?? [];
+  }, [hospitalsResponse]);
 
   // Set Priority Dialog State
   const [priorityDialogOpen, setPriorityDialogOpen] = useState(false);

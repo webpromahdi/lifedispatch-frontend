@@ -36,7 +36,9 @@ import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedDispatches } from "@/lib/dummy/dispatches";
 import { seedDrivers } from "@/lib/dummy/drivers";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
+import type { Ambulance } from "@/lib/types/ambulance.types";
 import type { Dispatch } from "@/lib/types/dispatch.types";
+import type { Driver } from "@/lib/types/driver.types";
 import { DispatchStatus } from "@/lib/types/enums";
 import { formatDate } from "@/lib/utils";
 
@@ -117,17 +119,21 @@ export function DispatcherDispatchView() {
   }, []);
 
   const ambulanceMap = useMemo(() => {
-    const map = new Map<string, any>(seedAmbulances.map((a) => [a.id, a]));
+    const map = new Map<string, Ambulance>(
+      seedAmbulances.map((a) => [a.id, a as unknown as Ambulance]),
+    );
     for (const a of ambulancesResponse?.data || []) {
-      map.set(a.id, a);
+      map.set(a.id, a as unknown as Ambulance);
     }
     return map;
   }, [ambulancesResponse]);
 
   const driverMap = useMemo(() => {
-    const map = new Map<string, any>(seedDrivers.map((d) => [d.id, d]));
+    const map = new Map<string, Driver>(
+      seedDrivers.map((d) => [d.id, d as unknown as Driver]),
+    );
     for (const d of driversResponse?.data || []) {
-      map.set(d.id, d);
+      map.set(d.id, d as unknown as Driver);
     }
     return map;
   }, [driversResponse]);

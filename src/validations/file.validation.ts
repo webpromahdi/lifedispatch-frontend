@@ -70,4 +70,3 @@ export const createFileSchema = (options: FileSchemaOptions = {}) => {
 
 export const singleDocumentSchema = createFileSchema({ required: true });
 export const optionalDocumentSchema = createFileSchema({ required: false });
-

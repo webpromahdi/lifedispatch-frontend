@@ -120,6 +120,23 @@ export interface InboundTrip {
   };
 }
 
+export interface CreateHospitalPayload {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  phone: string;
+  emergencyContact: string;
+  capabilities: string[];
+  totalErBeds: number;
+  availableErBeds: number;
+  staffName: string;
+  staffEmail: string;
+  staffPhone?: string;
+  staffDesignation?: string;
+  staffEmployeeId?: string;
+}
+
 export interface UpdateHospitalPayload {
   name?: string;
   address?: string;

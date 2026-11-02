@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   ActiveEmergenciesCard,
   AuditLogCard,
@@ -11,30 +11,65 @@ import {
 } from "@/components/shared/AdminDashboardSections";
 import { CornerNotch } from "@/components/shared/DashboardUIPrimitives";
 import {
-  type AnalyticsOverviewData,
-  getAnalyticsOverview,
-} from "@/lib/dummy/analytics";
-import { seedAuditLogs } from "@/lib/dummy/audit-logs";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
-import { seedUsers } from "@/lib/dummy/users";
+  useGetAdminUsers,
+  useGetAnalyticsOverview,
+  useGetAuditLogs,
+  useGetEmergencies,
+} from "@/hooks";
+import type { AnalyticsOverviewData } from "@/lib/dummy/analytics";
+import type { AdminAnalyticsOverview } from "@/lib/types/admin.types";
 import { EmergencyStatus, UserRole, UserStatus } from "@/lib/types/enums";
 
+function mapToAnalyticsOverviewData(
+  data?: AdminAnalyticsOverview,
+): AnalyticsOverviewData {
+  return {
+    liveOperations: {
+      activeEmergencies: data?.liveOperations?.activeEmergencies ?? 0,
+      availableAmbulances: data?.liveOperations?.availableAmbulances ?? 0,
+      busyAmbulances: data?.liveOperations?.busyAmbulances ?? 0,
+      outOfService: data?.liveOperations?.outOfServiceAmbulances ?? 0,
+      driversOnShift: data?.liveOperations?.driversOnShift ?? 0,
+    },
+    revenue: {
+      totalCollected: data?.revenue?.totalCollected ?? 0,
+      totalPending: data?.revenue?.totalPending ?? 0,
+      currency: "BDT",
+    },
+    historicStats: {
+      completed: data?.historicStats?.totalCompletedEmergencies ?? 0,
+      cancelled: data?.historicStats?.totalCancelledEmergencies ?? 0,
+      totalTrips: data?.historicStats?.totalTrips ?? 0,
+    },
+    emergencyAnalytics: {
+      avgResponseTimeMinutes: 8.4,
+    },
+    usersAndResources: {
+      totalPatients: data?.usersAndResources?.totalPatients ?? 0,
+      totalDrivers: data?.usersAndResources?.totalDrivers ?? 0,
+      totalHospitals: data?.usersAndResources?.totalHospitals ?? 0,
+    },
+  };
+}
+
 export function SuperAdminOverviewView() {
-  const [analytics, setAnalytics] = useState<AnalyticsOverviewData>(
-    getAnalyticsOverview(),
+  // Live Operations from backend API refreshed every 15s
+  const { data: analyticsResponse } = useGetAnalyticsOverview({
+    refetchInterval: 15_000,
+  });
+
+  const analytics = useMemo(() => {
+    return mapToAnalyticsOverviewData(analyticsResponse?.data);
+  }, [analyticsResponse]);
+
+  // Live active emergencies
+  const { data: emergenciesResponse } = useGetEmergencies(
+    { limit: 20 },
+    { refetchInterval: 15_000 },
   );
 
-  // Live Operations refresh ~15 seconds with existing fetching approach
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnalytics(getAnalyticsOverview());
-    }, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Latest 5 emergencies in PENDING, PRIORITIZED, DISPATCHING or ACTIVE_TRIP
   const activeEmergenciesList = useMemo(() => {
-    return seedEmergencies
+    return (emergenciesResponse?.data ?? [])
       .filter(
         (e) =>
           e.status === EmergencyStatus.PENDING ||
@@ -42,37 +77,42 @@ export function SuperAdminOverviewView() {
           e.status === EmergencyStatus.DISPATCHING ||
           e.status === EmergencyStatus.ACTIVE_TRIP,
       )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
       .slice(0, 5);
-  }, []);
+  }, [emergenciesResponse]);
 
-  // Account governance metrics: Admin Accounts, Suspended Accounts, Deleted Accounts
+  // Live user directory for account governance counts
+  const { data: usersResponse } = useGetAdminUsers(
+    { limit: 100 },
+    { refetchInterval: 30_000 },
+  );
+
+  const usersList = useMemo(() => {
+    return usersResponse?.data ?? [];
+  }, [usersResponse]);
+
   const adminAccountsCount = useMemo(() => {
-    return seedUsers.filter((u) => u.role === UserRole.ADMIN).length;
-  }, []);
+    return usersList.filter((u) => u.role === UserRole.ADMIN).length;
+  }, [usersList]);
 
   const suspendedAccountsCount = useMemo(() => {
-    return seedUsers.filter((u) => u.status === UserStatus.SUSPENDED).length;
-  }, []);
+    return usersList.filter((u) => u.status === UserStatus.SUSPENDED).length;
+  }, [usersList]);
 
   const deletedAccountsCount = useMemo(() => {
-    return seedUsers.filter(
+    return usersList.filter(
       (u) => u.status === UserStatus.DELETED || u.isDeleted,
     ).length;
-  }, []);
+  }, [usersList]);
 
   // Security audit trail: Up to 8 rows, security-oriented view with IP address
+  const { data: auditResponse } = useGetAuditLogs(
+    { limit: 8 },
+    { refetchInterval: 15_000 },
+  );
+
   const securityLogs = useMemo(() => {
-    return [...seedAuditLogs]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 8);
-  }, []);
+    return auditResponse?.data ?? [];
+  }, [auditResponse]);
 
   return (
     <div className="space-y-6 flex flex-col">

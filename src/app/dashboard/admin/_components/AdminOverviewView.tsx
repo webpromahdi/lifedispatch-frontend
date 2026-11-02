@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   ActiveEmergenciesCard,
   AuditLogCard,
@@ -10,29 +10,64 @@ import {
   SystemScaleCards,
 } from "@/components/shared/AdminDashboardSections";
 import {
-  type AnalyticsOverviewData,
-  getAnalyticsOverview,
-} from "@/lib/dummy/analytics";
-import { seedAuditLogs } from "@/lib/dummy/audit-logs";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
+  useGetAnalyticsOverview,
+  useGetAuditLogs,
+  useGetEmergencies,
+} from "@/hooks";
+import type { AnalyticsOverviewData } from "@/lib/dummy/analytics";
+import type { AdminAnalyticsOverview } from "@/lib/types/admin.types";
 import { EmergencyStatus } from "@/lib/types/enums";
 
+function mapToAnalyticsOverviewData(
+  data?: AdminAnalyticsOverview,
+): AnalyticsOverviewData {
+  return {
+    liveOperations: {
+      activeEmergencies: data?.liveOperations?.activeEmergencies ?? 0,
+      availableAmbulances: data?.liveOperations?.availableAmbulances ?? 0,
+      busyAmbulances: data?.liveOperations?.busyAmbulances ?? 0,
+      outOfService: data?.liveOperations?.outOfServiceAmbulances ?? 0,
+      driversOnShift: data?.liveOperations?.driversOnShift ?? 0,
+    },
+    revenue: {
+      totalCollected: data?.revenue?.totalCollected ?? 0,
+      totalPending: data?.revenue?.totalPending ?? 0,
+      currency: "BDT",
+    },
+    historicStats: {
+      completed: data?.historicStats?.totalCompletedEmergencies ?? 0,
+      cancelled: data?.historicStats?.totalCancelledEmergencies ?? 0,
+      totalTrips: data?.historicStats?.totalTrips ?? 0,
+    },
+    emergencyAnalytics: {
+      avgResponseTimeMinutes: 8.4,
+    },
+    usersAndResources: {
+      totalPatients: data?.usersAndResources?.totalPatients ?? 0,
+      totalDrivers: data?.usersAndResources?.totalDrivers ?? 0,
+      totalHospitals: data?.usersAndResources?.totalHospitals ?? 0,
+    },
+  };
+}
+
 export function AdminOverviewView() {
-  const [analytics, setAnalytics] = useState<AnalyticsOverviewData>(
-    getAnalyticsOverview(),
+  // Live Operations from backend API refreshed every 15s
+  const { data: analyticsResponse } = useGetAnalyticsOverview({
+    refetchInterval: 15_000,
+  });
+
+  const analytics = useMemo(() => {
+    return mapToAnalyticsOverviewData(analyticsResponse?.data);
+  }, [analyticsResponse]);
+
+  // Live active emergencies
+  const { data: emergenciesResponse } = useGetEmergencies(
+    { limit: 20 },
+    { refetchInterval: 15_000 },
   );
 
-  // Live Operations refresh ~15 seconds with existing fetching approach
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnalytics(getAnalyticsOverview());
-    }, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Latest 5 emergencies in PENDING, PRIORITIZED, DISPATCHING or ACTIVE_TRIP
   const activeEmergenciesList = useMemo(() => {
-    return seedEmergencies
+    return (emergenciesResponse?.data ?? [])
       .filter(
         (e) =>
           e.status === EmergencyStatus.PENDING ||
@@ -40,22 +75,18 @@ export function AdminOverviewView() {
           e.status === EmergencyStatus.DISPATCHING ||
           e.status === EmergencyStatus.ACTIVE_TRIP,
       )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
       .slice(0, 5);
-  }, []);
+  }, [emergenciesResponse]);
 
-  // Latest 4 to 5 audit logs
+  // Live audit logs
+  const { data: auditResponse } = useGetAuditLogs(
+    { limit: 4 },
+    { refetchInterval: 15_000 },
+  );
+
   const recentLogs = useMemo(() => {
-    return [...seedAuditLogs]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 4);
-  }, []);
+    return auditResponse?.data ?? [];
+  }, [auditResponse]);
 
   return (
     <div className="space-y-6 flex flex-col">

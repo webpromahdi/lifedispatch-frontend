@@ -24,4 +24,3 @@ export const useSetMobileDrawerOpen = () =>
 
 export const useToggleMobileDrawer = () =>
   useAppStore((state) => state.toggleMobileDrawer);
-
