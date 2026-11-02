@@ -1,11 +1,21 @@
 "use client";
 
-import { AlertTriangle, Ban, Filter, Search, Truck, User } from "lucide-react";
+import {
+  AlertTriangle,
+  Ban,
+  Eye,
+  Filter,
+  Hospital as HospitalIcon,
+  Search,
+  Truck,
+  User,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { RerouteHospitalDialog, TripDetailDialog } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,6 +46,7 @@ import { seedAmbulances } from "@/lib/dummy/ambulances";
 import { seedDispatches } from "@/lib/dummy/dispatches";
 import { seedDrivers } from "@/lib/dummy/drivers";
 import { seedEmergencies } from "@/lib/dummy/emergencies";
+import { seedTrips } from "@/lib/dummy/trips";
 import type { Ambulance } from "@/lib/types/ambulance.types";
 import type { Dispatch } from "@/lib/types/dispatch.types";
 import type { Driver } from "@/lib/types/driver.types";
@@ -52,6 +63,20 @@ export function DispatcherDispatchView() {
   const [selectedDispatch, setSelectedDispatch] = useState<Dispatch | null>(
     null,
   );
+
+  // Live Trip & Reroute State
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [tripDetailOpen, setTripDetailOpen] = useState(false);
+  const [rerouteTripId, setRerouteTripId] = useState<string | null>(null);
+  const [rerouteHospitalOpen, setRerouteHospitalOpen] = useState(false);
+
+  const getTripIdForDispatch = (disp: Dispatch) => {
+    return (
+      seedTrips.find((t) => t.dispatchId === disp.id)?.id ||
+      disp.tripId ||
+      `trip_${disp.id}`
+    );
+  };
 
   const { mutate: cancelDispatchMutation, isPending: isCancelling } =
     useCancelDispatch();
@@ -333,21 +358,59 @@ export function DispatcherDispatchView() {
                       {formatDate(disp.createdAt, "MMM dd, hh:mm a")}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={isTerminal || isCancelling}
-                        onClick={() => handleOpenCancelDialog(disp)}
-                        aria-label={`Cancel dispatch assignment ${disp.id}`}
-                        className={`h-7 px-2.5 text-xs font-medium cursor-pointer ${
-                          isTerminal
-                            ? "text-text-muted opacity-40 border-border cursor-not-allowed"
-                            : "text-destructive border-destructive/30 hover:bg-destructive-bg"
-                        }`}
-                      >
-                        <Ban className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                        Cancel
-                      </Button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        {disp.status === "ACCEPTED" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const tId = getTripIdForDispatch(disp);
+                              setRerouteTripId(tId);
+                              setRerouteHospitalOpen(true);
+                            }}
+                            className="h-7 px-2 text-xs font-semibold bg-white border-primary/40 text-primary hover:bg-primary-light/20 cursor-pointer"
+                          >
+                            <HospitalIcon className="h-3.5 w-3.5 mr-1" />
+                            Reroute
+                          </Button>
+                        )}
+
+                        {(disp.status === "ACCEPTED" ||
+                          disp.status === "COMPLETED") && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const tId = getTripIdForDispatch(disp);
+                              setSelectedTripId(tId);
+                              setTripDetailOpen(true);
+                            }}
+                            className="h-7 px-2 text-xs font-medium border-border hover:bg-slate-50 cursor-pointer"
+                          >
+                            <Eye className="h-3.5 w-3.5 mr-1 text-primary" />
+                            Telemetry
+                          </Button>
+                        )}
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isTerminal || isCancelling}
+                          onClick={() => handleOpenCancelDialog(disp)}
+                          aria-label={`Cancel dispatch assignment ${disp.id}`}
+                          className={`h-7 px-2.5 text-xs font-medium cursor-pointer ${
+                            isTerminal
+                              ? "text-text-muted opacity-40 border-border cursor-not-allowed"
+                              : "text-destructive border-destructive/30 hover:bg-destructive-bg"
+                          }`}
+                        >
+                          <Ban
+                            className="h-3.5 w-3.5 mr-1"
+                            aria-hidden="true"
+                          />
+                          Cancel
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -405,6 +468,20 @@ export function DispatcherDispatchView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Re-Route Destination Hospital Dialog */}
+      <RerouteHospitalDialog
+        tripId={rerouteTripId}
+        open={rerouteHospitalOpen}
+        onOpenChange={setRerouteHospitalOpen}
+      />
+
+      {/* Live Trip Telemetry Inspector Dialog */}
+      <TripDetailDialog
+        tripId={selectedTripId}
+        open={tripDetailOpen}
+        onOpenChange={setTripDetailOpen}
+      />
     </div>
   );
 }

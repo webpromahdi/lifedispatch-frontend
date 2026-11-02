@@ -16,6 +16,8 @@ export interface Dispatch {
   cancellationReason: string | null;
   createdAt: string;
   updatedAt: string;
+  tripId?: string;
+  trip?: { id: string; status: string };
 }
 
 export interface AcceptDispatchResult {

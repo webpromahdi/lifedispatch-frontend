@@ -1,9 +1,11 @@
 "use client";
 
+import { FileText } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { TripDetailDialog } from "@/components/shared";
 import { formatEnumTitle } from "@/components/shared/AdminDashboardSections";
 import {
   CornerNotch,
@@ -122,6 +124,7 @@ export function DriverView() {
   // Complete Trip Dialog State
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [tripDistanceKm, setTripDistanceKm] = useState<string>("8.5");
+  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   // Timer: 1-second interval for countdown clock
   useEffect(() => {
@@ -557,16 +560,26 @@ export function DriverView() {
                     </div>
                   </div>
 
-                  {activeTrip.destinationHospital && (
-                    <div className="text-right">
-                      <span className="text-[11px] text-text-secondary block">
-                        Destination Hospital:
-                      </span>
-                      <span className="text-xs font-bold text-text-primary">
-                        {activeTrip.destinationHospital.name}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {activeTrip.destinationHospital && (
+                      <div className="text-right">
+                        <span className="text-[11px] text-text-secondary block">
+                          Destination Hospital:
+                        </span>
+                        <span className="text-xs font-bold text-text-primary">
+                          {activeTrip.destinationHospital.name}
+                        </span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setInspectorOpen(true)}
+                      className="px-2.5 py-1.5 text-xs font-bold border border-border hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer rounded-none bg-white text-text-primary"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-primary" />
+                      Telemetry Inspector
+                    </button>
+                  </div>
                 </div>
 
                 {/* ── Shared Notched Stepper (4 steps) ── */}
@@ -993,6 +1006,13 @@ export function DriverView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Live Trip Telemetry Inspector Dialog */}
+      <TripDetailDialog
+        tripId={activeTrip?.tripId ?? null}
+        open={inspectorOpen}
+        onOpenChange={setInspectorOpen}
+      />
     </div>
   );
 }

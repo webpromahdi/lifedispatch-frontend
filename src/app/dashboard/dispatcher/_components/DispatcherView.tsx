@@ -1,9 +1,11 @@
 "use client";
 
+import { Building2, Eye, Hospital as HospitalIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { RerouteHospitalDialog, TripDetailDialog } from "@/components/shared";
 import {
   formatEnumTitle,
   formatTime,
@@ -36,6 +38,8 @@ import {
   useRecommendAmbulances,
   useUpdateEmergencyPriority,
 } from "@/hooks";
+import { seedHospitals } from "@/lib/dummy/hospitals";
+import { seedTrips } from "@/lib/dummy/trips";
 import type { ScoredAmbulanceCandidate } from "@/lib/types/dispatch.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
@@ -87,6 +91,19 @@ export function DispatcherView() {
     useState<EmergencyRequest | null>(null);
   const [candidates, setCandidates] = useState<ScoredAmbulanceCandidate[]>([]);
   const [dispatchError, setDispatchError] = useState<string | null>(null);
+
+  // Active Trips & Hospital Routing State
+  const [activeTab, setActiveTab] = useState<"queue" | "trips">("queue");
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [tripDetailOpen, setTripDetailOpen] = useState(false);
+  const [rerouteTripId, setRerouteTripId] = useState<string | null>(null);
+  const [rerouteHospitalOpen, setRerouteHospitalOpen] = useState(false);
+  const [rerouteCurrentHospitalId, setRerouteCurrentHospitalId] = useState<
+    string | null
+  >(null);
+  const [rerouteCurrentHospitalName, setRerouteCurrentHospitalName] = useState<
+    string | null
+  >(null);
 
   // Mutations
   const { mutate: updatePriorityMutation, isPending: isUpdatingPriority } =
@@ -162,6 +179,60 @@ export function DispatcherView() {
   const hospitalList = useMemo(() => {
     return hospitals.slice(0, 5);
   }, [hospitals]);
+
+  // Active Trips for hospital routing and telemetry inspection
+  const activeTripEmergencies = useMemo(() => {
+    return emergencies.filter((e) => e.status === EmergencyStatus.ACTIVE_TRIP);
+  }, [emergencies]);
+
+  const getTripInfoForEmergency = (em: EmergencyRequest) => {
+    // 1. If emergency has trips relation populated
+    if (em.trips && em.trips.length > 0) {
+      const trip = em.trips[0];
+      const hosp = hospitals.find((h) => h.id === trip.hospitalId);
+      return {
+        tripId: trip.id,
+        hospitalId: trip.hospitalId || null,
+        hospitalName: hosp?.name || null,
+      };
+    }
+
+    // 2. Fallback to seedTrips for dummy mode
+    const seed = seedTrips.find(
+      (t) => t.emergencyId === em.id || t.id === em.id,
+    );
+    if (seed) {
+      const hosp =
+        hospitals.find((h) => h.id === seed.hospitalId) ||
+        seedHospitals.find((h) => h.id === seed.hospitalId);
+      return {
+        tripId: seed.id,
+        hospitalId: seed.hospitalId || null,
+        hospitalName: hosp?.name || null,
+      };
+    }
+
+    // 3. Fallback deterministic ID
+    return {
+      tripId: `trip_${em.id}`,
+      hospitalId: null,
+      hospitalName: null,
+    };
+  };
+
+  const handleOpenReroute = (em: EmergencyRequest) => {
+    const info = getTripInfoForEmergency(em);
+    setRerouteTripId(info.tripId);
+    setRerouteCurrentHospitalId(info.hospitalId);
+    setRerouteCurrentHospitalName(info.hospitalName);
+    setRerouteHospitalOpen(true);
+  };
+
+  const handleOpenTelemetry = (em: EmergencyRequest) => {
+    const info = getTripInfoForEmergency(em);
+    setSelectedTripId(info.tripId);
+    setTripDetailOpen(true);
+  };
 
   // Handler: Open Set Priority Dialog
   const handleOpenSetPriority = (emergency: EmergencyRequest) => {
@@ -287,14 +358,18 @@ export function DispatcherView() {
           </div>
 
           {/* Active Trips (ACTIVE_TRIP) - Teal */}
-          <div className="p-3 sm:px-4 sm:py-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("trips")}
+            className="p-3 sm:px-4 sm:py-2 cursor-pointer hover:bg-slate-50 transition-colors text-left w-full border-0 bg-transparent"
+          >
             <span className="text-xs font-semibold text-text-secondary block mb-1">
               Active Trips
             </span>
             <div className="text-3xl sm:text-4xl font-black text-primary-dark font-mono leading-none">
               {activeTripsCount}
             </div>
-          </div>
+          </button>
 
           {/* Available Ambulances - Teal */}
           <div className="p-3 sm:px-4 sm:py-2">
@@ -313,114 +388,255 @@ export function DispatcherView() {
         {/* Left Column: EMERGENCY QUEUE TABLE */}
         <div className="lg:col-span-8 w-full">
           <section
-            aria-label="Emergency Queue"
+            aria-label="Emergency Queue and Active Operations"
             className="relative bg-white border-2 border-primary rounded-none shadow-[2px_2px_0px_0px_rgba(20,184,166,0.15)] p-5 sm:p-6"
           >
             <CornerNotch />
-            <LabelTab label="EMERGENCY QUEUE" />
-
-            <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
-              <div className="min-w-170 px-5 sm:px-0">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
-                      <th scope="col" className="py-2.5 pr-4">
-                        Incident No.
-                      </th>
-                      <th scope="col" className="py-2.5 px-3">
-                        Type
-                      </th>
-                      <th scope="col" className="py-2.5 px-3">
-                        Priority
-                      </th>
-                      <th scope="col" className="py-2.5 px-3">
-                        Status
-                      </th>
-                      <th scope="col" className="py-2.5 px-3">
-                        Location
-                      </th>
-                      <th scope="col" className="py-2.5 px-3">
-                        Created
-                      </th>
-                      <th scope="col" className="py-2.5 pl-3 text-right">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs">
-                    {queueEmergencies.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={7}
-                          className="py-8 text-center text-text-muted"
-                        >
-                          No active incidents waiting in dispatch queue.
-                        </td>
-                      </tr>
-                    ) : (
-                      queueEmergencies.map((em) => {
-                        const canDispatch =
-                          em.status === EmergencyStatus.PRIORITIZED ||
-                          em.status === EmergencyStatus.DISPATCHING ||
-                          em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
-
-                        return (
-                          <tr
-                            key={em.id}
-                            className="hover:bg-slate-50 transition-colors"
-                          >
-                            <td className="py-3 pr-4 font-mono font-bold text-text-primary">
-                              {em.incidentNumber}
-                            </td>
-                            <td className="py-3 px-3 font-medium text-text-primary">
-                              {formatEnumTitle(em.emergencyType)}
-                            </td>
-                            <td className="py-3 px-3">
-                              <PriorityBadge
-                                priority={em.priority}
-                                variant="square"
-                              />
-                            </td>
-                            <td className="py-3 px-3">
-                              <StatusBadge
-                                status={em.status}
-                                variant="square"
-                              />
-                            </td>
-                            <td className="py-3 px-3 text-text-secondary truncate max-w-37.5">
-                              {em.locationAddress}
-                            </td>
-                            <td className="py-3 px-3 text-text-secondary whitespace-nowrap">
-                              {formatTime(em.createdAt)}
-                            </td>
-                            <td className="py-3 pl-3 text-right whitespace-nowrap">
-                              <div className="flex items-center justify-end gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenSetPriority(em)}
-                                  className="border border-border text-text-primary hover:bg-slate-100 px-2.5 py-1 text-xs font-semibold rounded-none min-h-8 cursor-pointer"
-                                >
-                                  Set Priority
-                                </button>
-                                {canDispatch && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenDispatch(em)}
-                                    className="bg-primary hover:bg-primary-dark text-white px-2.5 py-1 text-xs font-bold rounded-none min-h-8 cursor-pointer"
-                                  >
-                                    Dispatch
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+              <LabelTab
+                label={
+                  activeTab === "queue"
+                    ? "EMERGENCY QUEUE"
+                    : "ACTIVE MISSIONS & ROUTING"
+                }
+              />
+              <div className="flex items-center gap-1 bg-slate-100 p-0.5 border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("queue")}
+                  className={`px-3 py-1 text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === "queue"
+                      ? "bg-white text-text-primary shadow-xs"
+                      : "text-text-muted hover:text-text-primary"
+                  }`}
+                >
+                  Triage Queue ({queueEmergencies.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("trips")}
+                  className={`px-3 py-1 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeTab === "trips"
+                      ? "bg-primary text-white shadow-xs"
+                      : "text-text-muted hover:text-text-primary"
+                  }`}
+                >
+                  <span>Active Trips ({activeTripsCount})</span>
+                </button>
               </div>
             </div>
+
+            {activeTab === "queue" ? (
+              <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
+                <div className="min-w-170 px-5 sm:px-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
+                        <th scope="col" className="py-2.5 pr-4">
+                          Incident No.
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Type
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Priority
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Status
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Location
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Created
+                        </th>
+                        <th scope="col" className="py-2.5 pl-3 text-right">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs">
+                      {queueEmergencies.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={7}
+                            className="py-8 text-center text-text-muted"
+                          >
+                            No active incidents waiting in dispatch queue.
+                          </td>
+                        </tr>
+                      ) : (
+                        queueEmergencies.map((em) => {
+                          const canDispatch =
+                            em.status === EmergencyStatus.PRIORITIZED ||
+                            em.status === EmergencyStatus.DISPATCHING ||
+                            em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
+
+                          return (
+                            <tr
+                              key={em.id}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              <td className="py-3 pr-4 font-mono font-bold text-text-primary">
+                                {em.incidentNumber}
+                              </td>
+                              <td className="py-3 px-3 font-medium text-text-primary">
+                                {formatEnumTitle(em.emergencyType)}
+                              </td>
+                              <td className="py-3 px-3">
+                                <PriorityBadge
+                                  priority={em.priority}
+                                  variant="square"
+                                />
+                              </td>
+                              <td className="py-3 px-3">
+                                <StatusBadge
+                                  status={em.status}
+                                  variant="square"
+                                />
+                              </td>
+                              <td className="py-3 px-3 text-text-secondary truncate max-w-37.5">
+                                {em.locationAddress}
+                              </td>
+                              <td className="py-3 px-3 text-text-secondary whitespace-nowrap font-mono">
+                                {formatTime(em.createdAt)}
+                              </td>
+                              <td className="py-3 pl-3 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenSetPriority(em)}
+                                    className="border border-border text-text-primary hover:bg-slate-100 px-2.5 py-1 text-xs font-semibold rounded-none min-h-8 cursor-pointer"
+                                  >
+                                    Set Priority
+                                  </button>
+                                  {canDispatch && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenDispatch(em)}
+                                      className="bg-primary hover:bg-primary-dark text-white px-2.5 py-1 text-xs font-bold rounded-none min-h-8 cursor-pointer"
+                                    >
+                                      Dispatch
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              /* ACTIVE IN-PROGRESS TRIPS WITH HOSPITAL ROUTING */
+              <div className="mt-4 overflow-x-auto -mx-5 sm:mx-0">
+                <div className="min-w-170 px-5 sm:px-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-xs font-bold text-text-primary">
+                        <th scope="col" className="py-2.5 pr-4">
+                          Incident No.
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Type & Priority
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Location Address
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Destination Hospital
+                        </th>
+                        <th scope="col" className="py-2.5 px-3">
+                          Dispatched
+                        </th>
+                        <th scope="col" className="py-2.5 pl-3 text-right">
+                          Routing & Telemetry
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs">
+                      {activeTripEmergencies.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="py-8 text-center text-text-muted"
+                          >
+                            No active ambulance trips currently in progress.
+                          </td>
+                        </tr>
+                      ) : (
+                        activeTripEmergencies.map((em) => {
+                          const tripInfo = getTripInfoForEmergency(em);
+                          return (
+                            <tr
+                              key={em.id}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              <td className="py-3 pr-4 font-mono font-bold text-text-primary">
+                                {em.incidentNumber}
+                              </td>
+                              <td className="py-3 px-3">
+                                <div className="space-y-1">
+                                  <span className="font-semibold text-text-primary block">
+                                    {formatEnumTitle(em.emergencyType)}
+                                  </span>
+                                  <PriorityBadge
+                                    priority={em.priority}
+                                    variant="square"
+                                  />
+                                </div>
+                              </td>
+                              <td className="py-3 px-3 text-text-secondary truncate max-w-44">
+                                {em.locationAddress}
+                              </td>
+                              <td className="py-3 px-3">
+                                {tripInfo.hospitalName ? (
+                                  <div className="font-semibold text-text-primary flex items-center gap-1">
+                                    <Building2 className="h-3.5 w-3.5 text-primary shrink-0" />
+                                    <span className="truncate max-w-40">
+                                      {tripInfo.hospitalName}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-amber-700 font-medium text-[11px] bg-amber-50 px-1.5 py-0.5 border border-amber-200">
+                                    Unassigned
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3 px-3 text-text-secondary whitespace-nowrap font-mono">
+                                {formatTime(em.createdAt)}
+                              </td>
+                              <td className="py-3 pl-3 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenReroute(em)}
+                                    className="bg-primary hover:bg-primary-dark text-white px-2.5 py-1 text-xs font-bold rounded-none flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <HospitalIcon className="h-3.5 w-3.5" />
+                                    Reroute Hospital
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenTelemetry(em)}
+                                    className="border border-border text-text-primary hover:bg-slate-100 px-2.5 py-1 text-xs font-semibold rounded-none flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Eye className="h-3.5 w-3.5 text-primary" />
+                                    Telemetry
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </section>
         </div>
 
@@ -716,6 +932,22 @@ export function DispatcherView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Re-Route Destination Hospital Dialog */}
+      <RerouteHospitalDialog
+        tripId={rerouteTripId}
+        currentHospitalId={rerouteCurrentHospitalId}
+        currentHospitalName={rerouteCurrentHospitalName}
+        open={rerouteHospitalOpen}
+        onOpenChange={setRerouteHospitalOpen}
+      />
+
+      {/* Live Trip Telemetry Inspector Dialog */}
+      <TripDetailDialog
+        tripId={selectedTripId}
+        open={tripDetailOpen}
+        onOpenChange={setTripDetailOpen}
+      />
     </div>
   );
 }

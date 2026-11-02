@@ -26,6 +26,7 @@ import { useGetHospitals, useUpdateHospitalDiversion } from "@/hooks";
 import type { HospitalDiversionStatus } from "@/lib/types/enums";
 import type { Hospital } from "@/lib/types/hospital.types";
 import { CreateHospitalDialog } from "./dialogs/CreateHospitalDialog";
+import { EditHospitalDialog } from "./dialogs/EditHospitalDialog";
 
 export function HospitalsManagementView() {
   const [search, setSearch] = useState("");
@@ -157,7 +158,7 @@ export function HospitalsManagementView() {
                 scope="col"
                 className="text-xs font-semibold text-right"
               >
-                Diversion Toggle
+                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -217,35 +218,38 @@ export function HospitalsManagementView() {
                     {hosp.diversionReason || "Accepting patient dispatches"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={isUpdating}
-                      onClick={() => handleToggleDiversion(hosp)}
-                      className={`h-8 px-3 text-xs font-medium gap-1.5 cursor-pointer ${
-                        hosp.diversionStatus === "ACCEPTING"
-                          ? "hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300"
-                          : "hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
-                      }`}
-                    >
-                      {hosp.diversionStatus === "ACCEPTING" ? (
-                        <>
-                          <AlertTriangle
-                            className="h-3.5 w-3.5 text-amber-500"
-                            aria-hidden="true"
-                          />
-                          Divert
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2
-                            className="h-3.5 w-3.5 text-status"
-                            aria-hidden="true"
-                          />
-                          Accept
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      <EditHospitalDialog hospital={hosp} />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={isUpdating}
+                        onClick={() => handleToggleDiversion(hosp)}
+                        className={`h-8 px-3 text-xs font-medium gap-1.5 cursor-pointer ${
+                          hosp.diversionStatus === "ACCEPTING"
+                            ? "hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300"
+                            : "hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
+                        }`}
+                      >
+                        {hosp.diversionStatus === "ACCEPTING" ? (
+                          <>
+                            <AlertTriangle
+                              className="h-3.5 w-3.5 text-amber-500"
+                              aria-hidden="true"
+                            />
+                            Divert
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2
+                              className="h-3.5 w-3.5 text-status"
+                              aria-hidden="true"
+                            />
+                            Accept
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

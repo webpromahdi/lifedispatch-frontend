@@ -5,6 +5,7 @@ export const seedTrips: Trip[] = [
   {
     id: "trip_001",
     dispatchId: "disp_001",
+    emergencyId: "em_002",
     driverId: "drv_002",
     ambulanceId: "amb_001",
     patientId: "usr_patient_01",
@@ -24,6 +25,7 @@ export const seedTrips: Trip[] = [
   {
     id: "trip_002",
     dispatchId: "disp_004",
+    emergencyId: "em_005",
     driverId: "drv_001",
     ambulanceId: "amb_001",
     patientId: "usr_patient_05",
@@ -43,6 +45,7 @@ export const seedTrips: Trip[] = [
   {
     id: "trip_003",
     dispatchId: "disp_005",
+    emergencyId: "em_007",
     driverId: "drv_005",
     ambulanceId: "amb_005",
     patientId: "usr_patient_07",
@@ -62,6 +65,7 @@ export const seedTrips: Trip[] = [
   {
     id: "trip_004",
     dispatchId: "disp_old_01",
+    emergencyId: "em_003",
     driverId: "drv_002",
     ambulanceId: "amb_002",
     patientId: "usr_patient_03",
@@ -81,6 +85,7 @@ export const seedTrips: Trip[] = [
   {
     id: "trip_005",
     dispatchId: "disp_old_02",
+    emergencyId: "em_004",
     driverId: "drv_004",
     ambulanceId: "amb_004",
     patientId: "usr_patient_04",

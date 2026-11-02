@@ -6,6 +6,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Eye,
   Filter,
   Route,
   Search,
@@ -16,6 +17,8 @@ import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { TripDetailDialog } from "@/components/shared";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -40,6 +43,13 @@ import { formatDate } from "@/lib/utils";
 export function DriverTripsView() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [tripDetailOpen, setTripDetailOpen] = useState(false);
+
+  const handleInspectTrip = (id: string) => {
+    setSelectedTripId(id);
+    setTripDetailOpen(true);
+  };
 
   const { data: tripsResponse, isLoading } = useGetMyTrips({
     limit: 100,
@@ -188,11 +198,14 @@ export function DriverTripsView() {
               <TableHead scope="col" className="text-xs font-semibold">
                 Status
               </TableHead>
+              <TableHead scope="col" className="text-xs font-semibold">
+                Completed At
+              </TableHead>
               <TableHead
                 scope="col"
                 className="text-xs font-semibold text-right"
               >
-                Completed At
+                Telemetry
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -200,17 +213,17 @@ export function DriverTripsView() {
             {isLoading ? (
               <>
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <Skeleton className="h-9 w-full rounded-none" />
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <Skeleton className="h-9 w-full rounded-none" />
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <Skeleton className="h-9 w-full rounded-none" />
                   </TableCell>
                 </TableRow>
@@ -218,7 +231,7 @@ export function DriverTripsView() {
             ) : filteredTrips.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center py-8 text-xs text-text-muted"
                 >
                   No trip records found matching this criteria.
@@ -228,7 +241,8 @@ export function DriverTripsView() {
               filteredTrips.map((trip) => (
                 <TableRow
                   key={trip.id}
-                  className="hover:bg-primary-light/20 transition-colors"
+                  className="hover:bg-primary-light/20 transition-colors cursor-pointer"
+                  onClick={() => handleInspectTrip(trip.id)}
                 >
                   <TableCell className="font-mono text-xs font-semibold text-text-primary">
                     {trip.id.slice(0, 8)}...
@@ -276,10 +290,24 @@ export function DriverTripsView() {
                   <TableCell>
                     <StatusBadge status={trip.status} />
                   </TableCell>
-                  <TableCell className="text-right text-xs font-mono text-text-muted">
+                  <TableCell className="text-xs font-mono text-text-muted">
                     {trip.completedAt
                       ? formatDate(trip.completedAt, "hh:mm a")
                       : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleInspectTrip(trip.id);
+                      }}
+                      className="h-7 text-xs px-2.5 rounded-none border-border hover:bg-slate-100 cursor-pointer"
+                    >
+                      <Eye className="h-3.5 w-3.5 mr-1 text-primary" />
+                      Inspect
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -287,6 +315,13 @@ export function DriverTripsView() {
           </TableBody>
         </Table>
       </DataTable>
+
+      {/* Live Trip Telemetry Inspector Dialog */}
+      <TripDetailDialog
+        tripId={selectedTripId}
+        open={tripDetailOpen}
+        onOpenChange={setTripDetailOpen}
+      />
     </div>
   );
 }

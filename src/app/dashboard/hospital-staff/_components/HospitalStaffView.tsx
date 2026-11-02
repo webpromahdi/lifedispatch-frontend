@@ -7,6 +7,7 @@ import {
   Bed,
   CheckCircle2,
   Clock,
+  Eye,
   HeartPulse,
   Hospital as HospitalIcon,
   Minus,
@@ -21,6 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { TripDetailDialog } from "@/components/shared";
 import {
   CornerNotch,
   LabelTab,
@@ -42,6 +44,10 @@ import { cn } from "@/lib/utils";
 
 export function HospitalStaffView() {
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
+  const [selectedInboundTripId, setSelectedInboundTripId] = useState<
+    string | null
+  >(null);
+  const [inboundDetailOpen, setInboundDetailOpen] = useState(false);
 
   // 1-second interval for live shift timer and transit calculation
   useEffect(() => {
@@ -710,13 +716,16 @@ export function HospitalStaffView() {
                     <th scope="col" className="py-2.5 px-3">
                       Transit Stage
                     </th>
+                    <th scope="col" className="py-2.5 px-3 text-right">
+                      Telemetry
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {inboundTrips.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="py-10 text-center text-text-muted space-y-1.5"
                       >
                         <HeartPulse className="h-6 w-6 text-slate-300 mx-auto" />
@@ -738,7 +747,11 @@ export function HospitalStaffView() {
                       return (
                         <tr
                           key={trip.id}
-                          className="hover:bg-slate-50/80 transition-colors"
+                          onClick={() => {
+                            setSelectedInboundTripId(trip.id);
+                            setInboundDetailOpen(true);
+                          }}
+                          className="hover:bg-slate-50/80 transition-colors cursor-pointer"
                         >
                           <td className="py-3 px-3">
                             <div className="space-y-1">
@@ -813,6 +826,22 @@ export function HospitalStaffView() {
                                 </span>
                               )}
                             </div>
+                          </td>
+
+                          <td className="py-3 px-3 text-right">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedInboundTripId(trip.id);
+                                setInboundDetailOpen(true);
+                              }}
+                              className="h-7 px-2.5 text-xs font-semibold rounded-none border-border hover:bg-slate-100 cursor-pointer"
+                            >
+                              <Eye className="h-3.5 w-3.5 mr-1 text-primary" />
+                              Inspect
+                            </Button>
                           </td>
                         </tr>
                       );
@@ -909,6 +938,14 @@ export function HospitalStaffView() {
           </div>
         </div>
       </section>
+
+      {/* Live Trip Telemetry Inspector Dialog for Inbound Transports */}
+      <TripDetailDialog
+        tripId={selectedInboundTripId}
+        open={inboundDetailOpen}
+        onOpenChange={setInboundDetailOpen}
+        allowReroute={false}
+      />
     </div>
   );
 }

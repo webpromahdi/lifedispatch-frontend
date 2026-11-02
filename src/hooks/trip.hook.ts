@@ -62,8 +62,12 @@ export function useSelectTripHospital() {
       payload: SelectHospitalPayload;
     }) => selectTripHospital(id, payload),
     onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["trips", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["trips", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["hospitals"] });
+      queryClient.invalidateQueries({ queryKey: ["emergencies"] });
+      queryClient.invalidateQueries({ queryKey: ["dispatch"] });
     },
   });
 }

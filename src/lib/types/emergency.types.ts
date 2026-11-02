@@ -31,6 +31,11 @@ export interface EmergencyRequest {
   cancelledBy: string | null;
   createdAt: string;
   updatedAt: string;
+  trips?: {
+    id: string;
+    status: string;
+    hospitalId?: string | null;
+  }[];
 }
 
 export interface IncidentTimelineEvent {

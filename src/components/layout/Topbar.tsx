@@ -140,7 +140,7 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
                 <div className="w-9 h-9 bg-[#CCFBF1] text-primary-dark font-bold text-sm flex items-center justify-center rounded-none shrink-0 shadow-xs">
                   {userInitials}
                 </div>
-                <div className="flex flex-col text-left hidden sm:flex">
+                <div className="flex flex-col text-left sm:flex">
                   <span className="text-sm font-semibold text-text-primary leading-tight">
                     {userName}
                   </span>

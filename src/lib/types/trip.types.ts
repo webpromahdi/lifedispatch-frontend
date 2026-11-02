@@ -3,6 +3,7 @@ import type { TripStatus } from "./enums";
 export interface Trip {
   id: string;
   dispatchId: string;
+  emergencyId?: string;
   driverId: string;
   ambulanceId: string;
   patientId: string;
