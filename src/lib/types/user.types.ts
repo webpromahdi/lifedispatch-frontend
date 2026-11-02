@@ -15,6 +15,8 @@ export interface User {
   emergencyContactPhone: string | null;
   knownConditions: string | null;
   avatarUrl: string | null;
+  mustChangePassword?: boolean;
+  isVerified?: boolean;
   createdAt: string;
   updatedAt: string;
 }

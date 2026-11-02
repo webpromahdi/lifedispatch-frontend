@@ -1,8 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  changePassword,
   forgotPassword,
   getMe,
   logout,
+  logoutAll,
+  refreshToken,
   resetPassword,
   userLogin,
   userRegister,
@@ -50,5 +53,23 @@ export function useGetMe() {
 export function useLogout() {
   return useMutation({
     mutationFn: logout,
+  });
+}
+
+export function useLogoutAll() {
+  return useMutation({
+    mutationFn: logoutAll,
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: changePassword,
+  });
+}
+
+export function useRefreshToken() {
+  return useMutation({
+    mutationFn: refreshToken,
   });
 }
