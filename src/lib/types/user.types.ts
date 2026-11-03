@@ -20,15 +20,3 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface DummyUser {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  avatarUrl: string | null;
-  role: UserRole;
-  driverId: string | null;
-  hospitalStaffId: string | null;
-  hospitalId: string | null;
-}

@@ -63,8 +63,9 @@ export function Sidebar({
     { enabled: isPatient, refetchInterval: 10_000 },
   );
 
-  const [hasActiveEmergencyOverride, setHasActiveEmergencyOverride] =
-    useState<boolean | null>(null);
+  const [hasActiveEmergencyOverride, setHasActiveEmergencyOverride] = useState<
+    boolean | null
+  >(null);
 
   const hasActiveEmergency = useMemo(() => {
     if (hasActiveEmergencyOverride !== null) {

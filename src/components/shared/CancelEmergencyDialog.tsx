@@ -97,57 +97,58 @@ export function CancelEmergencyDialog({
       ) : null}
 
       <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base text-destructive">
+              <AlertTriangle className="h-4 w-4" />
+              Cancel Incident {incidentNumber ? `(${incidentNumber})` : ""}
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Aborting this CAD emergency will permanently stop dispatching and
+              telematics tracking. Please record a mandatory audit explanation.
+            </DialogDescription>
+          </DialogHeader>
 
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base text-destructive">
-            <AlertTriangle className="h-4 w-4" />
-            Cancel Incident {incidentNumber ? `(${incidentNumber})` : ""}
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            Aborting this CAD emergency will permanently stop dispatching and
-            telematics tracking. Please record a mandatory audit explanation.
-          </DialogDescription>
-        </DialogHeader>
+          <form onSubmit={handleCancelEmergency} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="cancel-reason">
+                Audit Reason for Cancellation *
+              </Label>
+              <Textarea
+                id="cancel-reason"
+                placeholder="e.g. Caller reported false alarm, duplicate CAD ticket, patient transport refused, or patient transported by private vehicle."
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={3}
+                required
+                className="text-xs resize-none"
+              />
+            </div>
 
-        <form onSubmit={handleCancelEmergency} className="space-y-4 pt-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="cancel-reason">Audit Reason for Cancellation *</Label>
-            <Textarea
-              id="cancel-reason"
-              placeholder="e.g. Caller reported false alarm, duplicate CAD ticket, patient transport refused, or patient transported by private vehicle."
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={3}
-              required
-              className="text-xs resize-none"
-            />
-          </div>
-
-          <DialogFooter className="gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={cancelMutation.isPending}
-            >
-              Keep Incident Active
-            </Button>
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={cancelMutation.isPending}
-              className="gap-2 cursor-pointer"
-            >
-              {cancelMutation.isPending && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              Confirm Cancellation
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter className="gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={cancelMutation.isPending}
+              >
+                Keep Incident Active
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={cancelMutation.isPending}
+                className="gap-2 cursor-pointer"
+              >
+                {cancelMutation.isPending && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                Confirm Cancellation
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

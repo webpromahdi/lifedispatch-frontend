@@ -205,86 +205,88 @@ export function EditDriverDialog({
               </Select>
             </div>
 
-          {/* License Number & Expiry */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-driver-license-num">License Number *</Label>
-              <Input
-                id="edit-driver-license-num"
-                value={licenseNumber}
-                onChange={(e) => setLicenseNumber(e.target.value)}
-                required
-              />
+            {/* License Number & Expiry */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-driver-license-num">
+                  License Number *
+                </Label>
+                <Input
+                  id="edit-driver-license-num"
+                  value={licenseNumber}
+                  onChange={(e) => setLicenseNumber(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-license-expiry">Expiry Date *</Label>
+                <Input
+                  id="edit-license-expiry"
+                  type="date"
+                  value={licenseExpiry}
+                  onChange={(e) => setLicenseExpiry(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-license-expiry">Expiry Date *</Label>
-              <Input
-                id="edit-license-expiry"
-                type="date"
-                value={licenseExpiry}
-                onChange={(e) => setLicenseExpiry(e.target.value)}
-                required
-              />
-            </div>
-          </div>
 
-          {/* Assigned Ambulance Select */}
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-assigned-ambulance">
-              Assigned Ambulance Unit
-            </Label>
-            <Select
-              value={assignedAmbulanceId}
-              onValueChange={(val) => val && setAssignedAmbulanceId(val)}
-            >
-              <SelectTrigger
-                id="edit-assigned-ambulance"
-                aria-label="Select assigned ambulance"
+            {/* Assigned Ambulance Select */}
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-assigned-ambulance">
+                Assigned Ambulance Unit
+              </Label>
+              <Select
+                value={assignedAmbulanceId}
+                onValueChange={(val) => val && setAssignedAmbulanceId(val)}
               >
-                <SelectValue placeholder="Select unit or unassign" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="NONE">
-                  None (Standby / Unassigned)
-                </SelectItem>
-                {isLoadingAmbulances ? (
-                  <SelectItem value="loading" disabled>
-                    Loading fleet units...
+                <SelectTrigger
+                  id="edit-assigned-ambulance"
+                  aria-label="Select assigned ambulance"
+                >
+                  <SelectValue placeholder="Select unit or unassign" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NONE">
+                    None (Standby / Unassigned)
                   </SelectItem>
-                ) : (
-                  ambulances.map((amb) => (
-                    <SelectItem key={amb.id} value={amb.id}>
-                      {amb.registrationNumber} ({amb.type.replace(/_/g, " ")})
+                  {isLoadingAmbulances ? (
+                    <SelectItem value="loading" disabled>
+                      Loading fleet units...
                     </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
+                  ) : (
+                    ambulances.map((amb) => (
+                      <SelectItem key={amb.id} value={amb.id}>
+                        {amb.registrationNumber} ({amb.type.replace(/_/g, " ")})
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <DialogFooter className="pt-3 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={updateDriverMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={updateDriverMutation.isPending}
-              className="gap-2 cursor-pointer"
-            >
-              {updateDriverMutation.isPending && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter className="pt-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={updateDriverMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={updateDriverMutation.isPending}
+                className="gap-2 cursor-pointer"
+              >
+                {updateDriverMutation.isPending && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

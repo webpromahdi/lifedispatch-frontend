@@ -375,7 +375,8 @@ export function AnalyticsView({
             Emergency Billing & Payment Telematics
           </h2>
           <p className="text-xs text-text-muted">
-            Live gateway settlement metrics, patient invoicing logs, and processed refunds.
+            Live gateway settlement metrics, patient invoicing logs, and
+            processed refunds.
           </p>
         </div>
 
@@ -410,7 +411,8 @@ export function AnalyticsView({
                 Recent Gateway Transactions
               </span>
               <span className="text-xs text-text-muted font-mono">
-                {paymentAnalytics?.recentPayments?.length ?? 0} recent settlements
+                {paymentAnalytics?.recentPayments?.length ?? 0} recent
+                settlements
               </span>
             </div>
           }
@@ -458,7 +460,8 @@ export function AnalyticsView({
                     colSpan={5}
                     className="text-center py-8 text-xs text-text-muted"
                   >
-                    No payment settlement transactions recorded for this reporting period.
+                    No payment settlement transactions recorded for this
+                    reporting period.
                   </TableCell>
                 </TableRow>
               ) : (

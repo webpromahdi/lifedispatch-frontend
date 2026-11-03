@@ -376,11 +376,16 @@ export function HospitalStaffShiftView() {
               Approved Weekly ER Shift Rotation (Department Template)
             </h3>
             <p className="text-xs text-text-secondary mt-0.5">
-              Recurring departmental shift pattern for {hospital?.name || "ER"}. Active duty status is controlled live via the Clock In/Out toggle above.
+              Recurring departmental shift pattern for {hospital?.name || "ER"}.
+              Active duty status is controlled live via the Clock In/Out toggle
+              above.
             </p>
           </div>
 
-          <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200 w-fit">
+          <Badge
+            variant="outline"
+            className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200 w-fit"
+          >
             Department Template
           </Badge>
         </div>
