@@ -17,7 +17,32 @@ export interface Dispatch {
   createdAt: string;
   updatedAt: string;
   tripId?: string;
-  trip?: { id: string; status: string };
+  trip?: { id: string; status: string; hospitalId?: string | null };
+  emergency?: {
+    id: string;
+    incidentNumber: string;
+    emergencyType: string;
+    priority: string;
+    status: string;
+    locationAddress: string;
+    description: string | null;
+    callerName?: string | null;
+    callerPhone?: string | null;
+  };
+  ambulance?: {
+    id: string;
+    registrationNumber: string;
+    type: string;
+    capabilities: string[];
+    currentLat?: number | null;
+    currentLng?: number | null;
+  };
+  driver?: {
+    id: string;
+    licenseNumber?: string;
+    certificationLevel?: string;
+    user?: { id: string; name: string; phone: string | null };
+  };
 }
 
 export interface AcceptDispatchResult {
@@ -93,4 +118,14 @@ export interface CreateDispatchPayload {
 
 export interface CancelDispatchPayload {
   reason: string;
+}
+
+export interface GetDispatchesParams {
+  page?: number;
+  limit?: number;
+  status?: DispatchStatus | "ALL";
+  emergencyId?: string;
+  ambulanceId?: string;
+  driverId?: string;
+  search?: string;
 }

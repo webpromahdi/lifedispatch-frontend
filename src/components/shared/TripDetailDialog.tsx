@@ -32,11 +32,6 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetTripById } from "@/hooks";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDrivers } from "@/lib/dummy/drivers";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
-import { seedHospitals } from "@/lib/dummy/hospitals";
-import { seedTrips } from "@/lib/dummy/trips";
 import type { EmergencyPriority } from "@/lib/types/enums";
 import type { TripDetail } from "@/lib/types/trip.types";
 import { formatDate } from "@/lib/utils";
@@ -66,87 +61,7 @@ export function TripDetailDialog({
     enabled: Boolean(tripId && open),
   });
 
-  // Trip data from API, or fallback to dummy data for seamless testing
-  const trip: TripDetail | null = useMemo(() => {
-    if (tripResponse?.data) {
-      return tripResponse.data;
-    }
-
-    if (!tripId) return null;
-
-    // Dummy fallback lookup
-    const seed = seedTrips.find((t) => t.id === tripId);
-    if (!seed) return null;
-
-    const seedEm = seedEmergencies.find((e) => e.id === seed.emergencyId);
-    const seedAmb = seedAmbulances.find((a) => a.id === seed.ambulanceId);
-    const seedDrv = seedDrivers.find((d) => d.id === seed.driverId);
-    const seedHosp = seedHospitals.find((h) => h.id === seed.hospitalId);
-
-    return {
-      ...seed,
-      dispatch: {
-        id: seed.dispatchId,
-        status: seed.status === "ACTIVE" ? "ACCEPTED" : "COMPLETED",
-        dispatchedBy: "Central Dispatch",
-        timeoutAt: new Date().toISOString(),
-        acceptedAt: seed.createdAt,
-      },
-      emergency: {
-        id: seedEm?.id || seed.emergencyId || "em_001",
-        incidentNumber: seedEm?.incidentNumber || "INC-2026-0001",
-        emergencyType: seedEm?.emergencyType || "TRAUMA",
-        priority: seedEm?.priority || "P1_CRITICAL",
-        status: seedEm?.status || "ACTIVE_TRIP",
-        locationAddress: seedEm?.locationAddress || "Dhaka Metropolitan Area",
-        locationLat: seedEm?.locationLat || 23.8103,
-        locationLng: seedEm?.locationLng || 90.4125,
-        description:
-          seedEm?.description ||
-          "Emergency dispatch paramedic transport in progress.",
-      },
-      ambulance: {
-        id: seedAmb?.id || seed.ambulanceId,
-        registrationNumber: seedAmb?.registrationNumber || "DHK-EM-101",
-        type: seedAmb?.type || "ALS",
-        capabilities: seedAmb?.capabilities || ["TRAUMA", "CARDIAC", "ICU"],
-      },
-      driver: {
-        id: seedDrv?.id || seed.driverId,
-        userId: seedDrv?.userId || "usr_drv_01",
-        certificationLevel: seedDrv?.certificationLevel || "PARAMEDIC_ADVANCED",
-        user: {
-          id: seedDrv?.userId || "usr_drv_01",
-          name: "Kamal Hossain (Paramedic)",
-          phone: "+880 1711-234567",
-        },
-      },
-      patient: {
-        id: seed.patientId,
-        name: seedEm?.callerName || "Assigned Patient",
-        phone: seedEm?.callerPhone || "+880 1711-000000",
-        email: "patient@emergency.local",
-      },
-      hospital: seedHosp
-        ? {
-            id: seedHosp.id,
-            name: seedHosp.name,
-            address: seedHosp.address,
-            phone: seedHosp.phone || null,
-          }
-        : null,
-      payment:
-        seed.status === "COMPLETED"
-          ? {
-              id: "pay_001",
-              invoiceNumber: `INV-${seed.id.slice(0, 6).toUpperCase()}`,
-              totalAmount: 1850,
-              paymentStatus: "PAID",
-              currency: "BDT",
-            }
-          : null,
-    };
-  }, [tripResponse, tripId]);
+  const trip: TripDetail | null = tripResponse?.data ?? null;
 
   // Telemetry lifecycle milestones
   const milestones = useMemo(() => {

@@ -35,6 +35,18 @@ export interface EmergencyRequest {
     id: string;
     status: string;
     hospitalId?: string | null;
+    payment?: {
+      id: string;
+      invoiceNumber: string;
+      totalAmount: number;
+      paymentStatus: string;
+      currency: string;
+    } | null;
+    hospital?: {
+      id: string;
+      name: string;
+      address: string;
+    } | null;
   }[];
 }
 

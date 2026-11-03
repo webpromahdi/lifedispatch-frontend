@@ -261,13 +261,29 @@ export function PatientHistoryView() {
                   Caller: <strong>{em.callerName}</strong> ({em.callerPhone})
                 </span>
 
-                <Link
-                  href={`/dashboard/patient/payment/${em.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-none hover:bg-primary-light cursor-pointer"
-                >
-                  <Receipt className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>View Trip Invoice</span>
-                </Link>
+                {(() => {
+                  const paymentId = em.trips?.[0]?.payment?.id || em.id;
+                  const hasTrip = Boolean(em.trips && em.trips.length > 0);
+                  const isCompleted = em.status === "COMPLETED";
+
+                  if (isCompleted || hasTrip) {
+                    return (
+                      <Link
+                        href={`/dashboard/patient/payment/${paymentId}`}
+                        className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-none hover:bg-primary-light cursor-pointer"
+                      >
+                        <Receipt className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>View Trip Invoice</span>
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <span className="text-[11px] text-text-muted italic">
+                      Billing generated upon completion
+                    </span>
+                  );
+                })()}
               </div>
             </div>
           ))

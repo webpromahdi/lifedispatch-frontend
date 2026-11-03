@@ -41,22 +41,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useCancelDispatch, useGetAmbulances, useGetDrivers } from "@/hooks";
-import { seedAmbulances } from "@/lib/dummy/ambulances";
-import { seedDispatches } from "@/lib/dummy/dispatches";
-import { seedDrivers } from "@/lib/dummy/drivers";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
-import { seedTrips } from "@/lib/dummy/trips";
+import {
+  useCancelDispatch,
+  useGetAmbulances,
+  useGetDispatches,
+  useGetDrivers,
+} from "@/hooks";
 import type { Ambulance } from "@/lib/types/ambulance.types";
 import type { Dispatch } from "@/lib/types/dispatch.types";
-import type { Driver } from "@/lib/types/driver.types";
+import type { DriverWithUser } from "@/lib/types/driver.types";
 import { DispatchStatus } from "@/lib/types/enums";
 import { formatDate } from "@/lib/utils";
 
 export function DispatcherDispatchView() {
-  const [dispatches, setDispatches] = useState<Dispatch[]>(seedDispatches);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const { data: dispatchesResponse } = useGetDispatches(
+    {
+      status:
+        statusFilter === "ALL" ? undefined : (statusFilter as DispatchStatus),
+      search: search.trim() || undefined,
+      limit: 100,
+    },
+    { refetchInterval: 10_000 },
+  );
+
+  const dispatches = useMemo(() => {
+    return dispatchesResponse?.data || [];
+  }, [dispatchesResponse]);
 
   // Cancel Confirmation Dialog State
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -71,11 +84,7 @@ export function DispatcherDispatchView() {
   const [rerouteHospitalOpen, setRerouteHospitalOpen] = useState(false);
 
   const getTripIdForDispatch = (disp: Dispatch) => {
-    return (
-      seedTrips.find((t) => t.dispatchId === disp.id)?.id ||
-      disp.tripId ||
-      `trip_${disp.id}`
-    );
+    return disp.trip?.id || disp.tripId || disp.id;
   };
 
   const { mutate: cancelDispatchMutation, isPending: isCancelling } =
@@ -96,25 +105,8 @@ export function DispatcherDispatchView() {
       },
       {
         onSuccess: () => {
-          const targetId = selectedDispatch.id;
-          setDispatches((prev) =>
-            prev.map((d) => {
-              if (d.id !== targetId) return d;
-              return {
-                ...d,
-                status: DispatchStatus.CANCELLED,
-                cancelledAt: new Date().toISOString(),
-                cancellationReason:
-                  "Cancelled manually by dispatcher console operator.",
-              };
-            }),
-          );
-
-          const relatedEmergency = seedEmergencies.find(
-            (e) => e.id === selectedDispatch.emergencyId,
-          );
           const incNumber =
-            relatedEmergency?.incidentNumber || selectedDispatch.id;
+            selectedDispatch.emergency?.incidentNumber || selectedDispatch.id;
 
           toast.success("Dispatch Assignment Cancelled", {
             description: `Assignment ${selectedDispatch.id} (Incident ${incNumber}) cancelled and unit released.`,
@@ -138,15 +130,8 @@ export function DispatcherDispatchView() {
   const { data: ambulancesResponse } = useGetAmbulances();
   const { data: driversResponse } = useGetDrivers();
 
-  // Helper maps for lookup
-  const emergencyMap = useMemo(() => {
-    return new Map(seedEmergencies.map((e) => [e.id, e]));
-  }, []);
-
   const ambulanceMap = useMemo(() => {
-    const map = new Map<string, Ambulance>(
-      seedAmbulances.map((a) => [a.id, a as unknown as Ambulance]),
-    );
+    const map = new Map<string, Ambulance>();
     for (const a of ambulancesResponse?.data || []) {
       map.set(a.id, a as unknown as Ambulance);
     }
@@ -154,26 +139,25 @@ export function DispatcherDispatchView() {
   }, [ambulancesResponse]);
 
   const driverMap = useMemo(() => {
-    const map = new Map<string, Driver>(
-      seedDrivers.map((d) => [d.id, d as unknown as Driver]),
-    );
+    const map = new Map<string, DriverWithUser>();
     for (const d of driversResponse?.data || []) {
-      map.set(d.id, d as unknown as Driver);
+      map.set(d.id, d);
     }
     return map;
   }, [driversResponse]);
 
   const filteredDispatches = useMemo(() => {
     return dispatches.filter((disp) => {
-      const em = emergencyMap.get(disp.emergencyId);
-      const amb = ambulanceMap.get(disp.ambulanceId);
-      const drv = driverMap.get(disp.driverId);
+      const em = disp.emergency;
+      const amb = disp.ambulance || ambulanceMap.get(disp.ambulanceId);
+      const drv = disp.driver || driverMap.get(disp.driverId);
 
       const searchTerms = [
         disp.id,
         em?.incidentNumber || "",
         amb?.registrationNumber || "",
         drv?.licenseNumber || "",
+        drv?.user?.name || "",
       ]
         .join(" ")
         .toLowerCase();
@@ -184,7 +168,7 @@ export function DispatcherDispatchView() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [dispatches, search, statusFilter, emergencyMap, ambulanceMap, driverMap]);
+  }, [dispatches, search, statusFilter, ambulanceMap, driverMap]);
 
   return (
     <div className="space-y-6">
@@ -305,9 +289,10 @@ export function DispatcherDispatchView() {
               </TableRow>
             ) : (
               filteredDispatches.map((disp) => {
-                const em = emergencyMap.get(disp.emergencyId);
-                const amb = ambulanceMap.get(disp.ambulanceId);
-                const drv = driverMap.get(disp.driverId);
+                const em = disp.emergency;
+                const amb =
+                  disp.ambulance || ambulanceMap.get(disp.ambulanceId);
+                const drv = disp.driver || driverMap.get(disp.driverId);
 
                 const isTerminal =
                   disp.status === "CANCELLED" ||
@@ -343,7 +328,11 @@ export function DispatcherDispatchView() {
                           className="h-3.5 w-3.5 text-text-muted shrink-0"
                           aria-hidden="true"
                         />
-                        <span>{drv ? drv.licenseNumber : disp.driverId}</span>
+                        <span>
+                          {drv?.user?.name ||
+                            drv?.licenseNumber ||
+                            disp.driverId}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="font-mono text-xs font-semibold text-primary">

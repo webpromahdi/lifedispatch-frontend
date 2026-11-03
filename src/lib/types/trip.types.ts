@@ -75,6 +75,15 @@ export interface GetDriverTripsParams {
   status?: TripStatus | "ALL";
 }
 
+export interface GetAllTripsParams {
+  page?: number;
+  limit?: number;
+  status?: TripStatus | "ALL";
+  hospitalId?: string;
+  driverId?: string;
+  search?: string;
+}
+
 export interface TripDetail extends Trip {
   dispatch: {
     id: string;

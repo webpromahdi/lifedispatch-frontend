@@ -38,8 +38,6 @@ import {
   useRecommendAmbulances,
   useUpdateEmergencyPriority,
 } from "@/hooks";
-import { seedHospitals } from "@/lib/dummy/hospitals";
-import { seedTrips } from "@/lib/dummy/trips";
 import type { ScoredAmbulanceCandidate } from "@/lib/types/dispatch.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 import {
@@ -189,7 +187,8 @@ export function DispatcherView() {
     // 1. If emergency has trips relation populated
     if (em.trips && em.trips.length > 0) {
       const trip = em.trips[0];
-      const hosp = hospitals.find((h) => h.id === trip.hospitalId);
+      const hosp =
+        trip.hospital || hospitals.find((h) => h.id === trip.hospitalId);
       return {
         tripId: trip.id,
         hospitalId: trip.hospitalId || null,
@@ -197,24 +196,9 @@ export function DispatcherView() {
       };
     }
 
-    // 2. Fallback to seedTrips for dummy mode
-    const seed = seedTrips.find(
-      (t) => t.emergencyId === em.id || t.id === em.id,
-    );
-    if (seed) {
-      const hosp =
-        hospitals.find((h) => h.id === seed.hospitalId) ||
-        seedHospitals.find((h) => h.id === seed.hospitalId);
-      return {
-        tripId: seed.id,
-        hospitalId: seed.hospitalId || null,
-        hospitalName: hosp?.name || null,
-      };
-    }
-
-    // 3. Fallback deterministic ID
+    // Fallback if trip not yet started
     return {
-      tripId: `trip_${em.id}`,
+      tripId: em.id,
       hospitalId: null,
       hospitalName: null,
     };

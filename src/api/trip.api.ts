@@ -4,12 +4,41 @@ import type {
   CompleteTripPayload,
   CompleteTripResult,
   DriverTripItem,
+  GetAllTripsParams,
   GetDriverTripsParams,
   SelectHospitalPayload,
   Trip,
   TripDetail,
   UpdateTripStatusPayload,
 } from "@/lib/types/trip.types";
+
+export function getAllTrips(params?: GetAllTripsParams) {
+  const query: Record<string, string | number> = {};
+
+  if (params?.page) {
+    query.page = params.page;
+  }
+  if (params?.limit) {
+    query.limit = params.limit;
+  }
+  if (params?.status && params.status !== "ALL") {
+    query.status = params.status;
+  }
+  if (params?.hospitalId) {
+    query.hospitalId = params.hospitalId;
+  }
+  if (params?.driverId) {
+    query.driverId = params.driverId;
+  }
+  if (params?.search?.trim()) {
+    query.search = params.search.trim();
+  }
+
+  return apiClient<ApiResponse<DriverTripItem[]>>("/trips", {
+    method: "GET",
+    query,
+  });
+}
 
 export function getTripById(id: string) {
   return apiClient<ApiResponse<TripDetail>>(`/trips/${id}`, {

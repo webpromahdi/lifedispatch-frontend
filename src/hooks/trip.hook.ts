@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   completeTrip,
+  getAllTrips,
   getMyTrips,
   getTripById,
   selectTripHospital,
@@ -8,10 +9,22 @@ import {
 } from "@/api";
 import type {
   CompleteTripPayload,
+  GetAllTripsParams,
   GetDriverTripsParams,
   SelectHospitalPayload,
   UpdateTripStatusPayload,
 } from "@/lib/types/trip.types";
+
+export function useGetAllTrips(
+  params?: GetAllTripsParams,
+  options?: { enabled?: boolean; refetchInterval?: number | false },
+) {
+  return useQuery({
+    queryKey: ["trips", "all", params],
+    queryFn: () => getAllTrips(params),
+    ...options,
+  });
+}
 
 export function useGetTripById(id?: string, options?: { enabled?: boolean }) {
   return useQuery({

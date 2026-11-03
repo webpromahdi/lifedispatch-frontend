@@ -4,10 +4,42 @@ import type {
   CancelDispatchPayload,
   CreateDispatchPayload,
   Dispatch,
+  GetDispatchesParams,
   PendingDispatchItem,
   ScoredAmbulanceCandidate,
 } from "@/lib/types/dispatch.types";
 import type { ApiResponse } from "@/lib/types/emergency.types";
+
+export function getDispatches(params?: GetDispatchesParams) {
+  const query: Record<string, string | number> = {};
+
+  if (params?.page) {
+    query.page = params.page;
+  }
+  if (params?.limit) {
+    query.limit = params.limit;
+  }
+  if (params?.status && params.status !== "ALL") {
+    query.status = params.status;
+  }
+  if (params?.emergencyId) {
+    query.emergencyId = params.emergencyId;
+  }
+  if (params?.ambulanceId) {
+    query.ambulanceId = params.ambulanceId;
+  }
+  if (params?.driverId) {
+    query.driverId = params.driverId;
+  }
+  if (params?.search?.trim()) {
+    query.search = params.search.trim();
+  }
+
+  return apiClient<ApiResponse<Dispatch[]>>("/dispatch", {
+    method: "GET",
+    query,
+  });
+}
 
 export function recommendAmbulances(emergencyId: string) {
   return apiClient<ApiResponse<ScoredAmbulanceCandidate[]>>(

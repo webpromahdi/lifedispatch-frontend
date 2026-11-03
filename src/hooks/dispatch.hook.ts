@@ -4,11 +4,26 @@ import {
   cancelDispatch,
   createDispatch,
   getDispatchById,
+  getDispatches,
   getMyPendingDispatches,
   recommendAmbulances,
   rejectDispatch,
 } from "@/api";
-import type { CreateDispatchPayload } from "@/lib/types/dispatch.types";
+import type {
+  CreateDispatchPayload,
+  GetDispatchesParams,
+} from "@/lib/types/dispatch.types";
+
+export function useGetDispatches(
+  params?: GetDispatchesParams,
+  options?: { enabled?: boolean; refetchInterval?: number | false },
+) {
+  return useQuery({
+    queryKey: ["dispatch", "list", params],
+    queryFn: () => getDispatches(params),
+    ...options,
+  });
+}
 
 export function useRecommendAmbulances() {
   return useMutation({

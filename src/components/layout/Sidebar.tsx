@@ -18,10 +18,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useGetEmergencies } from "@/hooks";
 import { useLogout } from "@/hooks/auth.hook";
-import { seedEmergencies } from "@/lib/dummy/emergencies";
 import { EmergencyStatus } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
 
@@ -57,25 +57,36 @@ export function Sidebar({
   const isPatient = pathname.startsWith("/dashboard/patient");
   const isAdmin = pathname.startsWith("/dashboard/admin");
 
-  // Track patient active emergency state
-  const [hasActiveEmergency, setHasActiveEmergency] = useState<boolean>(() => {
-    // Check initial seed data
-    const active = seedEmergencies.find(
-      (e) =>
-        e.patientId === "usr_patient_01" &&
-        (e.status === EmergencyStatus.PENDING ||
+  // Track patient active emergency state via query and optional event override
+  const { data: emergenciesResponse } = useGetEmergencies(
+    { limit: 10 },
+    { enabled: isPatient, refetchInterval: 10_000 },
+  );
+
+  const [hasActiveEmergencyOverride, setHasActiveEmergencyOverride] =
+    useState<boolean | null>(null);
+
+  const hasActiveEmergency = useMemo(() => {
+    if (hasActiveEmergencyOverride !== null) {
+      return hasActiveEmergencyOverride;
+    }
+    const list = emergenciesResponse?.data ?? [];
+    return Boolean(
+      list.find(
+        (e) =>
+          e.status === EmergencyStatus.PENDING ||
           e.status === EmergencyStatus.PRIORITIZED ||
           e.status === EmergencyStatus.DISPATCHING ||
-          e.status === EmergencyStatus.ACTIVE_TRIP),
+          e.status === EmergencyStatus.ACTIVE_TRIP,
+      ),
     );
-    return Boolean(active);
-  });
+  }, [hasActiveEmergencyOverride, emergenciesResponse]);
 
   useEffect(() => {
     const handleStatusUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<{ hasActiveEmergency: boolean }>;
       if (typeof customEvent.detail?.hasActiveEmergency === "boolean") {
-        setHasActiveEmergency(customEvent.detail.hasActiveEmergency);
+        setHasActiveEmergencyOverride(customEvent.detail.hasActiveEmergency);
       }
     };
 
