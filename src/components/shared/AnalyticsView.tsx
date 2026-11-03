@@ -6,7 +6,10 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  CreditCard,
+  DollarSign,
   Loader2,
+  Receipt,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +18,7 @@ import { StatusBreakdownBar } from "@/components/charts/StatusBreakdownBar";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -31,7 +35,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAnalyticsOverview, useGetEmergencyAnalytics } from "@/hooks";
+import {
+  useGetAnalyticsOverview,
+  useGetEmergencyAnalytics,
+  useGetPaymentAnalytics,
+} from "@/hooks";
+import { formatDate } from "@/lib/utils";
 
 interface AnalyticsViewProps {
   userRole?: "SUPER_ADMIN" | "ADMIN";
@@ -89,9 +98,12 @@ export function AnalyticsView({
 
   const { data: emergencyAnalyticsResponse, isLoading: isLoadingAnalytics } =
     useGetEmergencyAnalytics(dateFilter);
+  const { data: paymentAnalyticsResponse, isLoading: isLoadingPayments } =
+    useGetPaymentAnalytics(dateFilter);
   const { data: overviewResponse } = useGetAnalyticsOverview();
 
   const emergencyAnalytics = emergencyAnalyticsResponse?.data;
+  const paymentAnalytics = paymentAnalyticsResponse?.data;
   const overview = overviewResponse?.data;
 
   // Real KPIs computed from backend analytics endpoints
@@ -355,6 +367,138 @@ export function AnalyticsView({
           </TableBody>
         </Table>
       </DataTable>
+
+      {/* Revenue & Billing Telematics */}
+      <div className="space-y-4 pt-2">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">
+            Emergency Billing & Payment Telematics
+          </h2>
+          <p className="text-xs text-text-muted">
+            Live gateway settlement metrics, patient invoicing logs, and processed refunds.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Total Settled Revenue"
+            value={`৳${Number(paymentAnalytics?.totalRevenue ?? 0).toLocaleString()}`}
+            icon={CreditCard}
+            trend={{ value: "Confirmed Invoices", isPositive: true }}
+            subtitle="CAD ambulance collections"
+          />
+          <StatCard
+            label="Invoices Processed"
+            value={paymentAnalytics?.totalPayments ?? 0}
+            icon={Receipt}
+            trend={{ value: "All Gateway Invoices", isPositive: true }}
+            subtitle="Trips billed to patients"
+          />
+          <StatCard
+            label="Processed Refunds"
+            value={`৳${Number(paymentAnalytics?.totalRefunded ?? 0).toLocaleString()}`}
+            icon={DollarSign}
+            trend={{ value: "Reversals & cancellations", isPositive: false }}
+            subtitle="Patient reimbursements"
+          />
+        </div>
+
+        <DataTable
+          headerSlot={
+            <div className="flex items-center justify-between w-full">
+              <span className="font-semibold text-sm text-text-primary">
+                Recent Gateway Transactions
+              </span>
+              <span className="text-xs text-text-muted font-mono">
+                {paymentAnalytics?.recentPayments?.length ?? 0} recent settlements
+              </span>
+            </div>
+          }
+        >
+          <Table>
+            <TableHeader className="bg-background">
+              <TableRow>
+                <TableHead scope="col" className="text-xs font-semibold">
+                  Invoice No.
+                </TableHead>
+                <TableHead scope="col" className="text-xs font-semibold">
+                  Patient Name
+                </TableHead>
+                <TableHead scope="col" className="text-xs font-semibold">
+                  Payment Method
+                </TableHead>
+                <TableHead
+                  scope="col"
+                  className="text-xs font-semibold text-right"
+                >
+                  Settled Amount
+                </TableHead>
+                <TableHead
+                  scope="col"
+                  className="text-xs font-semibold text-right"
+                >
+                  Confirmation Time
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoadingPayments ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <div className="flex items-center justify-center gap-2 text-xs text-text-muted">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      Loading revenue transactions...
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : !paymentAnalytics?.recentPayments ||
+                paymentAnalytics.recentPayments.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-8 text-xs text-text-muted"
+                  >
+                    No payment settlement transactions recorded for this reporting period.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paymentAnalytics.recentPayments.map((pmt) => (
+                  <TableRow
+                    key={pmt.id}
+                    className="hover:bg-primary-light/20 transition-colors"
+                  >
+                    <TableCell className="font-mono text-xs font-semibold text-primary">
+                      {pmt.invoiceNumber}
+                    </TableCell>
+                    <TableCell className="text-xs font-medium text-text-primary">
+                      {pmt.patient?.name || "Patient Consumer"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="font-mono text-[10px] font-semibold bg-muted text-text-secondary"
+                      >
+                        {pmt.paymentMethod || "GATEWAY"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-xs font-semibold text-text-primary">
+                      ৳{Number(pmt.totalAmount).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-xs text-text-muted">
+                      {pmt.paymentConfirmedAt
+                        ? formatDate(
+                            pmt.paymentConfirmedAt,
+                            "dd MMM yyyy, hh:mm a",
+                          )
+                        : "Pending"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </DataTable>
+      </div>
     </div>
   );
 }

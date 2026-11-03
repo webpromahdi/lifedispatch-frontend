@@ -370,18 +370,18 @@ export function HospitalStaffShiftView() {
 
       {/* Weekly Schedule Overview */}
       <div className="bg-surface border border-border rounded-none p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-border gap-2">
           <div>
             <h3 className="font-bold text-base text-text-primary">
-              Approved Weekly ER Shift Rotation
+              Approved Weekly ER Shift Rotation (Department Template)
             </h3>
             <p className="text-xs text-text-secondary mt-0.5">
-              Standard clinical rotation schedule for {hospital?.name || "ER"}.
+              Recurring departmental shift pattern for {hospital?.name || "ER"}. Active duty status is controlled live via the Clock In/Out toggle above.
             </p>
           </div>
 
-          <Badge variant="outline" className="text-xs font-mono">
-            Zone Emergency Care
+          <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200 w-fit">
+            Department Template
           </Badge>
         </div>
 

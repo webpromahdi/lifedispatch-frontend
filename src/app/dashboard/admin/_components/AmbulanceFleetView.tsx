@@ -27,6 +27,7 @@ import {
 import { useGetAmbulances, useUpdateAmbulanceStatus } from "@/hooks";
 import { AmbulanceStatus } from "@/lib/types/enums";
 import { CreateAmbulanceDialog } from "./dialogs/CreateAmbulanceDialog";
+import { EditAmbulanceDialog } from "./dialogs/EditAmbulanceDialog";
 
 const SKELETON_ROWS = ["skel-row-1", "skel-row-2", "skel-row-3", "skel-row-4"];
 
@@ -207,7 +208,7 @@ export function AmbulanceFleetView() {
                 scope="col"
                 className="text-xs font-semibold text-right"
               >
-                Telemetry Override
+                Actions & Telemetry
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -297,7 +298,9 @@ export function AmbulanceFleetView() {
                     <StatusBadge status={amb.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="inline-flex items-center gap-1">
+                    <div className="inline-flex items-center gap-1.5">
+                      <EditAmbulanceDialog ambulance={amb} />
+                      <div className="h-4 w-px bg-border mx-0.5" />
                       <Button
                         size="sm"
                         variant={

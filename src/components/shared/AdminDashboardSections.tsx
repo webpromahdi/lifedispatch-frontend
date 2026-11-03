@@ -6,7 +6,7 @@ import {
   CornerNotch,
   LabelTab,
 } from "@/components/shared/DashboardUIPrimitives";
-import type { AnalyticsOverviewData } from "@/lib/dummy/analytics";
+import type { AnalyticsOverviewData } from "@/lib/types/admin.types";
 import type { AuditLog } from "@/lib/types/audit.types";
 import type { EmergencyRequest } from "@/lib/types/emergency.types";
 

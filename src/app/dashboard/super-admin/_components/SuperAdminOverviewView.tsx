@@ -15,13 +15,17 @@ import {
   useGetAnalyticsOverview,
   useGetAuditLogs,
   useGetEmergencies,
+  useGetEmergencyAnalytics,
 } from "@/hooks";
-import type { AnalyticsOverviewData } from "@/lib/dummy/analytics";
-import type { AdminAnalyticsOverview } from "@/lib/types/admin.types";
+import type {
+  AdminAnalyticsOverview,
+  AnalyticsOverviewData,
+} from "@/lib/types/admin.types";
 import { EmergencyStatus, UserRole, UserStatus } from "@/lib/types/enums";
 
 function mapToAnalyticsOverviewData(
   data?: AdminAnalyticsOverview,
+  avgResponseTimeMinutes?: number | null,
 ): AnalyticsOverviewData {
   return {
     liveOperations: {
@@ -42,7 +46,7 @@ function mapToAnalyticsOverviewData(
       totalTrips: data?.historicStats?.totalTrips ?? 0,
     },
     emergencyAnalytics: {
-      avgResponseTimeMinutes: 8.4,
+      avgResponseTimeMinutes: avgResponseTimeMinutes ?? 8.4,
     },
     usersAndResources: {
       totalPatients: data?.usersAndResources?.totalPatients ?? 0,
@@ -58,9 +62,17 @@ export function SuperAdminOverviewView() {
     refetchInterval: 15_000,
   });
 
+  const { data: emergencyAnalyticsResponse } = useGetEmergencyAnalytics(
+    undefined,
+    { refetchInterval: 30_000 },
+  );
+
   const analytics = useMemo(() => {
-    return mapToAnalyticsOverviewData(analyticsResponse?.data);
-  }, [analyticsResponse]);
+    return mapToAnalyticsOverviewData(
+      analyticsResponse?.data,
+      emergencyAnalyticsResponse?.data?.avgResponseTimeMinutes,
+    );
+  }, [analyticsResponse, emergencyAnalyticsResponse]);
 
   // Live active emergencies
   const { data: emergenciesResponse } = useGetEmergencies(

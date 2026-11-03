@@ -18,6 +18,7 @@ import {
 import { useGetDrivers } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 import { CreateDriverDialog } from "./dialogs/CreateDriverDialog";
+import { EditDriverDialog } from "./dialogs/EditDriverDialog";
 
 const SKELETON_ROWS = [
   "skel-driver-1",
@@ -155,7 +156,13 @@ export function DriversManagementView() {
                 scope="col"
                 className="text-xs font-semibold text-right"
               >
-                Trips Completed
+                Trips
+              </TableHead>
+              <TableHead
+                scope="col"
+                className="text-xs font-semibold text-right"
+              >
+                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -183,12 +190,15 @@ export function DriversManagementView() {
                   <TableCell className="text-right">
                     <div className="h-3.5 bg-muted animate-pulse rounded w-12 ml-auto" />
                   </TableCell>
+                  <TableCell className="text-right">
+                    <div className="h-7 bg-muted animate-pulse rounded w-16 ml-auto" />
+                  </TableCell>
                 </TableRow>
               ))
             ) : filteredDrivers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="py-12 text-center text-xs text-text-muted"
                 >
                   <UserCheck className="h-8 w-8 mx-auto mb-2 text-text-muted/40" />
@@ -260,6 +270,9 @@ export function DriversManagementView() {
                   </TableCell>
                   <TableCell className="text-right font-mono text-xs font-semibold text-text-primary">
                     {driver.totalTripsCompleted ?? 0}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <EditDriverDialog driver={driver} />
                   </TableCell>
                 </TableRow>
               ))

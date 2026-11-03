@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Pagination } from "@/components/common/Pagination";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { CancelEmergencyDialog } from "@/components/shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -243,6 +244,12 @@ export function EmergenciesListView() {
               <TableHead scope="col" className="text-xs font-semibold">
                 Logged At
               </TableHead>
+              <TableHead
+                scope="col"
+                className="text-xs font-semibold text-right"
+              >
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -273,60 +280,81 @@ export function EmergenciesListView() {
                   <TableCell>
                     <div className="h-4 w-20 bg-muted animate-pulse rounded-none" />
                   </TableCell>
+                  <TableCell className="text-right">
+                    <div className="h-6 w-16 bg-muted animate-pulse rounded-none ml-auto" />
+                  </TableCell>
                 </TableRow>
               ))
             ) : emergencies.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center py-10 text-xs text-text-muted"
                 >
                   No emergency incidents found matching this criteria.
                 </TableCell>
               </TableRow>
             ) : (
-              emergencies.map((em) => (
-                <TableRow
-                  key={em.id}
-                  className="hover:bg-primary-light/20 transition-colors"
-                >
-                  <TableCell className="font-mono text-xs font-semibold text-primary py-3">
-                    <div className="flex items-center gap-1.5">
-                      <AlertCircle
-                        className="h-3.5 w-3.5 text-primary shrink-0"
-                        aria-hidden="true"
-                      />
-                      {em.incidentNumber}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="font-mono text-[10px] font-semibold bg-muted text-text-secondary"
-                    >
-                      {em.emergencyType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <PriorityBadge priority={em.priority} />
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={em.status} />
-                  </TableCell>
-                  <TableCell className="text-xs text-text-secondary max-w-55 truncate">
-                    {em.locationAddress}
-                  </TableCell>
-                  <TableCell className="text-xs text-text-primary">
-                    <div className="font-medium">{em.callerName}</div>
-                    <div className="text-[11px] text-text-muted font-mono">
-                      {em.callerPhone}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-text-muted">
-                    {formatDate(em.createdAt, "dd MMM, hh:mm a")}
-                  </TableCell>
-                </TableRow>
-              ))
+              emergencies.map((em) => {
+                const isCancellable =
+                  em.status === EmergencyStatus.PENDING ||
+                  em.status === EmergencyStatus.PRIORITIZED ||
+                  em.status === EmergencyStatus.DISPATCHING ||
+                  em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
+
+                return (
+                  <TableRow
+                    key={em.id}
+                    className="hover:bg-primary-light/20 transition-colors"
+                  >
+                    <TableCell className="font-mono text-xs font-semibold text-primary py-3">
+                      <div className="flex items-center gap-1.5">
+                        <AlertCircle
+                          className="h-3.5 w-3.5 text-primary shrink-0"
+                          aria-hidden="true"
+                        />
+                        {em.incidentNumber}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="font-mono text-[10px] font-semibold bg-muted text-text-secondary"
+                      >
+                        {em.emergencyType}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <PriorityBadge priority={em.priority} />
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={em.status} />
+                    </TableCell>
+                    <TableCell className="text-xs text-text-secondary max-w-55 truncate">
+                      {em.locationAddress}
+                    </TableCell>
+                    <TableCell className="text-xs text-text-primary">
+                      <div className="font-medium">{em.callerName}</div>
+                      <div className="text-[11px] text-text-muted font-mono">
+                        {em.callerPhone}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-text-muted">
+                      {formatDate(em.createdAt, "dd MMM, hh:mm a")}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {isCancellable ? (
+                        <CancelEmergencyDialog
+                          emergencyId={em.id}
+                          incidentNumber={em.incidentNumber}
+                        />
+                      ) : (
+                        <span className="text-[11px] text-text-muted">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

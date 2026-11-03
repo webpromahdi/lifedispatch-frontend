@@ -72,3 +72,31 @@ export interface AnalyticsDateFilterParams {
   from?: string;
   to?: string;
 }
+
+export interface AnalyticsOverviewData {
+  liveOperations: {
+    activeEmergencies: number;
+    availableAmbulances: number;
+    busyAmbulances: number;
+    outOfService: number;
+    driversOnShift: number;
+  };
+  revenue: {
+    totalCollected: number;
+    totalPending: number;
+    currency: string;
+  };
+  historicStats: {
+    completed: number;
+    cancelled: number;
+    totalTrips: number;
+  };
+  emergencyAnalytics: {
+    avgResponseTimeMinutes: number | null;
+  };
+  usersAndResources: {
+    totalPatients: number;
+    totalDrivers: number;
+    totalHospitals: number;
+  };
+}

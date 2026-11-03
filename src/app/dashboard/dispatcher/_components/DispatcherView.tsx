@@ -5,7 +5,11 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PriorityBadge } from "@/components/common/PriorityBadge";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { RerouteHospitalDialog, TripDetailDialog } from "@/components/shared";
+import {
+  CancelEmergencyDialog,
+  RerouteHospitalDialog,
+  TripDetailDialog,
+} from "@/components/shared";
 import {
   formatEnumTitle,
   formatTime,
@@ -456,6 +460,12 @@ export function DispatcherView() {
                             em.status === EmergencyStatus.DISPATCHING ||
                             em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
 
+                          const isCancellable =
+                            em.status === EmergencyStatus.PENDING ||
+                            em.status === EmergencyStatus.PRIORITIZED ||
+                            em.status === EmergencyStatus.DISPATCHING ||
+                            em.status === EmergencyStatus.REASSIGNMENT_REQUIRED;
+
                           return (
                             <tr
                               key={em.id}
@@ -502,6 +512,12 @@ export function DispatcherView() {
                                     >
                                       Dispatch
                                     </button>
+                                  )}
+                                  {isCancellable && (
+                                    <CancelEmergencyDialog
+                                      emergencyId={em.id}
+                                      incidentNumber={em.incidentNumber}
+                                    />
                                   )}
                                 </div>
                               </td>
