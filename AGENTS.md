@@ -97,14 +97,20 @@ src/
 ```
 
 ### Important Coding Rules
-1. **Always read `node_modules/next/dist/docs/`** before writing any Next.js-specific code — this version has breaking changes.
+1. **Reading `node_modules/next/dist/docs/`** is strictly limited to new Next.js 16 routing/server APIs or build errors, and is completely skipped for styling, Tailwind CSS v4, shadcn/ui, or standard component updates.
 2. **Never use `credentials: "include"` manually** — the `apiClient` already sets this globally.
 3. **Role-to-URL mapping** lives in `LoginForm.tsx` → `getRoleDashboardPath()`. If new roles are added, update this function.
 4. **Sidebar nav** is role-aware via `usePathname()` — no prop drilling needed.
-5. **Topbar** currently shows hardcoded dummy user names — needs to be wired to `useGetMe()` in a future task.
+5. **Topbar** user data is dynamically wired to `useGetMe()` instead of hardcoded dummy names.
 6. **Dummy data** in `src/lib/dummy/` is used across all dashboards — all dashboards currently show UI with seed data, not real API data.
 7. **Biome** is the linter — run `npm run check` to auto-fix. Avoid `switch` case fall-through and unused variables.
 8. **Image hosting**: Remote images are loaded from `i.ibb.co` (configured in `next.config.ts`).
 9. **No authentication middleware** exists on the frontend yet — route protection (redirect unauthenticated users to `/login`) is a future task.
+
+### Agent Speed & Execution Rules
+- Read each target file completely in a single call instead of reading small line-range chunks.
+- Apply all changes to any given file in a single edit call rather than making multiple single-line edits.
+- Exclude `.next`, `node_modules`, `screenshots`, `logos`, and `public` directories from all searches.
+- Run `npm run check` (Biome) only once after finishing all file edits for a task, never after every individual file edit.
 
 <!-- END:lifedispatch-project-rules -->

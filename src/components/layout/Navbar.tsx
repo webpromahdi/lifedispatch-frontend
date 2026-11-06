@@ -82,6 +82,19 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
     const element = document.getElementById(id);
@@ -103,7 +116,7 @@ export function Navbar() {
         {/* ── Logo (left zone) ── */}
         <Link
           href="/"
-          className="flex items-center focus:outline-hidden shrink-0"
+          className="flex items-center outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs shrink-0"
           aria-label="LifeDispatch Home"
         >
           <Image
@@ -129,7 +142,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="py-1 hover:text-slate-900 transition-colors duration-150"
+              className="py-1 hover:text-slate-900 transition-colors duration-150 outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
             >
               {link.label}
             </a>
@@ -144,7 +157,7 @@ export function Navbar() {
               <div className="w-32 h-9.5 rounded-[3px] bg-slate-100/80 animate-pulse border-2 border-slate-200"></div>
             ) : authUser ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-slate-900 rounded-[3px] text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:translate-y-px hover:translate-x-px hover:shadow-[1px_1px_0px_0px_#0f172a] transition-all cursor-pointer outline-hidden">
+                <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-slate-900 rounded-[3px] text-slate-900 font-bold text-sm shadow-[2px_2px_0px_0px_#0f172a] hover:bg-slate-50 hover:translate-y-px hover:translate-x-px hover:shadow-[1px_1px_0px_0px_#0f172a] transition-all cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary">
                   <div className="w-6 h-6 bg-primary/10 text-primary flex items-center justify-center rounded-sm text-xs">
                     {userInitials}
                   </div>
@@ -204,7 +217,7 @@ export function Navbar() {
             aria-label={
               mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
             }
-            className="md:hidden min-h-11 min-w-11 p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-px active:translate-y-px active:shadow-none focus:outline-hidden flex items-center justify-center cursor-pointer transition-all"
+            className="md:hidden min-h-11 min-w-11 p-2 text-slate-900 bg-white border-2 border-slate-900 rounded-[3px] shadow-[2px_2px_0px_0px_#0f172a] active:translate-x-px active:translate-y-px active:shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary flex items-center justify-center cursor-pointer transition-all"
           >
             {mobileMenuOpen ? (
               <X
@@ -244,7 +257,7 @@ export function Navbar() {
                 key={item.id}
                 type="button"
                 onClick={() => scrollToSection(item.id)}
-                className="w-full text-left px-3 py-3 rounded-[3px] text-sm font-bold text-slate-700 hover:bg-slate-100 hover:text-primary transition-colors min-h-11 flex items-center cursor-pointer"
+                className="w-full text-left px-3 py-3 rounded-[3px] text-sm font-bold text-slate-700 hover:bg-slate-100 hover:text-primary transition-colors min-h-11 flex items-center cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
               >
                 {item.label}
               </button>

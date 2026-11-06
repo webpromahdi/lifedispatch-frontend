@@ -113,7 +113,7 @@ export function ResetPasswordForm() {
                         placeholder="e.g. 492815"
                         autoComplete="one-time-code"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent font-mono tracking-widest text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent font-mono tracking-widest text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                     </div>
                     <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
@@ -160,7 +160,7 @@ export function ResetPasswordForm() {
                         placeholder="Create new password"
                         autoComplete="new-password"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                       <button
                         type="button"
@@ -221,7 +221,7 @@ export function ResetPasswordForm() {
                         placeholder="Confirm new password"
                         autoComplete="new-password"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                       <button
                         type="button"

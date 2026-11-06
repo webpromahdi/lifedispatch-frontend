@@ -35,8 +35,9 @@ export interface TopbarProps {
 export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: meRes, isLoading } = useGetMe();
+  const { data: meRes, isLoading, isError } = useGetMe();
   const authUser = meRes?.data?.user || null;
+  const isUserLoading = isLoading || (!authUser && !isError);
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -82,19 +83,23 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
     greetingTime = "evening";
   }
 
-  const userName = authUser?.name ?? "–";
+  const userName = authUser?.name?.trim() || "User";
   const userRole = authUser?.role
     ? (ROLE_LABELS[authUser.role] ?? authUser.role)
-    : "–";
-  const userInitials = authUser
+    : "Member";
+  const userInitials = authUser?.name
     ? authUser.name
-        .split(" ")
+        .trim()
+        .split(/\s+/)
         .map((n: string) => n[0])
+        .filter(Boolean)
         .join("")
         .substring(0, 2)
         .toUpperCase()
-    : "–";
-  const firstName = authUser ? authUser.name.split(" ")[0] : "there";
+    : "U";
+  const firstName = authUser?.name
+    ? authUser.name.trim().split(/\s+/)[0]
+    : "there";
 
   return (
     <>
@@ -106,14 +111,14 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
             size="icon"
             onClick={onOpenMobileDrawer}
             aria-label="Open navigation menu"
-            className="lg:hidden min-h-11 min-w-11 text-text-primary hover:bg-muted rounded-none cursor-pointer"
+            className="lg:hidden min-h-11 min-w-11 text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </Button>
 
-          <h1 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight">
+          <h1 className="text-base sm:text-xl font-bold text-text-primary tracking-tight truncate max-w-35 sm:max-w-none">
             Good {greetingTime},{" "}
-            {isLoading ? (
+            {isUserLoading ? (
               <span className="inline-block w-24 h-5 bg-slate-200 animate-pulse rounded align-middle" />
             ) : (
               firstName
@@ -122,11 +127,16 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
         </div>
 
         {/* Right: Square Avatar + Name + Role + Dropdown Menu */}
-        <div className="flex items-center gap-3">
-          {isLoading ? (
-            <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {isUserLoading ? (
+            <div
+              className="flex items-center gap-2 sm:gap-3"
+              role="status"
+              aria-busy="true"
+            >
+              <span className="sr-only">Loading user profile</span>
               <div className="w-9 h-9 bg-slate-200 animate-pulse rounded-none shrink-0" />
-              <div className="flex flex-col gap-1">
+              <div className="hidden sm:flex flex-col gap-1.5">
                 <div className="w-24 h-3.5 bg-slate-200 animate-pulse rounded" />
                 <div className="w-16 h-3 bg-slate-100 animate-pulse rounded" />
               </div>
@@ -134,13 +144,13 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="flex items-center gap-3 p-1.5 hover:bg-slate-50 transition-colors cursor-pointer rounded-none outline-none focus-visible:ring-1 focus-visible:ring-primary border border-transparent hover:border-border"
+                className="flex items-center gap-2 sm:gap-3 p-1.5 hover:bg-slate-50 transition-colors cursor-pointer rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary border border-transparent hover:border-border"
                 aria-label="User profile and account options"
               >
                 <div className="w-9 h-9 bg-[#CCFBF1] text-primary-dark font-bold text-sm flex items-center justify-center rounded-none shrink-0 shadow-xs">
                   {userInitials}
                 </div>
-                <div className="flex flex-col text-left sm:flex">
+                <div className="hidden sm:flex flex-col text-left">
                   <span className="text-sm font-semibold text-text-primary leading-tight">
                     {userName}
                   </span>

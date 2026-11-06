@@ -145,7 +145,7 @@ export function LoginForm() {
                       placeholder="you@example.com"
                       autoComplete="off"
                       aria-invalid={isInvalid}
-                      className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                      className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                     />
                   </div>
                   {/* Teal corner notch */}
@@ -193,7 +193,7 @@ export function LoginForm() {
                       placeholder="Enter your password"
                       autoComplete="new-password"
                       aria-invalid={isInvalid}
-                      className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                      className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                     />
                     <button
                       type="button"

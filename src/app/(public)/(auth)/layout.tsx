@@ -9,14 +9,14 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-slate-50 relative flex flex-col overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-slate-50 relative flex flex-col overflow-x-hidden">
       {/* Full screen background image covering entire page background */}
       <div
         className="fixed inset-0 pointer-events-none select-none z-0"
         aria-hidden="true"
       >
         <Image
-          src="https://i.ibb.co.com/MyxnLRtc/Sunrise-Hospital-Arrival-with-Ambulance.png"
+          src="/images/auth-bg.webp"
           alt="Decorative background"
           fill
           priority

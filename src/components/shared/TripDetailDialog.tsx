@@ -325,7 +325,7 @@ export function TripDetailDialog({
                         <button
                           type="button"
                           onClick={() => setRerouteOpen(true)}
-                          className="font-bold underline cursor-pointer"
+                          className="font-bold underline cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                         >
                           Select Hospital Now
                         </button>

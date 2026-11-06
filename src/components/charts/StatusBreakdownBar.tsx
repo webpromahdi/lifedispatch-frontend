@@ -12,11 +12,11 @@ import {
 } from "recharts";
 
 const defaultData = [
-  { status: "Pending", count: 3, color: "#F59E0B" },
-  { status: "Assigned", count: 4, color: "#3B82F6" },
+  { status: "Pending", count: 3, color: "#94A3B8" },
+  { status: "Assigned", count: 4, color: "#64748B" },
   { status: "En Route", count: 6, color: "#8B5CF6" },
-  { status: "On Scene", count: 5, color: "#14B8A6" },
-  { status: "Transporting", count: 4, color: "#06B6D4" },
+  { status: "On Scene", count: 5, color: "#0D9488" },
+  { status: "Transporting", count: 4, color: "#14B8A6" },
   { status: "Handed Over", count: 8, color: "#22C55E" },
 ];
 

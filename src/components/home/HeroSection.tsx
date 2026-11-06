@@ -23,7 +23,7 @@ export function HeroSection() {
       {/* Subtle ambient teal background glow */}
       <div
         aria-hidden="true"
-        className="absolute -top-32 right-0 w-125 h-125 bg-primary-light/50 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-32 right-0 w-[500px] h-[500px] bg-primary-light/50 rounded-full blur-3xl pointer-events-none"
       />
 
       {/* ── Technical Wireframe & HUD Background Accents (From Reference Image) ── */}
@@ -33,7 +33,7 @@ export function HeroSection() {
       >
         {/* Top perimeter circuit line with 45° step notches */}
         <svg
-          className="absolute top-16 sm:top-17.5 left-0 w-full h-8 text-slate-200"
+          className="absolute top-16 sm:top-[70px] left-0 w-full h-8 text-slate-200"
           preserveAspectRatio="none"
           viewBox="0 0 1200 32"
           fill="none"
@@ -115,7 +115,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.16 }}
-              className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-125 font-normal"
+              className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-[500px] font-normal"
             >
               LifeDispatch connects patients, ambulances, dispatchers, and
               hospitals to coordinate emergency response in real time.
@@ -264,7 +264,7 @@ export function HeroSection() {
             </div>
 
             {/* Image Container with 45° Chamfered Corners & 2px Dark Border */}
-            <div className="relative w-full max-w-145 aspect-4/3 filter drop-shadow-[4px_4px_0px_#0f172a]">
+            <div className="relative w-full max-w-[580px] aspect-[4/3] drop-shadow-[4px_4px_0px_#0f172a]">
               {/* Dark border shell (2px outline via 2px padding on clipped container) */}
               <div
                 className="w-full h-full bg-slate-900 p-0.5"
@@ -282,13 +282,12 @@ export function HeroSection() {
                   }}
                 >
                   <Image
-                    src="https://i.ibb.co.com/M598dxsK/lifedispatch-hero-emergency-response.png"
+                    src="/images/hero-emergency-response.webp"
                     alt="Emergency response coordination in action"
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 580px"
                     className="object-cover"
                     priority
-                    unoptimized
                   />
                   {/* Subtle bottom contrast gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
@@ -302,7 +301,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.45, delay: 0.55 }}
               aria-hidden="true"
-              className="absolute -top-3 left-4 sm:-top-4 sm:left-2 z-20 pointer-events-none"
+              className="hidden sm:block absolute -top-3 left-4 sm:-top-4 sm:left-2 z-20 pointer-events-none"
             >
               {/* Structured UI Component with bottom-right chamfer and subtle depth */}
               <div
@@ -321,7 +320,7 @@ export function HeroSection() {
                 >
                   {/* Small vertical teal accent tab on top right */}
                   <span
-                    className="absolute top-0 right-0 w-2 h-4.5 bg-primary"
+                    className="absolute top-0 right-0 w-2 h-[18px] bg-primary"
                     style={{
                       clipPath:
                         "polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 4px))",
@@ -353,7 +352,7 @@ export function HeroSection() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               transition={{ duration: 0.45, delay: 0.68 }}
               aria-hidden="true"
-              className="absolute top-1/2 -translate-y-1/2 -right-3 sm:-right-6 z-20 pointer-events-none"
+              className="hidden sm:block absolute top-1/2 -translate-y-1/2 -right-3 sm:-right-6 z-20 pointer-events-none"
             >
               {/* Structured UI Component with technical chamfered corners and subtle depth */}
               <div
@@ -364,7 +363,7 @@ export function HeroSection() {
                 }}
               >
                 <div
-                  className="relative bg-white px-3 py-2 sm:px-3.5 sm:py-2.5 flex items-center gap-2.5 min-w-[135px] sm:min-w-[145px] overflow-hidden"
+                  className="relative bg-white px-3 py-2 sm:px-3.5 sm:py-2.5 flex items-center gap-2.5 min-w-33.75 sm:min-w-36.25 overflow-hidden"
                   style={{
                     clipPath:
                       "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px)",
@@ -404,7 +403,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.45, delay: 0.8 }}
               aria-hidden="true"
-              className="absolute -bottom-3 left-4 sm:-bottom-4 sm:left-4 z-20 pointer-events-none"
+              className="hidden sm:block absolute -bottom-3 left-4 sm:-bottom-4 sm:left-4 z-20 pointer-events-none"
             >
               {/* Structured UI Component with bottom-right chamfer and subtle depth */}
               <div
@@ -423,7 +422,7 @@ export function HeroSection() {
                 >
                   {/* Small vertical purple accent tab on top right */}
                   <span
-                    className="absolute top-0 right-0 w-2 h-4.5 bg-secondary"
+                    className="absolute top-0 right-0 w-2 h-[18px] bg-secondary"
                     style={{
                       clipPath:
                         "polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 4px))",

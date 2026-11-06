@@ -155,7 +155,7 @@ export function ChangePasswordDialog({
               <button
                 type="button"
                 onClick={() => setShowNewPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary cursor-pointer p-0.5"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary cursor-pointer p-0.5 rounded-xs outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label={showNewPassword ? "Hide password" : "Show password"}
               >
                 {showNewPassword ? (
@@ -193,7 +193,7 @@ export function ChangePasswordDialog({
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary cursor-pointer p-0.5"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary cursor-pointer p-0.5 rounded-xs outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label={
                   showConfirmPassword ? "Hide password" : "Show password"
                 }

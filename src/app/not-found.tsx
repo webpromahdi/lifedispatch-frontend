@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background text-text-primary flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-[100dvh] bg-background text-text-primary flex flex-col items-center justify-center p-6 text-center">
       <div className="h-16 w-16 rounded-2xl bg-primary-light text-primary flex items-center justify-center mb-6 shadow-xs">
         <AlertCircle className="h-8 w-8" aria-hidden="true" />
       </div>

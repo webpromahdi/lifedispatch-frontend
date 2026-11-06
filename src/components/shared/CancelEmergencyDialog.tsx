@@ -80,7 +80,7 @@ export function CancelEmergencyDialog({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="bg-transparent border-0 p-0 text-left cursor-pointer inline-flex"
+          className="bg-transparent border-0 p-0 text-left cursor-pointer inline-flex outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
         >
           {trigger}
         </button>
@@ -89,7 +89,7 @@ export function CancelEmergencyDialog({
           variant="outline"
           size="sm"
           onClick={() => setOpen(true)}
-          className="h-7 px-2 text-xs text-destructive hover:bg-destructive-bg border-destructive/20 gap-1 cursor-pointer"
+          className="min-h-11 md:min-h-7 h-9 md:h-7 px-2.5 md:px-2 text-xs text-destructive hover:bg-destructive-bg border-destructive/20 gap-1 cursor-pointer"
         >
           <Ban className="h-3 w-3" />
           Cancel

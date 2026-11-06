@@ -11,10 +11,9 @@ import {
   Loader2,
   Receipt,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { PriorityPieChart } from "@/components/charts/PriorityPieChart";
-import { StatusBreakdownBar } from "@/components/charts/StatusBreakdownBar";
 import { DataTable } from "@/components/common/DataTable";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
@@ -42,21 +41,86 @@ import {
 } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 
+const PriorityPieChart = dynamic(
+  () =>
+    import("@/components/charts/PriorityPieChart").then(
+      (mod) => mod.PriorityPieChart,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        role="status"
+        aria-label="Loading priority chart"
+        className="w-full h-72 sm:h-80 flex flex-col items-center justify-center bg-slate-50/60 border border-slate-200/70 rounded-md p-6"
+      >
+        <div className="relative flex items-center justify-center mb-4">
+          <div className="h-36 w-36 rounded-full border-16 border-slate-200 border-t-primary/40 animate-pulse" />
+          <div className="absolute text-[11px] font-mono text-slate-400">
+            LOADING
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+          <div className="h-2.5 w-14 bg-slate-200 rounded-full animate-pulse" />
+          <div className="h-2.5 w-16 bg-slate-200 rounded-full animate-pulse" />
+          <div className="h-2.5 w-12 bg-slate-200 rounded-full animate-pulse" />
+        </div>
+        <span className="sr-only">Loading priority distribution chart</span>
+      </div>
+    ),
+  },
+);
+
+const StatusBreakdownBar = dynamic(
+  () =>
+    import("@/components/charts/StatusBreakdownBar").then(
+      (mod) => mod.StatusBreakdownBar,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        role="status"
+        aria-label="Loading status breakdown chart"
+        className="w-full h-72 sm:h-80 flex flex-col items-center justify-center bg-slate-50/60 border border-slate-200/70 rounded-md p-6"
+      >
+        <div className="w-full max-w-xs h-36 flex items-end justify-between gap-3 px-4 pb-2 border-b border-slate-200 mb-4">
+          <div className="w-7 h-14 bg-slate-200/70 rounded-t-lg animate-pulse" />
+          <div className="w-7 h-24 bg-slate-200/80 rounded-t-lg animate-pulse" />
+          <div className="w-7 h-32 bg-slate-200 rounded-t-lg animate-pulse" />
+          <div className="w-7 h-20 bg-slate-200/70 rounded-t-lg animate-pulse" />
+          <div className="w-7 h-28 bg-slate-200/80 rounded-t-lg animate-pulse" />
+          <div className="w-7 h-16 bg-slate-200/60 rounded-t-lg animate-pulse" />
+        </div>
+        <div className="flex items-center justify-between w-full max-w-xs px-2">
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+          <div className="h-2 w-8 bg-slate-200 rounded animate-pulse" />
+        </div>
+        <span className="sr-only">Loading status breakdown chart</span>
+      </div>
+    ),
+  },
+);
+
 interface AnalyticsViewProps {
   userRole?: "SUPER_ADMIN" | "ADMIN";
 }
 
 const priorityColorMap: Record<string, string> = {
   P1_CRITICAL: "#EF4444",
-  P2_EMERGENCY: "#F97316",
-  P3_URGENT: "#EAB308",
-  P4_NON_URGENT: "#3B82F6",
-  P5_ROUTINE: "#64748B",
+  P2_EMERGENCY: "#8B5CF6",
+  P3_URGENT: "#14B8A6",
+  P4_NON_URGENT: "#64748B",
+  P5_ROUTINE: "#94A3B8",
 };
 
 const statusColorMap: Record<string, string> = {
-  PENDING: "#F59E0B",
-  PRIORITIZED: "#3B82F6",
+  PENDING: "#94A3B8",
+  PRIORITIZED: "#64748B",
   DISPATCHING: "#8B5CF6",
   ACTIVE_TRIP: "#14B8A6",
   COMPLETED: "#22C55E",
@@ -142,7 +206,7 @@ export function AnalyticsView({
     return filtered.map((s) => ({
       status: s.status.replace(/_/g, " "),
       count: s.count,
-      color: statusColorMap[s.status] || "#3B82F6",
+      color: statusColorMap[s.status] || "#14B8A6",
     }));
   }, [emergencyAnalytics]);
 

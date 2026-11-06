@@ -370,7 +370,7 @@ export function Sidebar({
       type="button"
       onClick={handleLogout}
       disabled={isLoggingOut}
-      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
     >
       <LogOut
         className="h-4 w-4 shrink-0 text-text-primary"
@@ -392,7 +392,7 @@ export function Sidebar({
         <div className="h-16 px-5 border-b border-border flex items-center justify-between shrink-0 bg-surface">
           <Link
             href="/"
-            className="flex items-center gap-2.5 focus:outline-hidden"
+            className="flex items-center gap-2.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
             onClick={onNavClick}
           >
             <Image
@@ -440,7 +440,7 @@ export function Sidebar({
                           : "Request emergency ambulance"
                       }
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 text-left cursor-pointer rounded-none",
+                        "w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 text-left cursor-pointer rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
                         hasActiveEmergency
                           ? "text-text-muted opacity-50 cursor-not-allowed"
                           : "text-text-secondary hover:text-text-primary hover:bg-sidebar-hover font-medium",
@@ -461,7 +461,7 @@ export function Sidebar({
                     href={item.href}
                     onClick={onNavClick}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 rounded-none",
+                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
                       isActive
                         ? "bg-primary-light text-primary-dark border-l-2 border-primary font-semibold"
                         : "text-text-secondary hover:text-text-primary hover:bg-slate-50 font-medium",
@@ -500,7 +500,7 @@ export function Sidebar({
                 : "Request urgent medical ambulance"
             }
             className={cn(
-              "w-full h-11 px-4 flex items-center justify-center gap-2.5 font-bold text-sm text-white select-none transition-all rounded-none",
+              "w-full h-11 px-4 flex items-center justify-center gap-2.5 font-bold text-sm text-white select-none transition-all rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
               hasActiveEmergency
                 ? "bg-slate-300 text-slate-500 cursor-not-allowed opacity-60 shadow-none"
                 : "bg-primary hover:bg-primary-dark active:translate-y-px shadow-sm cursor-pointer",

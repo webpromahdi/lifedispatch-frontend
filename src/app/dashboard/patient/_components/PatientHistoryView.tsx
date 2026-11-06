@@ -270,7 +270,7 @@ export function PatientHistoryView() {
                     return (
                       <Link
                         href={`/dashboard/patient/payment/${paymentId}`}
-                        className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-none hover:bg-primary-light cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-semibold px-3 py-1.5 rounded-none hover:bg-primary-light cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                       >
                         <Receipt className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>View Trip Invoice</span>

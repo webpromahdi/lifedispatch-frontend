@@ -11,10 +11,10 @@ import {
 
 const defaultData = [
   { name: "P1 Resuscitation", value: 3, color: "#EF4444" },
-  { name: "P2 Emergent", value: 5, color: "#F97316" },
-  { name: "P3 Urgent", value: 7, color: "#EAB308" },
-  { name: "P4 Less Urgent", value: 4, color: "#3B82F6" },
-  { name: "P5 Non-Urgent", value: 2, color: "#64748B" },
+  { name: "P2 Emergent", value: 5, color: "#8B5CF6" },
+  { name: "P3 Urgent", value: 7, color: "#14B8A6" },
+  { name: "P4 Less Urgent", value: 4, color: "#64748B" },
+  { name: "P5 Non-Urgent", value: 2, color: "#94A3B8" },
 ];
 
 interface PriorityPieChartProps {

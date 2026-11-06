@@ -42,6 +42,7 @@ const AUTH_EXEMPT_PATHS = [
   "/auth/refresh-token",
   "/auth/forgot-password",
   "/auth/reset-password",
+  "/auth/me",
 ];
 
 export async function apiClient<T = unknown, R extends ResponseType = "json">(

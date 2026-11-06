@@ -135,7 +135,7 @@ export default function LoginPage() {
                   Don&apos;t have an account?{" "}
                   <Link
                     href="/register"
-                    className="text-primary font-bold hover:text-primary-dark hover:underline transition-colors ml-0.5"
+                    className="inline-block py-2 -my-2 px-1 text-primary font-bold hover:text-primary-dark hover:underline transition-colors ml-0.5"
                   >
                     Register here
                   </Link>
@@ -210,7 +210,7 @@ export default function LoginPage() {
                       <Link
                         href={`?demo=${encodeURIComponent(role.name)}`}
                         scroll={false}
-                        className="mt-2.5 relative w-full h-10 min-h-10 group/btn flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
+                        className="mt-2.5 relative w-full h-11 min-h-11 group/btn flex items-center justify-center select-none active:translate-x-px active:translate-y-px hover:bg-transparent rounded-none p-0"
                       >
                         {/* Outer continuous dark border with 4-corner chamfer */}
                         <div

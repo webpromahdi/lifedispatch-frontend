@@ -618,7 +618,7 @@ export function PatientView() {
                   type="button"
                   onClick={() => setCancelDialogOpen(true)}
                   aria-label="Cancel Emergency"
-                  className="relative px-4 py-1.5 border-2 border-destructive text-destructive hover:bg-red-50 text-xs font-semibold rounded-none cursor-pointer transition-colors"
+                  className="relative min-h-12 px-5 py-2.5 flex items-center justify-center border-2 border-destructive text-destructive hover:bg-red-50 text-xs sm:text-sm font-semibold rounded-none cursor-pointer transition-colors"
                 >
                   <div
                     className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-destructive pointer-events-none"
@@ -686,7 +686,7 @@ export function PatientView() {
 
               <Link
                 href="/dashboard/patient/history"
-                className="w-full h-10 mt-2 bg-primary hover:bg-primary-dark active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none cursor-pointer shadow-xs"
+                className="w-full h-10 mt-2 bg-primary hover:bg-primary-dark active:translate-y-px text-white text-xs font-bold flex items-center justify-center gap-2 rounded-none cursor-pointer shadow-xs outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span>View Invoices & History</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -834,7 +834,7 @@ export function PatientView() {
                       <td className="py-3 pl-4 text-right">
                         <Link
                           href={`/dashboard/patient/history?search=${em.incidentNumber}`}
-                          className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-8 cursor-pointer"
+                          className="inline-flex items-center gap-1 border border-slate-300 px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-slate-50 transition-colors rounded-none min-h-11 md:min-h-8 cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                         >
                           <span>View</span>
                           <ArrowRight

@@ -17,12 +17,12 @@ export function DataTable({
   return (
     <div
       className={cn(
-        "w-full bg-surface border border-border rounded-none shadow-xs overflow-hidden flex flex-col",
+        "w-[calc(100%+2rem)] -mx-4 sm:w-full sm:mx-0 bg-surface border-y sm:border border-border rounded-none shadow-xs overflow-hidden flex flex-col",
         className,
       )}
     >
       {headerSlot && (
-        <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="px-4 py-4 sm:p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           {headerSlot}
         </div>
       )}
@@ -36,7 +36,7 @@ export function DataTable({
       </section>
 
       {footerSlot && (
-        <div className="p-3 border-t border-border bg-surface">
+        <div className="px-4 py-3 sm:p-3 border-t border-border bg-surface">
           {footerSlot}
         </div>
       )}

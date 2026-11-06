@@ -225,7 +225,7 @@ export function CreateEmergencyForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe symptoms, patient consciousness, and hazards..."
-          className="w-full text-base md:text-xs rounded-md border border-input bg-background p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary leading-relaxed"
+          className="w-full text-base md:text-xs rounded-md border border-input bg-background p-2.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary leading-relaxed"
           required
         />
       </div>

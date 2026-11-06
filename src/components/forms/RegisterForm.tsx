@@ -122,7 +122,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
                         placeholder="e.g. Nafisa Anjum"
                         autoComplete="name"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                     </div>
                     <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
@@ -169,7 +169,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
                         placeholder="you@example.com"
                         autoComplete="email"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                     </div>
                     <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
@@ -218,7 +218,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
                         placeholder="+880 1700-000000"
                         autoComplete="tel"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                       />
                     </div>
                     <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
@@ -267,7 +267,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
                           placeholder="Create password"
                           autoComplete="new-password"
                           aria-invalid={isInvalid}
-                          className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                          className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                         />
                         <button
                           type="button"
@@ -330,7 +330,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
                           placeholder="Confirm password"
                           autoComplete="new-password"
                           aria-invalid={isInvalid}
-                          className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
+                          className="w-full h-11 border-0 pl-2.5 pr-11 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none"
                         />
                         <button
                           type="button"
@@ -443,7 +443,7 @@ function DetailsForm({ onSuccess }: { onSuccess: (email: string) => void }) {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-primary font-bold hover:text-primary-dark hover:underline transition-colors ml-0.5"
+          className="inline-block py-2 -my-2 px-1 text-primary font-bold hover:text-primary-dark hover:underline transition-colors ml-0.5"
         >
           Sign In
         </Link>
@@ -577,7 +577,7 @@ function OtpForm({ email }: { email: string }) {
                         placeholder="000000"
                         autoComplete="one-time-code"
                         aria-invalid={isInvalid}
-                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none tracking-widest font-mono"
+                        className="w-full h-11 border-0 pl-2.5 pr-4 bg-transparent text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:border-0 aria-invalid:ring-0 aria-invalid:border-0 rounded-none tracking-widest font-mono"
                       />
                     </div>
                     <TealCornerNotch className="absolute top-0 right-0 w-3.5 h-3.5 text-primary pointer-events-none" />
