@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 import { useGetMe } from "@/hooks/auth.hook";
+import { useEmergencyAudio } from "@/hooks/useEmergencyAudio";
 import {
   useAppStore,
   useIsMobileDrawerOpen,
   useSetMobileDrawerOpen,
 } from "@/store/useAppStore";
+import { EmergencyAlertBanner } from "./EmergencyAlertBanner";
 import { MobileDrawer } from "./MobileDrawer";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
@@ -25,6 +27,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     useAppStore.persist.rehydrate();
   }, []);
+
+  // Coordinate siren audio lifecycle, autoplay-unlock flow, and pruning
+  useEmergencyAudio();
 
   // Redirect to login if the session check finished and no user was found
   useEffect(() => {
@@ -70,6 +75,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:pl-60 min-w-0 min-h-screen">
         <Topbar onOpenMobileDrawer={() => setMobileDrawerOpen(true)} />
+
+        {/* Global P1 Critical Emergency Alert Banner */}
+        <EmergencyAlertBanner />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full">{children}</div>

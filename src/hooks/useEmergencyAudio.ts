@@ -208,8 +208,14 @@ export function useEmergencyAudio() {
   useEffect(() => {
     if (!audioBlocked || isMuted || !isAuthorized || !hasHydrated) return;
 
-    const handleUserUnlock = (event: Event) => {
+    function removeListeners() {
+      window.removeEventListener("pointerdown", handleUserUnlock);
+      window.removeEventListener("keydown", handleUserUnlock);
+    }
+
+    function handleUserUnlock(event: Event) {
       // Contract: return early if the click occurred inside an acknowledge button
+      // An Acknowledge click must not consume or remove the unlock listener
       const target = event.target as HTMLElement | null;
       if (target?.closest("[data-alert-ack]")) {
         return;
@@ -218,6 +224,7 @@ export function useEmergencyAudio() {
       const audio = audioRef.current;
       // Do NOT start siren if nothing is pending and unacknowledged
       if (!audio || pendingCountRef.current === 0) {
+        removeListeners();
         setAudioBlocked(false);
         return;
       }
@@ -225,6 +232,7 @@ export function useEmergencyAudio() {
       audio
         .play()
         .then(() => {
+          removeListeners();
           setAudioPlaying(true);
           setAudioBlocked(false);
         })
@@ -234,30 +242,24 @@ export function useEmergencyAudio() {
               return;
             }
             if (err.name === "NotAllowedError") {
-              // Re-arm listener for next user interaction if still blocked
-              window.addEventListener("pointerdown", handleUserUnlock, {
-                once: true,
-              });
-              window.addEventListener("keydown", handleUserUnlock, {
-                once: true,
-              });
+              // Browser still blocked; keep listener registered
               return;
             }
             console.error("Emergency siren audio unlock play failed:", err);
           } else {
             console.error("Emergency siren audio unlock play failed:", err);
           }
+          removeListeners();
           setAudioBlocked(false);
           setAudioPlaying(false);
         });
-    };
+    }
 
-    window.addEventListener("pointerdown", handleUserUnlock, { once: true });
-    window.addEventListener("keydown", handleUserUnlock, { once: true });
+    window.addEventListener("pointerdown", handleUserUnlock);
+    window.addEventListener("keydown", handleUserUnlock);
 
     return () => {
-      window.removeEventListener("pointerdown", handleUserUnlock);
-      window.removeEventListener("keydown", handleUserUnlock);
+      removeListeners();
     };
   }, [
     audioBlocked,
