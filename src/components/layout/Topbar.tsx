@@ -1,7 +1,17 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, KeyRound, LogOut, Menu, ShieldAlert } from "lucide-react";
+import {
+  ChevronDown,
+  KeyRound,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ShieldAlert,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +27,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetMe, useLogout, useLogoutAll } from "@/hooks/auth.hook";
+import { useHasHydrated } from "@/hooks/useHasHydrated";
+import {
+  useIsEmergencySoundMuted,
+  useIsSidebarCollapsed,
+  useToggleEmergencySoundMuted,
+  useToggleSidebarCollapsed,
+} from "@/store/useAppStore";
 
 // Map API role values to human-readable display labels
 const ROLE_LABELS: Record<string, string> = {
@@ -38,6 +55,13 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
   const { data: meRes, isLoading, isError } = useGetMe();
   const authUser = meRes?.data?.user || null;
   const isUserLoading = isLoading || (!authUser && !isError);
+
+  const isSidebarCollapsed = useIsSidebarCollapsed();
+  const toggleSidebar = useToggleSidebarCollapsed();
+  const isEmergencySoundMuted = useIsEmergencySoundMuted();
+  const toggleEmergencySoundMuted = useToggleEmergencySoundMuted();
+  const hasHydrated = useHasHydrated();
+  const isCollapsed = hasHydrated && isSidebarCollapsed;
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -104,8 +128,8 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
   return (
     <>
       <header className="h-16 bg-white border-b border-border px-4 sm:px-8 flex items-center justify-between gap-4 sticky top-0 z-30 select-none">
-        {/* Left: Mobile Drawer Trigger + Greeting */}
-        <div className="flex items-center gap-3">
+        {/* Left: Mobile Drawer Trigger + Desktop Sidebar Toggle + Greeting */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -114,6 +138,21 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
             className="lg:hidden min-h-11 min-w-11 text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="hidden lg:inline-flex min-h-9 min-w-9 h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+            )}
           </Button>
 
           <h1 className="text-base sm:text-xl font-bold text-text-primary tracking-tight truncate max-w-35 sm:max-w-none">
@@ -126,8 +165,31 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
           </h1>
         </div>
 
-        {/* Right: Square Avatar + Name + Role + Dropdown Menu */}
+        {/* Right: Sound Mute Toggle + User Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Emergency Audio Siren Mute Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleEmergencySoundMuted}
+            aria-label={
+              isEmergencySoundMuted
+                ? "Unmute emergency sirens"
+                : "Mute emergency sirens"
+            }
+            title={
+              isEmergencySoundMuted
+                ? "Emergency siren audio is muted (click to unmute)"
+                : "Emergency siren audio is active (click to mute)"
+            }
+            className="min-h-9 min-w-9 h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {isEmergencySoundMuted ? (
+              <VolumeX className="h-4 w-4 text-text-muted" aria-hidden="true" />
+            ) : (
+              <Volume2 className="h-4 w-4 text-primary" aria-hidden="true" />
+            )}
+          </Button>
           {isUserLoading ? (
             <div
               className="flex items-center gap-2 sm:gap-3"

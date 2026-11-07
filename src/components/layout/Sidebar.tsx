@@ -22,8 +22,10 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useGetEmergencies } from "@/hooks";
 import { useLogout } from "@/hooks/auth.hook";
+import { useHasHydrated } from "@/hooks/useHasHydrated";
 import { EmergencyStatus } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
+import { useIsSidebarCollapsed } from "@/store/useAppStore";
 
 interface NavItem {
   label: string;
@@ -42,13 +44,20 @@ export interface SidebarProps {
   className?: string;
   onNavClick?: () => void;
   customNavSections?: NavSection[];
+  collapsed?: boolean;
 }
 
 export function Sidebar({
   className,
   onNavClick,
   customNavSections,
+  collapsed,
 }: SidebarProps) {
+  const storeCollapsed = useIsSidebarCollapsed();
+  const hasHydrated = useHasHydrated();
+  const isCollapsed =
+    collapsed !== undefined ? collapsed : hasHydrated && storeCollapsed;
+
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -370,53 +379,81 @@ export function Sidebar({
       type="button"
       onClick={handleLogout}
       disabled={isLoggingOut}
-      className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+      title={
+        isCollapsed ? (isLoggingOut ? "Logging out…" : "Logout") : undefined
+      }
+      className={cn(
+        "w-full flex items-center text-sm font-medium text-text-primary hover:text-destructive hover:bg-slate-50 transition-colors rounded-none min-h-11 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+        isCollapsed ? "justify-center px-0" : "gap-3 px-3 py-2",
+      )}
     >
       <LogOut
         className="h-4 w-4 shrink-0 text-text-primary"
         aria-hidden="true"
       />
-      <span>{isLoggingOut ? "Logging out…" : "Logout"}</span>
+      {!isCollapsed && <span>{isLoggingOut ? "Logging out…" : "Logout"}</span>}
     </button>
   );
 
   return (
     <aside
       className={cn(
-        "w-60 h-screen bg-sidebar border-r border-border flex flex-col justify-between shrink-0 select-none overflow-y-auto",
+        "h-screen bg-sidebar border-r border-border flex flex-col justify-between shrink-0 select-none overflow-y-auto overflow-x-hidden",
+        isCollapsed ? "w-16" : "w-60",
+        hasHydrated ? "transition-[width] duration-200" : "transition-none",
         className,
       )}
     >
       <div className="flex flex-col">
         {/* Brand Logo Header */}
-        <div className="h-16 px-5 border-b border-border flex items-center justify-between shrink-0 bg-surface">
+        <div
+          className={cn(
+            "h-16 border-b border-border flex items-center shrink-0 bg-surface",
+            isCollapsed ? "px-3 justify-center" : "px-5 justify-between",
+          )}
+        >
           <Link
             href="/"
             className="flex items-center gap-2.5 outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
             onClick={onNavClick}
+            title={isCollapsed ? "LifeDispatch Home" : undefined}
           >
-            <Image
-              src="/lifedispatch-logo-header.png"
-              alt="LifeDispatch"
-              width={140}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
+            {isCollapsed ? (
+              <Image
+                src="/lifedispatch-logo-mark.png"
+                alt="LifeDispatch"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain shrink-0"
+                priority
+              />
+            ) : (
+              <Image
+                src="/lifedispatch-logo-header.png"
+                alt="LifeDispatch"
+                width={140}
+                height={36}
+                className="h-8 w-auto object-contain"
+                priority
+              />
+            )}
           </Link>
         </div>
 
         {/* Nav Sections */}
         <nav
-          className="p-3 space-y-4"
+          className={cn("space-y-4", isCollapsed ? "p-2" : "p-3")}
           aria-label="Dashboard sidebar navigation"
         >
           {navSections.map((section) => (
             <div key={section.title || "section"} className="space-y-1">
-              {section.title && (
+              {section.title && !isCollapsed && (
                 <div className="px-3 pb-1 pt-2 text-[10px] font-bold tracking-wider text-text-muted uppercase">
                   {section.title}
                 </div>
+              )}
+              {section.title && isCollapsed && (
+                <div className="my-2 border-t border-border/60 mx-1" />
               )}
               {section.items.map((item) => {
                 const isActive =
@@ -437,10 +474,13 @@ export function Sidebar({
                       title={
                         hasActiveEmergency
                           ? "Active emergency in progress"
-                          : "Request emergency ambulance"
+                          : item.label
                       }
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 text-left cursor-pointer rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+                        "w-full flex items-center text-sm transition-all group min-h-11 text-left cursor-pointer rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+                        isCollapsed
+                          ? "justify-center px-0"
+                          : "gap-3 px-3 py-2.5",
                         hasActiveEmergency
                           ? "text-text-muted opacity-50 cursor-not-allowed"
                           : "text-text-secondary hover:text-text-primary hover:bg-sidebar-hover font-medium",
@@ -450,7 +490,9 @@ export function Sidebar({
                         className="h-4 w-4 shrink-0 transition-colors text-text-muted group-hover:text-text-primary"
                         aria-hidden="true"
                       />
-                      <span className="truncate">{item.label}</span>
+                      {!isCollapsed && (
+                        <span className="truncate">{item.label}</span>
+                      )}
                     </button>
                   );
                 }
@@ -460,8 +502,10 @@ export function Sidebar({
                     key={item.href}
                     href={item.href}
                     onClick={onNavClick}
+                    title={isCollapsed ? item.label : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 text-sm transition-all group min-h-11 rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+                      "flex items-center text-sm transition-all group min-h-11 rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+                      isCollapsed ? "justify-center px-0" : "gap-3 px-3 py-2.5",
                       isActive
                         ? "bg-primary-light text-primary-dark border-l-2 border-primary font-semibold"
                         : "text-text-secondary hover:text-text-primary hover:bg-slate-50 font-medium",
@@ -477,7 +521,9 @@ export function Sidebar({
                       )}
                       aria-hidden="true"
                     />
-                    <span className="truncate">{item.label}</span>
+                    {!isCollapsed && (
+                      <span className="truncate">{item.label}</span>
+                    )}
                   </Link>
                 );
               })}
@@ -488,7 +534,12 @@ export function Sidebar({
 
       {/* Bottom section */}
       {isPatient ? (
-        <div className="p-4 border-t border-border space-y-3 bg-white shrink-0">
+        <div
+          className={cn(
+            "border-t border-border space-y-3 bg-white shrink-0",
+            isCollapsed ? "p-2" : "p-4",
+          )}
+        >
           {/* Solid teal Request Emergency button */}
           <button
             type="button"
@@ -500,7 +551,8 @@ export function Sidebar({
                 : "Request urgent medical ambulance"
             }
             className={cn(
-              "w-full h-11 px-4 flex items-center justify-center gap-2.5 font-bold text-sm text-white select-none transition-all rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+              "w-full h-11 flex items-center justify-center font-bold text-sm text-white select-none transition-all rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+              isCollapsed ? "px-0" : "px-4 gap-2.5",
               hasActiveEmergency
                 ? "bg-slate-300 text-slate-500 cursor-not-allowed opacity-60 shadow-none"
                 : "bg-primary hover:bg-primary-dark active:translate-y-px shadow-sm cursor-pointer",
@@ -511,13 +563,18 @@ export function Sidebar({
             }}
           >
             <Ambulance className="w-5 h-5 shrink-0" aria-hidden="true" />
-            <span>Request Emergency</span>
+            {!isCollapsed && <span>Request Emergency</span>}
           </button>
 
           {logoutButton}
         </div>
       ) : (
-        <div className="p-4 border-t border-border bg-white shrink-0">
+        <div
+          className={cn(
+            "border-t border-border bg-white shrink-0",
+            isCollapsed ? "p-2" : "p-4",
+          )}
+        >
           {logoutButton}
         </div>
       )}

@@ -64,8 +64,7 @@ export const useToggleEmergencySoundMuted = () =>
 export const useSetEmergencySoundMuted = () =>
   useAppStore((state) => state.setEmergencySoundMuted);
 
-export const useTableDensity = () =>
-  useAppStore((state) => state.tableDensity);
+export const useTableDensity = () => useAppStore((state) => state.tableDensity);
 
 export const useSetTableDensity = () =>
   useAppStore((state) => state.setTableDensity);
@@ -74,11 +73,9 @@ export const useSetTableDensity = () =>
 export const useDismissedAlertIds = () =>
   useAppStore((state) => state.dismissedAlertIds);
 
-export const useAudioPlaying = () =>
-  useAppStore((state) => state.audioPlaying);
+export const useAudioPlaying = () => useAppStore((state) => state.audioPlaying);
 
-export const useAudioBlocked = () =>
-  useAppStore((state) => state.audioBlocked);
+export const useAudioBlocked = () => useAppStore((state) => state.audioBlocked);
 
 export const useSetAudioPlaying = () =>
   useAppStore((state) => state.setAudioPlaying);
@@ -86,8 +83,7 @@ export const useSetAudioPlaying = () =>
 export const useSetAudioBlocked = () =>
   useAppStore((state) => state.setAudioBlocked);
 
-export const useDismissAlert = () =>
-  useAppStore((state) => state.dismissAlert);
+export const useDismissAlert = () => useAppStore((state) => state.dismissAlert);
 
 export const useDismissAllAlerts = () =>
   useAppStore((state) => state.dismissAllAlerts);

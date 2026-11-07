@@ -453,7 +453,8 @@ Every source below was directly queried, fetched, and reviewed during research:
 2. **Sidebar Collapsed Visual Specification**:
    - In collapsed mode (`isSidebarCollapsed === true`), should the sidebar collapse to an icon-only dock (`w-16`) or hide entirely with an off-canvas drawer? *(Plan assumes an icon-only dock of `w-16` on desktop).*
 3. **Audio Asset Location**:
-   - Where will the emergency alert audio asset be hosted (static `/sounds/siren.mp3` in `public/` or synthesized via Web Audio API oscillator)?
+   - Audio path is hardcoded to `/sounds/emergency-siren.mp3`.
+   - **NOTE (Action Required by User)**: The file `public/sounds/emergency-siren.mp3` does not currently exist in the repository and must be supplied by the user. The audio hook contains a safe error listener that catches 404/decode failures gracefully without throwing unhandled exceptions.
 4. **Window Event Bus Cleanup**:
    - [`Sidebar.tsx`](file:///d:/level-2/lifedispatch/lifedispatch-frontend/src/components/layout/Sidebar.tsx#L86-L104) and [`PatientView.tsx`](file:///d:/level-2/lifedispatch/lifedispatch-frontend/src/app/dashboard/patient/_components/PatientView.tsx#L165-L186) currently use `window.CustomEvent` for `lifedispatch:emergency-status` and `lifedispatch:open-request-modal`. Should cleaning up this custom event bus in favor of TanStack Query cache derivation and a unified UI trigger be included when wiring the layout stores?
 

@@ -14,11 +14,12 @@ export function useHasHydrated(): boolean {
   );
 
   useEffect(() => {
-    const unsub = useAppStore.persist.onFinishHydration(() => setHydrated(true));
+    const unsub = useAppStore.persist.onFinishHydration(() =>
+      setHydrated(true),
+    );
     setHydrated(useAppStore.persist.hasHydrated());
     return () => unsub();
   }, []);
 
   return hydrated;
 }
-

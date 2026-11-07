@@ -5,9 +5,12 @@ import type React from "react";
 import { useEffect } from "react";
 import { useGetMe } from "@/hooks/auth.hook";
 import { useEmergencyAudio } from "@/hooks/useEmergencyAudio";
+import { useHasHydrated } from "@/hooks/useHasHydrated";
+import { cn } from "@/lib/utils";
 import {
   useAppStore,
   useIsMobileDrawerOpen,
+  useIsSidebarCollapsed,
   useSetMobileDrawerOpen,
 } from "@/store/useAppStore";
 import { EmergencyAlertBanner } from "./EmergencyAlertBanner";
@@ -18,6 +21,9 @@ import { Topbar } from "./Topbar";
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const mobileDrawerOpen = useIsMobileDrawerOpen();
   const setMobileDrawerOpen = useSetMobileDrawerOpen();
+  const isSidebarCollapsed = useIsSidebarCollapsed();
+  const hasHydrated = useHasHydrated();
+  const isCollapsed = hasHydrated && isSidebarCollapsed;
   const router = useRouter();
 
   const { data: meRes, isLoading, isError } = useGetMe();
@@ -73,7 +79,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:pl-60 min-w-0 min-h-screen">
+      <div
+        className={cn(
+          "flex-1 flex flex-col min-w-0 min-h-screen",
+          isCollapsed ? "lg:pl-16" : "lg:pl-60",
+          hasHydrated ? "transition-[padding] duration-200" : "transition-none",
+        )}
+      >
         <Topbar onOpenMobileDrawer={() => setMobileDrawerOpen(true)} />
 
         {/* Global P1 Critical Emergency Alert Banner */}

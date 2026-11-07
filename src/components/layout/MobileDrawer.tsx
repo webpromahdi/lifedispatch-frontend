@@ -77,6 +77,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             <Sidebar
               className="w-full border-r-0 h-full"
               onNavClick={onClose}
+              collapsed={false}
             />
           </motion.div>
         </div>

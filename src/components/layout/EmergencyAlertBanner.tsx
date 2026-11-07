@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  AlertTriangle,
-  MapPin,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { AlertTriangle, MapPin, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDerivedEmergencyAlert } from "@/hooks/useDerivedEmergencyAlert";
@@ -45,7 +40,10 @@ export function EmergencyAlertBanner() {
           {/* Left section: Alert header, Incident ID, Badge, and Message */}
           <div className="flex items-start gap-3 min-w-0">
             <div className="mt-0.5 p-1.5 rounded-lg bg-red-700/80 shrink-0 flex items-center justify-center animate-pulse">
-              <AlertTriangle className="w-5 h-5 text-white" aria-hidden="true" />
+              <AlertTriangle
+                className="w-5 h-5 text-white"
+                aria-hidden="true"
+              />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -89,12 +87,16 @@ export function EmergencyAlertBanner() {
 
               <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-red-50 font-medium">
                 <span className="capitalize">
-                  {activeEmergency.emergencyType.toLowerCase().replace(/_/g, " ")}
+                  {activeEmergency.emergencyType
+                    .toLowerCase()
+                    .replace(/_/g, " ")}
                 </span>
                 {activeEmergency.locationAddress && (
                   <span className="inline-flex items-center gap-1 truncate max-w-md text-red-100">
                     <MapPin className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{activeEmergency.locationAddress}</span>
+                    <span className="truncate">
+                      {activeEmergency.locationAddress}
+                    </span>
                   </span>
                 )}
                 {activeEmergency.description && (
@@ -136,4 +138,3 @@ export function EmergencyAlertBanner() {
     </aside>
   );
 }
-

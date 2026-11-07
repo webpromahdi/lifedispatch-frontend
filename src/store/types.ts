@@ -11,7 +11,7 @@ import type { UISlice } from "./slices/createUISlice";
  */
 export type BoundState = UISlice & PreferencesSlice & AlertSlice;
 
-export type { PreferencesSlice, AlertSlice, PersistedPreferences };
+export type { AlertSlice, PersistedPreferences, PreferencesSlice };
 
 export type SliceCreator<T> = StateCreator<
   BoundState,
