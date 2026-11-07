@@ -9,16 +9,14 @@ import { useAppStore } from "@/store/useAppStore";
  * Rehydration is executed exactly once in DashboardShell.
  */
 export function useHasHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(() =>
-    useAppStore.persist.hasHydrated(),
-  );
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const unsub = useAppStore.persist.onFinishHydration(() =>
+    const unsub = useAppStore.persist?.onFinishHydration?.(() =>
       setHydrated(true),
     );
-    setHydrated(useAppStore.persist.hasHydrated());
-    return () => unsub();
+    setHydrated(useAppStore.persist?.hasHydrated?.() ?? true);
+    return () => unsub?.();
   }, []);
 
   return hydrated;

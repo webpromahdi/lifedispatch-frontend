@@ -31,7 +31,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   // Rehydrate persisted preferences from localStorage exactly once on client mount
   useEffect(() => {
-    useAppStore.persist.rehydrate();
+    useAppStore.persist?.rehydrate?.();
   }, []);
 
   // Coordinate siren audio lifecycle, autoplay-unlock flow, and pruning

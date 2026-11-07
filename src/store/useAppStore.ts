@@ -1,9 +1,15 @@
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import { createAlertSlice } from "./slices/createAlertSlice";
 import { createPreferencesSlice } from "./slices/createPreferencesSlice";
 import { createUISlice } from "./slices/createUISlice";
 import type { BoundState, PersistedPreferences } from "./types";
+
+const dummyStorage = {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+};
 
 export const useAppStore = create<BoundState>()(
   devtools(
@@ -17,6 +23,9 @@ export const useAppStore = create<BoundState>()(
         name: "lifedispatch-preferences",
         version: 1,
         skipHydration: true,
+        storage: createJSONStorage(() =>
+          typeof window !== "undefined" ? window.localStorage : dummyStorage,
+        ),
         partialize: (state): PersistedPreferences => ({
           isSidebarCollapsed: state.isSidebarCollapsed,
           isEmergencySoundMuted: state.isEmergencySoundMuted,
