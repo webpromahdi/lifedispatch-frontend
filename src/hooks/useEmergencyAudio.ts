@@ -214,10 +214,10 @@ export function useEmergencyAudio() {
     }
 
     function handleUserUnlock(event: Event) {
-      // Contract: return early if the click occurred inside an acknowledge button
-      // An Acknowledge click must not consume or remove the unlock listener
+      // Contract: return early if the click occurred inside an acknowledge button or alert control (e.g. mute toggle)
+      // These clicks must not consume or remove the unlock listener or trigger siren audio
       const target = event.target as HTMLElement | null;
-      if (target?.closest("[data-alert-ack]")) {
+      if (target?.closest("[data-alert-ack], [data-alert-control]")) {
         return;
       }
 

@@ -379,6 +379,7 @@ export function Sidebar({
       type="button"
       onClick={handleLogout}
       disabled={isLoggingOut}
+      aria-label={isLoggingOut ? "Logging out…" : "Logout"}
       title={
         isCollapsed ? (isLoggingOut ? "Logging out…" : "Logout") : undefined
       }
@@ -471,6 +472,7 @@ export function Sidebar({
                       type="button"
                       onClick={handleTriggerEmergencyModal}
                       disabled={hasActiveEmergency}
+                      aria-label={item.label}
                       title={
                         hasActiveEmergency
                           ? "Active emergency in progress"
@@ -486,10 +488,18 @@ export function Sidebar({
                           : "text-text-secondary hover:text-text-primary hover:bg-sidebar-hover font-medium",
                       )}
                     >
-                      <Icon
-                        className="h-4 w-4 shrink-0 transition-colors text-text-muted group-hover:text-text-primary"
-                        aria-hidden="true"
-                      />
+                      <div className="relative inline-flex items-center justify-center">
+                        <Icon
+                          className="h-4 w-4 shrink-0 transition-colors text-text-muted group-hover:text-text-primary"
+                          aria-hidden="true"
+                        />
+                        {hasActiveEmergency && (
+                          <span
+                            className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </div>
                       {!isCollapsed && (
                         <span className="truncate">{item.label}</span>
                       )}
@@ -502,6 +512,7 @@ export function Sidebar({
                     key={item.href}
                     href={item.href}
                     onClick={onNavClick}
+                    aria-label={item.label}
                     title={isCollapsed ? item.label : undefined}
                     className={cn(
                       "flex items-center text-sm transition-all group min-h-11 rounded-none outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
@@ -545,6 +556,11 @@ export function Sidebar({
             type="button"
             onClick={handleTriggerEmergencyModal}
             disabled={hasActiveEmergency}
+            aria-label={
+              hasActiveEmergency
+                ? "Active emergency in progress"
+                : "Request urgent medical ambulance"
+            }
             title={
               hasActiveEmergency
                 ? "Active emergency in progress"
@@ -562,7 +578,16 @@ export function Sidebar({
                 "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
             }}
           >
-            <Ambulance className="w-5 h-5 shrink-0" aria-hidden="true" />
+            <div className="relative inline-flex items-center justify-center">
+              <Ambulance className="w-5 h-5 shrink-0" aria-hidden="true" />
+              {hasActiveEmergency && (
+                <span
+                  className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse ring-2 ring-white"
+                  aria-hidden="true"
+                  title="Active Emergency"
+                />
+              )}
+            </div>
             {!isCollapsed && <span>Request Emergency</span>}
           </button>
 

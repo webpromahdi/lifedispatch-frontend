@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { TableDensityToggle } from "@/components/common/DataTable";
 import { ChangePasswordDialog } from "@/components/shared/ChangePasswordDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
   const toggleEmergencySoundMuted = useToggleEmergencySoundMuted();
   const hasHydrated = useHasHydrated();
   const isCollapsed = hasHydrated && isSidebarCollapsed;
+  const isMuted = hasHydrated ? isEmergencySoundMuted : false;
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -145,6 +147,7 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
             size="icon"
             onClick={toggleSidebar}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-pressed={isCollapsed}
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="hidden lg:inline-flex min-h-9 min-w-9 h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           >
@@ -165,26 +168,29 @@ export function Topbar({ onOpenMobileDrawer }: TopbarProps) {
           </h1>
         </div>
 
-        {/* Right: Sound Mute Toggle + User Profile */}
+        {/* Right: Table Density + Sound Mute Toggle + User Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Table Density Selector */}
+          <TableDensityToggle className="hidden sm:inline-flex" />
+
           {/* Emergency Audio Siren Mute Toggle */}
           <Button
             variant="ghost"
             size="icon"
+            data-alert-control="true"
             onClick={toggleEmergencySoundMuted}
             aria-label={
-              isEmergencySoundMuted
-                ? "Unmute emergency sirens"
-                : "Mute emergency sirens"
+              isMuted ? "Unmute emergency sirens" : "Mute emergency sirens"
             }
+            aria-pressed={isMuted}
             title={
-              isEmergencySoundMuted
+              isMuted
                 ? "Emergency siren audio is muted (click to unmute)"
                 : "Emergency siren audio is active (click to mute)"
             }
             className="min-h-9 min-w-9 h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-muted rounded-none cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
           >
-            {isEmergencySoundMuted ? (
+            {isMuted ? (
               <VolumeX className="h-4 w-4 text-text-muted" aria-hidden="true" />
             ) : (
               <Volume2 className="h-4 w-4 text-primary" aria-hidden="true" />
