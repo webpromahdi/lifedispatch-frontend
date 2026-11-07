@@ -14,7 +14,11 @@ import type { EmergencyPriority } from "@/lib/types/enums";
 
 export function useGetEmergencies(
   params?: GetEmergenciesParams,
-  options?: { enabled?: boolean; refetchInterval?: number | false },
+  options?: {
+    enabled?: boolean;
+    refetchInterval?: number | false;
+    refetchIntervalInBackground?: boolean;
+  },
 ) {
   return useQuery({
     queryKey: ["emergencies", params],

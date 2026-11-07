@@ -5,6 +5,7 @@ import type React from "react";
 import { useEffect } from "react";
 import { useGetMe } from "@/hooks/auth.hook";
 import {
+  useAppStore,
   useIsMobileDrawerOpen,
   useSetMobileDrawerOpen,
 } from "@/store/useAppStore";
@@ -19,6 +20,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const { data: meRes, isLoading, isError } = useGetMe();
   const authUser = meRes?.data?.user || null;
+
+  // Rehydrate persisted preferences from localStorage exactly once on client mount
+  useEffect(() => {
+    useAppStore.persist.rehydrate();
+  }, []);
 
   // Redirect to login if the session check finished and no user was found
   useEffect(() => {

@@ -1,5 +1,4 @@
-import type { StateCreator } from "zustand";
-import type { BoundState } from "../types";
+import type { SliceCreator } from "../types";
 
 export interface UISlice {
   isMobileDrawerOpen: boolean;
@@ -7,9 +6,7 @@ export interface UISlice {
   toggleMobileDrawer: () => void;
 }
 
-export const createUISlice: StateCreator<BoundState, [], [], UISlice> = (
-  set,
-) => ({
+export const createUISlice: SliceCreator<UISlice> = (set) => ({
   isMobileDrawerOpen: false,
   setMobileDrawerOpen: (open: boolean) => set({ isMobileDrawerOpen: open }),
   toggleMobileDrawer: () =>
