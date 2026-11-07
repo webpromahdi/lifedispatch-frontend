@@ -288,7 +288,7 @@ export function Sidebar({
           items: [
             {
               label: "Payments",
-              href: "/dashboard/patient#payment",
+              href: "/dashboard/patient/history",
               icon: CreditCard,
             },
             {

@@ -25,6 +25,7 @@ export interface PatientPaymentViewProps {
 
 export function PatientPaymentView({ paymentId }: PatientPaymentViewProps) {
   const [selectedMethod, setSelectedMethod] = useState<string>("BKASH");
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const {
     data: paymentResponse,
@@ -72,11 +73,43 @@ export function PatientPaymentView({ paymentId }: PatientPaymentViewProps) {
     });
   };
 
-  const handleDownloadReceipt = () => {
+  const handleDownloadReceipt = async () => {
     if (!payment) return;
-    toast.success("Receipt Downloaded", {
-      description: `${payment.invoiceNumber}-receipt.pdf saved to downloads.`,
-    });
+    try {
+      setIsDownloading(true);
+      toast.info("Downloading receipt...", {
+        description: "Preparing your official medical dispatch invoice PDF.",
+      });
+
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+      const response = await fetch(`${baseUrl}/payment/${payment.id}/invoice`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Server failed to generate PDF.");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${payment.invoiceNumber}-receipt.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Receipt Downloaded", {
+        description: `${payment.invoiceNumber}-receipt.pdf saved to downloads.`,
+      });
+    } catch (err) {
+      console.error("PDF download failed, using print fallback:", err);
+      window.print();
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   if (isLoading) {
@@ -230,12 +263,13 @@ export function PatientPaymentView({ paymentId }: PatientPaymentViewProps) {
               <Button
                 variant="outline"
                 size="sm"
+                disabled={isDownloading}
                 onClick={handleDownloadReceipt}
                 aria-label={`Download PDF receipt for invoice ${payment.invoiceNumber}`}
                 className="h-8 text-xs cursor-pointer gap-1.5"
               >
                 <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Download PDF</span>
+                <span>{isDownloading ? "Downloading..." : "Download PDF"}</span>
               </Button>
             )}
           </div>
