@@ -324,8 +324,16 @@ function AmbulanceStatusCard({
         <div className="flex items-center gap-1.5 text-text-muted text-[11px]">
           <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
           <span>
-            GPS: {ambulance.baseLocationLat.toFixed(4)},{" "}
-            {ambulance.baseLocationLng.toFixed(4)}
+            GPS:{" "}
+            {ambulance.baseLocationLat != null &&
+            !Number.isNaN(Number(ambulance.baseLocationLat))
+              ? Number(ambulance.baseLocationLat).toFixed(4)
+              : "—"}
+            ,{" "}
+            {ambulance.baseLocationLng != null &&
+            !Number.isNaN(Number(ambulance.baseLocationLng))
+              ? Number(ambulance.baseLocationLng).toFixed(4)
+              : "—"}
           </span>
         </div>
 

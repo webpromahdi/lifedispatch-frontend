@@ -291,8 +291,15 @@ export function AmbulanceFleetView() {
                     )}
                   </TableCell>
                   <TableCell className="text-xs font-mono text-text-secondary">
-                    {amb.baseLocationLat.toFixed(4)},{" "}
-                    {amb.baseLocationLng.toFixed(4)}
+                    {amb.baseLocationLat != null &&
+                    !Number.isNaN(Number(amb.baseLocationLat))
+                      ? Number(amb.baseLocationLat).toFixed(4)
+                      : "—"}
+                    ,{" "}
+                    {amb.baseLocationLng != null &&
+                    !Number.isNaN(Number(amb.baseLocationLng))
+                      ? Number(amb.baseLocationLng).toFixed(4)
+                      : "—"}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={amb.status} />

@@ -173,9 +173,11 @@ export function AnalyticsView({
   // Real KPIs computed from backend analytics endpoints
   const totalEmergencies = emergencyAnalytics?.total ?? 0;
   const escalatedCount = emergencyAnalytics?.escalated ?? 0;
-  const avgResponseTime = emergencyAnalytics?.avgResponseTimeMinutes
-    ? `${emergencyAnalytics.avgResponseTimeMinutes.toFixed(1)} mins`
-    : "8.4 mins";
+  const avgResponseTime =
+    emergencyAnalytics?.avgResponseTimeMinutes != null &&
+    !Number.isNaN(Number(emergencyAnalytics.avgResponseTimeMinutes))
+      ? `${Number(emergencyAnalytics.avgResponseTimeMinutes).toFixed(1)} mins`
+      : "8.4 mins";
 
   const handoverSuccessRate = useMemo(() => {
     if (!overview?.historicStats) return "98.2%";

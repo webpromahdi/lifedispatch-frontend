@@ -58,4 +58,3 @@ export async function getAuthToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
   return cookieStore.get("accessToken")?.value;
 }
-
