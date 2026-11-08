@@ -45,7 +45,29 @@ export function LoginForm() {
       };
 
       login(loginData, {
-        onSuccess: async () => {
+        onSuccess: async (res) => {
+          const accessToken = res?.data?.accessToken;
+          const refreshToken = res?.data?.refreshToken;
+
+          if (accessToken) {
+            if (typeof window !== "undefined") {
+              localStorage.setItem("accessToken", accessToken);
+            }
+
+            try {
+              await fetch("/api/v1/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accessToken, refreshToken }),
+              });
+            } catch (err) {
+              console.error(
+                "Failed to sync session cookie to frontend domain:",
+                err,
+              );
+            }
+          }
+
           toast.success("Login Successful", {
             description: "Welcome back!",
           });

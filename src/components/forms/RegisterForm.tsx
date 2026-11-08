@@ -480,7 +480,25 @@ function OtpForm({ email }: { email: string }) {
       verifyEmailMutation(
         { email, otp: value.otp },
         {
-          onSuccess: () => {
+          onSuccess: async (res) => {
+            const accessToken = res?.data?.accessToken;
+            const refreshToken = res?.data?.refreshToken;
+
+            if (accessToken) {
+              if (typeof window !== "undefined") {
+                localStorage.setItem("accessToken", accessToken);
+              }
+              try {
+                await fetch("/api/v1/auth/session", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ accessToken, refreshToken }),
+                });
+              } catch {
+                // Non-critical session sync
+              }
+            }
+
             toast.success("Email Verified!", {
               description: "Your account is active. Please sign in.",
             });

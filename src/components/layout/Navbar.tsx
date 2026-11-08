@@ -14,6 +14,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { refreshToken as apiRefreshToken } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,6 +45,29 @@ export function Navbar() {
   const { data: meRes, isLoading } = useGetMe();
   const authUser = meRes?.data?.user || null;
   const { mutate: logoutMutate } = useLogout();
+
+  // Auto-sync frontend session cookies if user is authenticated on backend
+  useEffect(() => {
+    if (authUser && typeof window !== "undefined") {
+      const hasLocalToken = Boolean(localStorage.getItem("accessToken"));
+      const hasCookieToken = document.cookie.includes("ld_token=");
+      if (!hasLocalToken && !hasCookieToken) {
+        apiRefreshToken()
+          .then(async (res) => {
+            const token = res?.data?.accessToken;
+            if (token) {
+              localStorage.setItem("accessToken", token);
+              await fetch("/api/v1/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accessToken: token }),
+              });
+            }
+          })
+          .catch(() => {});
+      }
+    }
+  }, [authUser]);
 
   const getDashboardUrl = (role: string) => {
     switch (role) {

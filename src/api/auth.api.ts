@@ -48,11 +48,27 @@ export function getMe() {
   return apiClient<ApiResponse<{ user: User }>>("/auth/me", { method: "GET" });
 }
 
-export function logout() {
+export async function logout() {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("accessToken");
+    try {
+      await fetch("/api/v1/auth/session", { method: "DELETE" });
+    } catch {
+      // Ignore background cleanup failures
+    }
+  }
   return apiClient<ApiResponse<null>>("/auth/logout", { method: "POST" });
 }
 
-export function logoutAll() {
+export async function logoutAll() {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("accessToken");
+    try {
+      await fetch("/api/v1/auth/session", { method: "DELETE" });
+    } catch {
+      // Ignore background cleanup failures
+    }
+  }
   return apiClient<ApiResponse<null>>("/auth/logout-all", { method: "POST" });
 }
 

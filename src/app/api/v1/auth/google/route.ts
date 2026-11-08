@@ -58,5 +58,13 @@ export async function GET(request: NextRequest) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
+  response.cookies.set("ld_token", accessToken, {
+    httpOnly: false,
+    secure: isProduction,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24, // 24 hours
+  });
+
   return response;
 }

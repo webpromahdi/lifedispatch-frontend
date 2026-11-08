@@ -10,6 +10,26 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const rawClient = ofetch.create({
   baseURL: BASE_URL,
   credentials: "include",
+  onRequest({ options }) {
+    if (typeof window !== "undefined") {
+      let token = localStorage.getItem("accessToken");
+      if (!token) {
+        // Fallback: check document.cookie for ld_token
+        const match = document.cookie.match(/(?:^|;\s*)ld_token=([^;]+)/);
+        if (match) {
+          token = decodeURIComponent(match[1]);
+        }
+      }
+
+      if (token) {
+        const headers = new Headers(options.headers || {});
+        if (!headers.has("Authorization")) {
+          headers.set("Authorization", `Bearer ${token}`);
+        }
+        options.headers = headers;
+      }
+    }
+  },
 });
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -21,9 +41,27 @@ async function refreshTokens(): Promise<boolean> {
 
   refreshPromise = (async () => {
     try {
-      await rawClient("/auth/refresh-token", {
-        method: "POST",
-      });
+      const res = await rawClient<{ data?: { accessToken?: string } }>(
+        "/auth/refresh-token",
+        {
+          method: "POST",
+        },
+      );
+
+      const newAccessToken = res?.data?.accessToken;
+      if (newAccessToken && typeof window !== "undefined") {
+        localStorage.setItem("accessToken", newAccessToken);
+        try {
+          await fetch("/api/v1/auth/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accessToken: newAccessToken }),
+          });
+        } catch {
+          // Non-critical session sync failure
+        }
+      }
+
       return true;
     } catch {
       return false;

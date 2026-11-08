@@ -31,7 +31,22 @@ function parseJwtPayload(token: string): JwtPayload | null {
       return null;
     }
     const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const jsonStr = atob(base64);
+    const padded = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      "=",
+    );
+    const jsonStr =
+      typeof Buffer !== "undefined"
+        ? Buffer.from(padded, "base64").toString("utf-8")
+        : decodeURIComponent(
+            Array.prototype.map
+              .call(
+                atob(padded),
+                (c: string) =>
+                  `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`,
+              )
+              .join(""),
+          );
     return JSON.parse(jsonStr) as JwtPayload;
   } catch {
     return null;
