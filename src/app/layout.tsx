@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} font-sans`}
+      className={`${inter.variable} font-sans scroll-smooth`}
       suppressHydrationWarning
     >
       <body

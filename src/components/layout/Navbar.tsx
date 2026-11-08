@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useGetMe, useLogout } from "@/hooks/auth.hook";
 
+const navLinks = [
+  { label: "How It Works", href: "/#how-it-works", id: "how-it-works" },
+  { label: "Features", href: "/#features", id: "features" },
+  {
+    label: "Why LifeDispatch",
+    href: "/#why-lifedispatch",
+    id: "why-lifedispatch",
+  },
+];
+
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -100,6 +111,8 @@ export function Navbar() {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    } else {
+      router.push(`/#${id}`);
     }
   };
 
@@ -134,15 +147,17 @@ export function Navbar() {
           className="hidden md:flex items-center justify-center gap-8 text-[13.5px] font-medium text-slate-500"
           aria-label="Main Navigation"
         >
-          {[
-            { label: "Features", href: "#features" },
-            { label: "How It Works", href: "#how-it-works" },
-            { label: "Hospital Network", href: "#network" },
-          ].map((link) => (
+          {navLinks.map((link) => (
             <a
-              key={link.href}
+              key={link.id}
               href={link.href}
-              className="py-1 hover:text-slate-900 transition-colors duration-150 outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+              onClick={(e) => {
+                if (pathname === "/") {
+                  e.preventDefault();
+                  scrollToSection(link.id);
+                }
+              }}
+              className="py-1 hover:text-slate-900 transition-colors duration-150 outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-xs cursor-pointer"
             >
               {link.label}
             </a>
@@ -248,11 +263,7 @@ export function Navbar() {
             className="flex flex-col space-y-1"
             aria-label="Mobile Navigation"
           >
-            {[
-              { label: "Features", id: "features" },
-              { label: "How It Works", id: "how-it-works" },
-              { label: "Hospital Network", id: "network" },
-            ].map((item) => (
+            {navLinks.map((item) => (
               <button
                 key={item.id}
                 type="button"
